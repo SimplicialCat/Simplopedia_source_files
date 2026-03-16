@@ -1,0 +1,222 @@
+<style>
+  body:has(input[value="furina"]:checked) {
+    --article-max-width: 110ex; /* default: 90ex */
+
+    --color-Furina-deep-navy: #253085;
+    --color-Furina-royal-blue: #465BCF;
+    --color-Furina-aqua-cyan: #6AC6E8;
+    --color-Furina-frost-white: #FAFBFC;
+    --color-Furina-misty-blue: #C4D7ED;
+    --color-Furina-vivid-sapphire: #5670E9;
+    --color-Furina-luminous-hydro: #70DBFF;
+    --color-Furina-bright-periwinkle: #8DA4F1;
+    --color-Furina-vintage-gold: #BD9368;
+    --color-Furina-vintage-gold-light: #DDB368;
+    --color-Furina-vintage-gold-ultra-light: #FDF388;
+
+    --background-color: var(--color-Furina-frost-white);
+    --link-color: var(--color-Furina-vivid-sapphire);
+    --slug-color: var(--color-Furina-aqua-cyan);
+    --logo-color: var(--color-Furina-deep-navy);
+
+    --block-background-color: #FFFFFF;
+    --shadow-color: rgba(27, 63, 143, 0.06);
+    --radius: 5px;
+    --margin-left: 14px;
+
+    --hover-color-block: var(--block-background-color);
+    --logo-hover-color: #88d;
+    --span-taxon-color: #88d;
+    --article-taxon-color: #88d;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    body:has(input[value="furina"]:checked) {
+      --color-Furina-deep-navy: #B5C0F5;
+      --color-Furina-royal-blue: #D6EBFF;
+
+      --background-color: #2f2f2f;
+      --block-background-color: #3a3a3a;
+    }
+  }
+
+  .block {
+    border-radius: var(--radius);
+    background-color: var(--block-background-color);
+    box-shadow: 0 2px 12px var(--shadow-color);
+  }
+
+  .footnote-definition {
+    margin-left: var(--margin-left);
+  }
+
+  h5,
+  h6,
+  p {
+    margin-left: var(--marginl-eft);
+    margin-top: 0;
+  }
+
+  tr {
+    border-bottom: 1px solid var(--color-Furina-bright-periwinkle);
+  }
+
+  /* 可选：去除表头下方的重复横线（如果表头需要特殊样式） */
+  thead tr {
+    border-bottom: 2px solid var(--color-Furina-deep-navy);
+  }
+
+  /* 去除最后一行的边框 */
+  tbody tr:last-child {
+    border-bottom: none;
+  }
+
+  .footnote-definition>p {
+    display: inline;
+    margin-left: 0;
+    color: var(--color-Furina-bright-periwinkle);
+    font-size: small;
+  }
+
+  h2 {
+    font-weight: 750;
+    color: var(--color-Furina-deep-navy);
+    margin-bottom: 10px;
+    border-bottom: 1px solid #88d;
+    padding-bottom: 1px;
+    /* 增加底部内边距让横线和文字有间距 */
+  }
+
+  h2::before {
+    content: "\2726";
+    /* ✦ 的Unicode转义码 */
+    display: inline-block;
+    margin-right: 0.3em;
+    /*color: var(--color-Furina-vintage-gold-light);*/
+    /* 替换 color 属性，改为以下背景和裁剪属性 */
+    background: linear-gradient(150deg,
+        var(--color-Furina-vintage-gold-ultra-light) 30%,
+        var(--color-Furina-vintage-gold-light) 60%,
+        var(--color-Furina-vintage-gold) 90%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    /* 将文字颜色设为透明以显示背景 */
+    /* 组合径向渐变（中心高光）和线性渐变（基础色调） */
+    /*background: radial-gradient(
+      ellipse at center,
+      var(--color-Furina-vintage-gold-ultra-light) 20%,
+      transparent 70%
+    ),
+    linear-gradient(
+      to bottom,
+      var(--color-Furina-vintage-gold-light),
+      var(--color-Furina-vintage-gold)
+    );
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent; */
+    filter: drop-shadow(0px 1px 1px rgba(184, 150, 131, 0.5));
+    /* 可选：增加与主色呼应的柔和投影 */
+    font-weight: normal;
+  }
+
+
+  h3 {
+    font-weight: 700;
+    color: var(--color-Furina-royal-blue);
+    margin-bottom: 5px;
+  }
+
+  h3::before {
+    content: "\2726";
+    /* ✦ 的Unicode转义码 */
+    display: inline-block;
+    margin-left: 0.06em;
+    margin-right: 0.36em;
+    /*color: var(--color-Furina-vintage-gold-ultra-light);*/
+    background: linear-gradient(150deg,
+        var(--color-Furina-vintage-gold-ultra-light) 20%,
+        var(--color-Furina-vintage-gold-light) 90%,
+        var(--color-Furina-vintage-gold) 95%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    font-weight: normal;
+  }
+
+  h4 {
+    text-indent: var(--marginleft);
+    font-weight: 700;
+    color: #696cd9;
+    margin-bottom: 0;
+  }
+
+  h5 {
+    text-indent: var(--marginleft);
+    font-weight: 700;
+    color: #8a8ff4;
+    margin-bottom: 0;
+  }
+
+  h6 {
+    text-indent: var(--marginleft);
+    font-weight: 700;
+    color: #aaaff4;
+    margin-bottom: 0;
+  }
+
+
+  @media only screen and (max-width: 1000px) {
+    #grid-wrapper>nav {
+      display: none !important;
+    }
+  }
+
+  #toc,
+  #toc .block {
+    background: none !important;
+    box-shadow: none !important;
+  }
+
+  ul {
+    margin: 0 0 0 0;
+    list-style-type: none;
+  }
+
+  ul li {
+    margin-bottom: 8px;
+    padding-left: 16px;
+    position: relative;
+    /*color: var(--text-secondary);*/
+  }
+
+  ul li::before {
+    content: '✦';
+    position: absolute;
+    left: 0;
+    top: 0.2em;
+    /*color: var(--color-Furina-vintage-gold-ultra-light);*/
+    font-size: 0.9em;
+  }
+
+  .metadata li::before {
+    content: none;
+  }
+
+  .music-player button {
+    text-decoration: none;
+  }
+
+  .music-player button:hover {
+    text-decoration: underline;
+    text-decoration-color: var(--color-Furina-vintage-gold-light);
+    /* 金色 */
+    text-underline-offset: 6px;
+    /* 调整下划线与文字距离 */
+    text-decoration-thickness: 1px;
+    /* 线条粗细 */
+  }
+</style>
+
+<theme-option name="furina" style="display: none;">furina</theme-option>

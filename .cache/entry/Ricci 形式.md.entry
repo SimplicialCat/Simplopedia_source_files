@@ -1,1 +1,0 @@
-{"metadata":{"title":[{"Plain":"“Ricci 形式”"},1],"taxon":[{"Plain":"Wiki. "},2],"slug":[{"Plain":"Ricci 形式"},0]},"content":{"Plain":"\n<h2>定义</h2>\n<p>[Kähler 流形](Kähler 流形.md)上的 Ricci 形式为\n$$\r\n\\frac{\\sqrt{-1}}{2\\pi}R_{i\\bar j} dz^i \\wedge d\\bar z^{j}\r\n$$</p>\n<h2>相关概念</h2>\n"}}

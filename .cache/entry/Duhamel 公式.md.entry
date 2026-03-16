@@ -1,1 +1,0 @@
-{"metadata":{"title":[{"Plain":"“Duhamel 公式”"},1],"slug":[{"Plain":"Duhamel 公式"},0],"taxon":[{"Plain":"Wiki. "},2]},"content":{"Plain":"\n<p>设 $A_z$ 是 $\\operatorname{End}(V)$ 中的单参数曲线, 则\n$$\r\n\\frac{d}{dz}e^{-tA_z} = - \\int_0^t e^{-(t-s)A_z} \\frac{dA_z}{dz} e^{-sA_z} \\,ds.\r\n$$</p>\n"}}
