@@ -1,0 +1,1 @@
+{"metadata":{"slug":[{"Plain":"集合 (同伦类型论)"},0],"taxon":[{"Plain":"Wiki. "},2],"title":[{"Plain":"“集合 (同伦类型论)”"},1]},"content":{"Lazy":[{"Plain":"\n<p>#同伦类型论</p>\n<h2>定义</h2>\n<p>在同伦类型论中, 若类型 $A$ 满足对任意 $x,y\\colon A$, 任意 $p,q\\colon x=y$, 都有 $p=q$, 则称 $A$ 为集合.</p>\n<h2>例</h2>\n<p>"},{"Local":{"url":"单点","text":"单点 (同伦类型论)"}},{"Plain":"是集合.</p>\n"}]}}

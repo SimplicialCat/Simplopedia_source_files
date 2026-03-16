@@ -1,0 +1,1 @@
+{"metadata":{"title":[{"Plain":"“环路 Lie 代数”"},1],"taxon":[{"Plain":"Wiki. "},2],"slug":[{"Plain":"环路 Lie 代数"},0]},"content":{"Lazy":[{"Plain":"\n<p>$$\r\nL\\mathfrak g := \\mathfrak g\\otimes k[t,t^{-1}]\r\n$$\n另一种定义是\n$$\r\nL\\mathfrak g := \\mathfrak g\\otimes_k k((t))\r\n$$</p>\n<p>"},{"Local":{"url":"环路群","text":"环路群"}},{"Plain":"</p>\n"}]}}

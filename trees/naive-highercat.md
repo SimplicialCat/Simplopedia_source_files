@@ -1,0 +1,46 @@
+---
+title : 一种朴素的建立高阶范畴的尝试
+taxon : 笔记
+author: [SimplicialCat](SimplicialCat.md)
+---
+
+[高阶范畴](高阶范畴.md)的概念长久以来缺乏实用的数学基础. 这里实用的意思是, 在严格性的前提下, 贴合实际应用中人们的直觉.
+
+所以我尝试根据所学为高阶范畴写出一套自洽的基础, 争取让每一条规则都 "理所当然", 即在任何人设计的理论中都不可能错误; 然后用这些事实搭建出尽量多熟悉的理论.
+
+建立高阶范畴使用的框架是某种[同伦类型论](同伦类型论.md), 包括使用嵌套的[宇宙](宇宙.md)层级, 允许高阶归纳类型等特性. 下面除非必要, 我们将省略宇宙这一参数. 为了照顾人类读者, 我们将较多地使用自然语言; 但读者应能将其翻译为类型论语言.
+
+---
+
+## 基础
+
+`高阶范畴的类型` 设有两个宇宙 $\mathsf{Type} : \mathsf{Type}'$. 我们将用一个 (巨大无比的) 归纳类型来定义**高阶范畴的类型** $\mathsf{Cat} : \mathsf{Type}'$, 同时定义许多其它类型. 称 $\mathcal C : \mathsf{Cat}$ 为**高阶范畴**, 或简称**范畴**.
+
+`对象的类型` 对于一个高阶范畴 $\mathcal C : \mathsf{Cat}$, 可取出其**对象的类型** $\operatorname{Obj}\mathcal C : \mathsf{Type}$. 称 $X : \operatorname{Obj}\mathcal C$ 为高阶范畴 $\mathcal C$ 的**对象**. 为了方便, 我们将用 $X : \mathcal C$ 来代替 $X : \operatorname{Obj}\mathcal C$, 希望这不会引起歧义.
+
+`范畴的范畴` 设有三个宇宙 $\mathsf{Type} : \mathsf{Type}' : \mathsf{Type}''$, 对应地有范畴的类型 $\mathsf{Cat} : \mathsf{Type}'$, $\mathsf{Cat}' : \mathsf{Type}''$. 那么有一个范畴 $\mathfrak{Cat} : \mathsf{Cat}'$, 称为**范畴的范畴**; 其对象的类型 $\operatorname{Obj}\mathfrak {Cat} : \mathsf{Type}'$ 等于 $\mathsf{Cat} : \mathsf{Type}'$. 为了方便, 以后我们将写 $\mathsf{Cat} : \mathsf{Cat}'$.
+
+`态射范畴` 对于高阶范畴 $\mathcal C : \mathsf{Cat}$ 的对象 $X,Y : \mathcal C$, 可取出**态射范畴** $\operatorname{Hom}_{\mathcal C}(X,Y) : \mathsf{Cat}$, 或简记为 $\mathcal C(X,Y)$.
+
+**例** (函子范畴). 对于高阶范畴 $\mathcal C,\mathcal D : \mathsf{Cat}$, 态射范畴 $\mathsf{Cat}(\mathcal C,\mathcal D) : \mathsf{Cat}$ 又称为**函子范畴** $\mathsf{Fun}(\mathcal C,\mathcal D) : \mathsf{Cat}$. 函子范畴的对象 $f : \mathsf{Fun}(\mathcal C,\mathcal D)$ 称为 $\mathcal C$ 到 $\mathcal D$ 的**函子**, 简记为 $f \colon  \mathcal C \to \mathcal D$. 多元函子如 $f \colon \mathcal C \to \mathsf{Fun}(\mathcal D,\mathcal E)$ 简记为 $f \colon \mathcal C \to \mathcal D \to \mathcal E$ (符号 "$\to$" 是右结合的, 遵从类型论的习惯).
+
+`函子作用于对象` 对于高阶范畴 $\mathcal C,\mathcal D : \mathsf{Cat}$, 函子 $f\colon \mathcal C\to \mathcal D$, 以及对象 $X : \mathcal C$, 有对象 $f(X) : \mathcal D$.
+
+`函子作用于态射` 对于高阶范畴 $\mathcal C,\mathcal D : \mathsf{Cat}$, 函子 $f\colon \mathcal C\to \mathcal D$, 以及对象 $X,Y : \mathcal C$, 有函子 $f_{X,Y} \colon \mathcal C(X,Y) \to \mathcal D(f(X),f(Y))$.
+
+`对偶` 对于高阶范畴 $\mathcal C : \mathsf{Cat}$ 有**对偶** $\mathcal C^{\mathrm{op}} : \mathsf{Cat}$, 其对象的类型 $\operatorname{Ob}\mathcal C^{\mathrm{op}}$ 等于 $\operatorname{Ob}\mathcal C$, 且对于 $X,Y : \mathcal C$, 态射范畴 $\mathcal C^{\mathrm{op}}(X,Y)$ 等于 $\mathcal C (Y,X)$.
+
+`态射函子` 对高阶范畴 $\mathcal C : \mathsf{Cat}$ 有**态射函子** ${\mathcal C}(-,-) \colon \mathcal C^{\mathrm{op}} \to \mathcal C \to \mathsf{Cat}$.
+
+**注**. 我们没有规定态射可以复合, 因为 ${\mathcal C}(-,-)$ 的函子性已经保证了这件事.
+
+**定理** (态射的复合). 对高阶范畴 $\mathcal C : \mathsf{Cat}$ 的对象 $X,Y,Z : \mathcal C$, 有 $(- \circ -)\colon \mathcal C(Y,Z) \to \mathcal C(X,Y) \to \mathcal C(X,Z)$.
+
+_证明_. 函子 $\mathcal C(X,-)\colon \mathcal C \to\mathsf{Cat}$ 作用于态射上, 给出 $\mathcal C(Y,Z) \to \mathsf{Cat}(\mathcal C(X,Y),\mathcal{C}(X,Z))$.
+
+`类型作为范畴` 对任意类型 $A : \mathsf{Type}$ 有一个范畴 $\operatorname{toCat} A : \mathsf{Cat}$; 为了方便, 仍记作 $A : \mathsf{Cat}$. 这种范畴又称为**生象**. 类型 $A$ 作为范畴, 其对象的类型 $\operatorname{Ob}A$ 等于 $A$ 自身. 对于 $A$ 的对象 $X,Y : A$, 态射范畴 $A(X,Y)$ 等于等式类型 $X =_A Y$ 对应的生象. 对任意范畴 $\mathcal C : \mathsf{Cat}$, 函子的类型 $\operatorname{Ob}\mathsf{Fun}(A,\mathcal C)$ 等于函数类型 $A \to \operatorname{Ob}\mathcal C$.
+
+**例** (单点). 单点类型 $1 : \mathsf{Type}$ 作为范畴, 其有一个对象 $\star : 1$.
+
+## 可表现范畴
+

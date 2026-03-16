@@ -1,0 +1,1 @@
+{"metadata":{"slug":[{"Plain":"Noether 环"},0],"title":[{"Plain":"“Noether 环”"},1],"taxon":[{"Plain":"Wiki. "},2]},"content":{"Plain":"\n<p>Noether 环是满足升链性质的环. (这里的环是指交换环.)</p>\n<h2>例</h2>\n<ul>\n<li>若 $R$ 是 Noether 环, 则 $R[x]$ 是 Noether 环.</li>\n<li>Noether 环的商是 Noether 环.</li>\n<li>Noether 环的局部化是 Noether 环.</li>\n<li>[Artin 环](Artin 环.md)是 Noether 环.</li>\n</ul>\n"}}

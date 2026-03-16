@@ -1,0 +1,28 @@
+[kodama]
+trees = "trees"
+assets = "assets"
+base-url = "./"
+
+[toc]
+placement = "right"
+sticky = true
+mobile-sticky = true
+max-width = "max-content"
+
+[text]
+toc = "目录"
+references = "参考资料"
+backlinks = "反向链接"
+
+[build]
+typst-root = "./"
+short-slug = true
+pretty-urls = false
+footer-mode = "embed"
+inline-css = false
+output = "D:/Simplopedia"
+
+[serve]
+edit = "vscode://file/"
+output = "./.cache/publish"
+command = ["miniserve", "<output>", "--index", "index.html", "--pretty-urls"]

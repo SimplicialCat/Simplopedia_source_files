@@ -1,0 +1,7 @@
+---
+title: 对象的生象
+taxon: 百科
+author: [SimplicialCat](SimplicialCat.md)
+---
+
+$(\infty ,1)$-范畴 $\mathcal C$ 的**对象的生象**, 又称其**极大子 $\infty$-群胚**, 是 "去除 $\mathcal C$ 中所有不可逆态射" 所得的 $(\infty ,0)$-范畴.

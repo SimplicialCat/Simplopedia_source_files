@@ -1,0 +1,1 @@
+{"metadata":{"slug":[{"Plain":"Dirac 算子"},0],"title":[{"Plain":"“Dirac 算子”"},1],"taxon":[{"Plain":"Wiki. "},2]},"content":{"Plain":"\n<h2>定义</h2>\n<p>设 $E$ 是 $\\mathbb Z_2$-分次向量丛. 对于 $E$ 上的微分算子 $D$, 若 $D$ 反转奇偶, 且 $D^2$ 为[广义 Laplace 算子](广义 Laplace 算子.md), 则称 $D$ 为 Dirac 算子.</p>\n"}}

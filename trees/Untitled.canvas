@@ -1,0 +1,12 @@
+{
+	"nodes":[
+		{"id":"f2a9ea94a4d12576","x":240,"y":-280,"width":250,"height":60,"type":"text","text":"类型论"},
+		{"id":"f47c9054fa5df6e3","x":-482,"y":-105,"width":250,"height":60,"type":"text","text":"一阶逻辑"},
+		{"id":"09f3578a33215a79","x":-80,"y":-105,"width":250,"height":60,"type":"text","text":"简单类型论 (STT)"},
+		{"id":"91cff911af3854c1","x":-120,"y":60,"width":250,"height":60,"type":"text","text":"Peano 算术 (PA)"}
+	],
+	"edges":[
+		{"id":"c2fbe827e9b494d2","fromNode":"f2a9ea94a4d12576","fromSide":"bottom","toNode":"09f3578a33215a79","toSide":"top"},
+		{"id":"ea942c0d0a67994d","fromNode":"09f3578a33215a79","fromSide":"bottom","toNode":"91cff911af3854c1","toSide":"top"}
+	]
+}

@@ -1,0 +1,2179 @@
+\documentclass{book}
+\usepackage[UTF8]{ctex}
+
+
+\usepackage{hyperref}
+
+% 哲思
+
+\newcommand{\philoquote}[2]{
+	~\\
+	\begin{center}
+		\begin{minipage}{0.7\linewidth}
+			{\quad\sffamily #1}\\
+			\begin{flushright}
+				\textsf{#2}
+			\end{flushright}
+		\end{minipage}
+	\end{center}
+	~\\
+}
+
+% 页边距
+\usepackage{geometry}
+\geometry{
+	b5paper,
+	left=15mm,
+	right=15mm,
+	top=20mm,
+	bottom=20mm
+}
+
+% 页眉与页脚样式
+\usepackage{fancyhdr}
+
+\newcommand{\chaptert}{}
+\newcommand{\sectiont}{}
+
+\renewcommand{\chaptermark}[1]{\renewcommand{\chaptert}{第\ \thechapter\ 章\ #1}}
+\renewcommand{\sectionmark}[1]{\renewcommand{\sectiont}{\thesection\ #1}}
+
+\fancypagestyle{plain}{
+	\fancyhf{}
+	\renewcommand{\headrulewidth}{0pt}
+	\renewcommand{\footrulewidth}{0pt}
+	\fancyfoot[LE,RO]{\thepage}
+}
+
+\fancypagestyle{Jfancy}{
+	\fancyhead[LE]{\chaptert{}}
+	\fancyhead[RO]{\sectiont{}}
+	\fancyhead[RE,LO]{}
+	\fancyfoot[C]{}
+	\fancyfoot[LE,RO]{\thepage}
+	\renewcommand{\headrulewidth}{0.4pt}% Line at the header visible
+	\renewcommand{\footrulewidth}{0pt}% Line at the footer visible
+}
+
+\pagestyle{Jfancy}
+
+% 章节样式
+\usepackage{titlesec}
+\titleformat{\chapter}{\huge\bfseries}{第\, \thechapter\, 章}{1em}{}
+
+\usepackage{amsthm, amsmath, amssymb}
+
+\usepackage{enumerate}
+
+\usepackage{tikz}
+\usetikzlibrary{cd}
+
+
+\newcommand{\mathrm{op}}{\mathrm{op}}
+\newcommand{\yo}{\mathbf{y}}
+
+\newcommand{\ringedlocale}{\mathsf{RingLoc}}
+\newcommand{\elements}{\mathsf{Elts}}
+\newcommand{\internalhom}{\mathcal{H}om}
+\newcommand{\requiresAC}{{\color{red}\fbox{本证明依赖选择公理}}}
+
+\newcommand{\Gm}{\mathbb{G}_{\mathrm{m}}}
+
+\input{colorboxes}
+
+\usepackage{biblatex}
+\addbibresource{ntg.bib}
+
+\newcommand{\todo}[1]{{\color{blue}\fbox{TODO: \textbf{#1}}}}
+
+\begin{document}
+	
+	
+	\title{几何学家眼中的数论}
+	
+	\author{\emph{王进一}}
+	
+	\date{2025年春}
+	
+	\maketitle
+	
+	\newpage
+	
+	\section*{计划}
+	
+	是不是要先明白一个整体域对应其整数环的谱, 然后引入位的概念 (谱的点?), 然后引入分解群与惯性群, 定义分歧性, 然后引入 Frobenius
+	
+	用 Kahler 微分定义非分歧性
+	
+	分歧性的函子式刻画: \url{https://stacks.math.columbia.edu/tag/024Q}
+	
+%	\section*{Deepseek 的启示:《几何学家眼中的数论》框架建议}
+%	
+%	\subsection*{第一部分：基础与动机}
+%	\begin{enumerate}
+%		\item \textbf{数论与几何的交汇}
+%		\begin{itemize}
+%			\item 历史背景：从费马大定理到算术几何的崛起
+%			\item 核心问题：如何用几何工具研究素数分布、方程整数解等数论问题？
+%			\item 几何哲学：局部 - 整体原理、空间化代数结构（如将数域视为“点”、扩张视为“覆盖”）
+%		\end{itemize}
+%		\item \textbf{代数数论速览}
+%		\begin{itemize}
+%			\item 数域、整数环、素理想的分解（Dedekind 域）
+%			\item \textbf{示例}：二次域 \(\mathbb{Q}(\sqrt{d})\) 的素理想分解
+%			\item 分解群与惯性群：动力学的初步几何化（群作用对应覆盖变换）
+%		\end{itemize}
+%		\item \textbf{几何语言入门}
+%		\begin{itemize}
+%			\item 代数曲线与函数域：将数域类比为曲线（如 \(\text{Spec } \mathcal{O}_K\) 的几何）
+%			\item 覆盖空间与分歧：复分析中的分支覆盖（如 \(z \mapsto z^n\) 的分歧点）
+%			\item \textbf{可视化}：黎曼面的覆盖映射，强调单值化与分支行为
+%		\end{itemize}
+%	\end{enumerate}
+%	
+%	\subsection*{第二部分：分歧理论——数论与几何的桥梁}
+%	\begin{enumerate}
+%		\setcounter{enumi}{3}
+%		\item \textbf{分歧的代数定义与几何直观}
+%		\begin{itemize}
+%			\item \textbf{数论侧}：分歧指数、判别式、惯性次数；Kummer 与 Dedekind 判别法
+%			\item \textbf{几何侧}：覆盖映射的临界点、纤维结构（如 \(\text{Spec } \mathcal{O}_L \to \text{Spec } \mathcal{O}_K\) 的奇点）
+%			\item \textbf{对应案例}：二次扩张 \(\mathbb{Q}(i)/\mathbb{Q}\) 中素数 2 的分歧 vs. 映射 \(w = z^2\) 在 \(z = 0\) 的分支
+%		\end{itemize}
+%		\item \textbf{局部视角下的分歧}
+%		\begin{itemize}
+%			\item 完备化与局部域：\(\mathbb{Q}_p\) 作为“解析邻域”
+%			\item Hensel 引理的几何解读：牛顿迭代法作为局部提升性质
+%			\item \textbf{分歧的局部不变量}：ramification filtration（高阶分歧群与几何中接触阶数的类比）
+%		\end{itemize}
+%		\item \textbf{几何模型与分歧}
+%		\begin{itemize}
+%			\item 椭圆曲线的 bad reduction：素数的分歧如何对应曲线模 \(p\) 的奇点
+%			\item \textbf{示例}：椭圆曲线 \(y^2 = x^3 + ax + b\) 在分歧素数处的约化行为
+%			\item 概形论观点：分歧在纤维 \(\mathfrak{p} \times_{\mathcal{O}_K} \mathcal{O}_L\) 中的表现
+%		\end{itemize}
+%	\end{enumerate}
+%	
+%	\subsection*{第三部分：进阶与延伸}
+%	\begin{enumerate}
+%		\setcounter{enumi}{6}
+%		\item \textbf{类域论的几何启示}
+%		\begin{itemize}
+%			\item 分歧控制与类域的构造：如何通过限制分歧得到 Abel 扩张
+%			\item 几何类比：覆叠空间分类与分歧数据的对应（Riemann - Hurwitz 公式的算术版本）
+%		\end{itemize}
+%		\item \textbf{全局与局部的互动}
+%		\begin{itemize}
+%			\item 分歧的上同调表述：Étale 上同调中的局部 - 全局原理
+%			\item \textbf{案例研究}：Größencharakter 与 L - 函数的几何起源
+%		\end{itemize}
+%		\item \textbf{现代视角：非阿基米德几何}
+%		\begin{itemize}
+%			\item Berkovich 空间中的分歧：用“树”结构可视化分歧层级
+%			\item Perfectoid 空间：大分歧扩张的几何化（如无穷分歧的 \(\mathbb{Q}_p(\mu_{p^\infty})\)）
+%		\end{itemize}
+%	\end{enumerate}
+%	
+%	\subsection*{第四部分：应用与前景}
+%	\begin{enumerate}
+%		\setcounter{enumi}{9}
+%		\item \textbf{分歧在当代数论中的角色}
+%		\begin{itemize}
+%			\item 模形式与 Galois 表示：分歧素数如何影响模形式空间的结构
+%			\item 算术几何中的未解问题：如 ABC 猜想中的分歧控制思想
+%		\end{itemize}
+%		\item \textbf{教学法附录}
+%		\begin{itemize}
+%			\item 如何用绘图软件可视化分歧（如 Mathematica 绘制覆盖映射的分支点）
+%			\item 习题精选：从计算具体扩张的分歧到几何模型的构造
+%		\end{itemize}
+%	\end{enumerate}
+%	
+%	\section*{关键设计思路}
+%	\begin{itemize}
+%		\item \textbf{几何直观先行}：每引入数论概念后，立即用几何对象（曲线、覆盖、奇点）对比阐释。
+%		\item \textbf{案例驱动}：通过具体数域（如二次域、分圆域）和几何映射（如幂函数、椭圆曲线约化）贯穿理论。
+%		\item \textbf{技术分层}：将高级工具（如概形、上同调）放在后半部分，确保初学者可通过前几章建立直觉。
+%	\end{itemize}
+	
+	\chapter{动机}
+	
+	写这本笔记的动机是允许我使用几何的眼光看待如下的事实.
+	
+	\begin{example}
+		{($\mathbb{Q}(i)/\mathbb{Q}$ 的分歧)}
+		域扩张 $\mathbb{Q}(i)/\mathbb{Q}$ 在素理想 $2$ 处分歧, 这个事实对应于映射 $\operatorname{Spec}\mathbb{Z}[i] \to \operatorname{Spec}\mathbb{Z}$ 在 $2$ 处有奇点. 映射 $\operatorname{Spec}\mathbb{Z}[i] \to \operatorname{Spec}\mathbb{Z}$ 在 $2$ 处的纤维为 $\operatorname{Spec} \mathbb F_2[x]/(x^2)$.
+		对比在奇素数 $p(\equiv 1\mod 4)$ 处的纤维为 $\operatorname{Spec} \mathbb F_p \sqcup \operatorname{Spec} \mathbb F_p$, 在奇素数 $p(\equiv 3\mod 4)$ 处的纤维为 $\operatorname{Spec} \mathbb F_{p^2}$.
+	\end{example}
+	
+	\begin{example}
+		{($\mathbb{Q}(\zeta_N)/\mathbb{Q}$ 的分歧)}
+		域扩张 $\mathbb{Q}(\zeta_N)/\mathbb{Q}$ 在素理想 $p$ 处分歧当且仅当 $p|N$.
+	\end{example}
+	
+	\begin{example}
+		{}
+		$
+		\operatorname{Gal}(\mathbb Q^{\mathrm{ab}}/\mathbb{Q}) 
+		$
+		同构于
+		$
+		\mathbb{Q}^\times \backslash \mathbb A_{\mathbb{Q}}^\times
+		$
+		的连通分支构成的群.
+		一般地,
+		对于数域 $F$,
+		$
+		\operatorname{Gal}(F^{\mathrm{ab}}/F) 
+		$
+		同构于
+		$
+		F^\times \backslash \mathbb A_{F}^\times
+		$
+		的连通分支构成的群.
+	\end{example}
+	
+	\chapter{函子式代数几何}
+	
+	代数几何起源于\footnote{这里所说的并非历史, 而是后人梳理出的一条逻辑上最自然的脉络.}这样一个见解: 代数对象 (如环) 与几何对象 (如拓扑空间) 之间存在某种对偶关系.
+	每个环都应当视为某个空间上的函数环, 这个空间即所谓仿射概形.
+	
+	代数几何的基本概念是概形. 概形有两种逻辑上等价但直观截然不同的定义:
+	\begin{itemize}
+		\item 作为局部同构于仿射概形的局部环化空间,
+		\item 作为环范畴到集合范畴的满足条件的函子 (定义 \ref{scheme-definition}).
+	\end{itemize}
+	前者是多数经典教材 (如 Hartshorne) 使用的定义, 而后者是 Grothendieck 学派的观点, 也是更贴近现代数学实践的观点, 而它没有在教科书上得到强调仅仅是历史的原因.
+	出于作者的私心, 也为了补全教材的遗憾, 本章中我们将尽可能以后一种定义为基础引入代数几何的语言.
+	
+	\section{仿射概形}
+	
+	这里所指的环是含幺交换环, 其中 $1$ 可能等于 $0$. 若 $1=0$, 则环中所有元素都等于 $0$, 记这个环为 $0$.
+	
+	粗略地说, 对于环 $A$, 我们希望有一个空间 $\operatorname{Spec} A$ 使得 $A$ 的元素可视为 $\operatorname{Spec} A$ 上的函数.
+	这里, ``函数'' 不是指 $\mathbb{R}$-值或任何确定的东西上取值的函数, 而是一个纯粹形式上的概念, 我们仅仅希望它满足如下性质:
+	\begin{itemize}
+		\item 对于空间之间的映射 $X\to Y$, 由 $Y$ 上的函数可得 $X$ 上的函数.
+	\end{itemize}
+	换言之, ``空间'' 与 ``空间上的函数'' 之间的对应是一个反变函子.
+	
+	\begin{definition}
+		[label={definition-affine-scheme}]
+		{(仿射概形)}
+		定义仿射概形的范畴为环范畴的对偶范畴:
+		$$
+		\mathsf{Aff} := \mathsf{Ring}^{\mathrm{op}}.
+		$$
+		环 $A$ 在对偶范畴中对应仿射概形 $\operatorname{Spec} A$.
+	\end{definition}
+	
+	需要强调的是 $\operatorname{Spec} A$ 是一个形式的记号, 它不是一个拓扑空间 (至少暂时不是).
+	
+	由定义,
+	\begin{itemize}
+		\item 对于仿射概形之间的映射 $\operatorname{Spec} A\to \operatorname{Spec} B$, 由 $B$ 的元素可得 $A$ 的元素.
+	\end{itemize}
+	这正是我们期望的.
+	
+	\begin{prop}
+		[label={aff-basic-cat-prop}]
+		{}
+		\begin{itemize}
+			\item $\mathsf{Aff}$ 具有始对象 $\varnothing := \operatorname{Spec} 0$.
+			\item $\mathsf{Aff}$ 具有终对象 $\operatorname{Spec}\mathbb{Z}$.
+			\item $\mathsf{Aff}$ 中存在推出, 对应于 $\mathsf{Ring}$ 中的拉回:
+			$$
+			\operatorname{Spec} A\sqcup_{\operatorname{Spec} B}\operatorname{Spec} C\simeq\operatorname{Spec} (A\times_B C).
+			$$
+			\item $\mathsf{Aff}$ 中存在拉回 (纤维积), 对应于 $\mathsf{Ring}$ 中的推出 (张量积):
+			$$
+			\operatorname{Spec} A\times_{\operatorname{Spec} B}\operatorname{Spec} C \simeq \operatorname{Spec} (A\otimes_B C).
+			$$
+		\end{itemize}
+	\end{prop}
+	\begin{proof}
+		这是因为仿射概形的范畴是环范畴的对偶 (定义 \ref{definition-affine-scheme}), 环范畴具有终对象 $0$ 和始对象 $\mathbb{Z}$, 具有拉回和推出.
+	\end{proof}
+	
+	\begin{example}
+		{}
+		在 $\mathsf{Ring}$ 中有 $\mathbb F_2 \otimes_{\mathbb{Z}} \mathbb F_3 \simeq 0$, 故在 $\mathsf{Aff}$ 中有 $\operatorname{Spec} \mathbb F_2\times_{\operatorname{Spec}\mathbb{Z}}\operatorname{Spec}\mathbb F_3\simeq \varnothing$. 
+	\end{example}
+	
+	\begin{example}
+		{(Galois 扩张对应主丛)}
+		设 $k$ 为域, $a\in k^\times$ 非平方, $K=k[t]/(t^2-a)$ 为二次扩域. 例如 $k=\mathbb{R},K=\mathbb{C}$.
+		那么 $\operatorname{Spec} K\to\operatorname{Spec} k$ 是 $\mathbb{Z}/2\mathbb{Z}$-主丛. 我们来解释这句话的意思.
+		
+		首先, $\operatorname{Spec} K$ 上有一个 $\mathbb{Z}/2\mathbb{Z}$-作用
+		$$
+		\operatorname{Spec} K\times \mathbb{Z}/2\mathbb{Z} \simeq^{\text{\emph{注}}} \operatorname{Spec} K \sqcup \operatorname{Spec} K \to \operatorname{Spec} K
+		$$
+		(\emph{注}. 这里 ${-}\times \mathbb{Z}/2\mathbb{Z}$ 可以理解为 ${-}\times_{\operatorname{Spec} k}(\operatorname{Spec} k \sqcup \operatorname{Spec} k \simeq \operatorname{Spec} k^2)$.)
+		它就是 $K$ 上的 Galois 群的作用
+		$$
+		K \to K^2, \quad x\mapsto (x,\bar x),
+		$$
+		其中 $x\mapsto \bar x$ 是 $K$ 上的自同构 $t\mapsto -t$.
+		
+		进一步, 有同构
+		$$
+		\operatorname{Spec} K\times\mathbb{Z}/2\mathbb{Z} \overset{\simeq}{\longrightarrow}\operatorname{Spec} K \times_{\operatorname{Spec} k}\operatorname{Spec} K.
+		$$
+		其中两个分量分别为投影和 Galois 群作用.
+		换言之, 环同态
+		$$
+		K\otimes_k K\to K^2,\quad x\otimes y\mapsto (xy,x\bar y)
+		$$
+		为同构.
+	\end{example}
+	
+	\begin{example}
+		{(仿射群概形)}
+		$\mathsf{Aff}$ 中的乘积对应 $\mathsf{Ring}$ 中的余积, 即张量积. 因此 $\mathsf{Aff}$ 中的群对象 $\operatorname{Spec} A$ 相当于环 $A$ 带有一个余结合的 ``余乘法'' $m\colon A\to A\otimes A$ 以及 ``余单位'' $A\to\mathbb{Z}$ (两个映射均为环同态). 这个结构又称为\emph{交换 Hopf 代数}.
+	\end{example}
+	
+	\begin{example}
+		{(仿射直线与仿射空间)}
+		称仿射概形 $\mathbb A^1:=\operatorname{Spec}\mathbb{Z}[x]$ 为\emph{仿射直线} (affine line).
+		对任意仿射概形 $\operatorname{Spec} A$,
+		映射 $\operatorname{Spec} A \to \mathbb A^1$ 等同于环同态 $\mathbb{Z}[x] \to A$, 因而等同于环 $A$ 的元素. 某种意义上这解释了 ``$A$ 的元素等同于 $\operatorname{Spec} A$ 上的函数'' 的直观.
+		
+		更一般地, 定义 $n$ 维\emph{仿射空间} (affine space) $\mathbb A^n$ 为 $\operatorname{Spec}\mathbb{Z}[x_1,\cdots,x_n]$. 因为 $n$ 元多项式环是 $n$ 个 $\mathbb{Z}[x]$ 的张量积, 所以在 $\mathsf{Aff}$ 中有 $\mathbb A^n\simeq (\mathbb A^1)^n$.
+		对任意仿射概形 $\operatorname{Spec} A$,
+		一个映射 $\operatorname{Spec} A \to \mathbb A^n$ 等同于环 $A$ 的 $n$ 个元素.
+		
+		值得注意的是, $\mathbb A^1$ 是 $\mathsf{Aff}$ 中的环对象, 其加法和乘法映射 $+,\times\colon \mathbb A^2\to \mathbb A^1$ 分别对应 $\operatorname{Spec}\mathbb{Z}[x]$ 到 $\operatorname{Spec} \mathbb{Z}[y,z]$ 的环同态 $x\mapsto y+z$ 和 $x\mapsto yz$.
+	\end{example}
+	
+%	\begin{example}
+%		{}
+%		对于环 $A$,
+%		有 $\operatorname{Spec} A \times \mathbb A^1 \simeq\operatorname{Spec} A$
+%	\end{example}
+	
+	\begin{example}
+		{(环上的仿射空间)}
+		给定环 $R$, 定义 $R$ 上的 $n$ 维仿射空间为
+		$$\mathbb A^n_R := \mathbb A^1\times\operatorname{Spec} R \simeq \operatorname{Spec} R[x_1,\cdots,x_n].$$
+		因为 $R[x,y]\simeq R[x]\otimes_R R[y]$, 有 $\mathbb A^2_R \simeq \mathbb A^1_R\times_{\operatorname{Spec} R}\mathbb A^1_R$.
+		在以 $\operatorname{Spec} R$ 为基底 (即在俯范畴 $\mathsf{Aff}_{/\operatorname{Spec} R}$, $\mathsf{Sch}_{/\operatorname{Spec} R}$ 工作) 时 $\mathbb A^1_R$ 的地位就相当于 $\mathbb A^1$ 在 $\operatorname{Spec} \mathbb{Z}$ 为基底时的地位. 参见 \ref{relative-algebraic-geometry} 节.
+	\end{example}
+	
+	\begin{example}
+		{}
+		环 $R$ 上的一个 $\mathbb{N}$-\emph{分次}是一个分解 $R= R_0\oplus R_1\oplus\cdots$, 且满足对 $r\in R_n,s\in R_m$ 有 $rs\in R_{n+m}$. 这等价于一个环同态
+		$$
+		R \to R[x], \quad (r\in R_n)\mapsto rx^n,
+		$$
+		满足复合
+		$$
+		R\to R[x]\overset{x=1}{\to} R = \mathrm{id}_R.
+		$$
+		翻译到仿射概形, 这等价于映射 $h\colon \operatorname{Spec} R\times\mathbb A^1 \to \operatorname{Spec} R$,
+		满足
+		$$
+		\operatorname{Spec} R \overset{1}{\to} \operatorname{Spec} R \times \mathbb A^1 \overset{h}{\to} \operatorname{Spec} R = \mathrm{id}_{\operatorname{Spec} R}.
+		$$
+		又注意到 $R\to R[x]\overset{x=0}{\to}R$ 是 $R$ 到 $R_0$ 的收缩.
+		因此在 ``$\mathbb{A}^1$ 同伦论'' 中, 上述结构称为 $\operatorname{Spec} R$ 的恒等映射与 $\operatorname{Spec} R$ 到 $\operatorname{Spec} R_0$ 的收缩之间的 $\mathbb{A}^1$ 同伦.
+		
+		另外, 环 $R$ 上的 $\mathbb{Z}$-分次相当于一个 $\Gm$-作用, 见例 \ref{Gm-action-Z-grading}.
+	\end{example}
+	
+	\begin{example}
+		{(方程的解的空间)}
+		对于多项式 $f\in\mathbb{Z}[x_1,\cdots,x_n]$,
+		考虑仿射概形
+		$$
+		V(f) := \operatorname{Spec} \big(\mathbb{Z}[x_1,\cdots,x_n]/(f)\big),
+		$$
+		直观上它是多项式方程 $f=0$ 的所有解的空间.
+		对任意仿射概形 $A$, 一个映射 $\operatorname{Spec} A\to V(f)$ 等同于方程 $f=0$ 在环 $A$ 上的一个解.
+		
+		当然, 对一般的环的元素 $f\in A$ 也可定义
+		$$
+		V(f) := \operatorname{Spec} (A/(f)).
+		$$
+		注意到, 元素 $f\in A$ 等同于环同态 $\mathbb{Z}[x]\to A$, 即仿射概形的映射 $\operatorname{Spec} A\to\mathbb{A}^1$, 从而环 $A/(f)$ 也可写成 $A\otimes_{\mathbb{Z}[x]}\mathbb Z$, 即 $V(f)$ 是如下的拉回.
+		% https://q.uiver.app/#q=WzAsNCxbMCwwLCJcXHNwZWMgQS8oZikiXSxbMCwxLCJcXHNwZWMgQSJdLFsxLDEsIlxcbWF0aGJie0F9XjEiXSxbMSwwLCJcXHNwZWNcXG1hdGhiYntafSJdLFswLDFdLFsxLDIsImYiLDJdLFswLDNdLFszLDIsIjAiXV0=
+		\[\begin{tikzcd}[ampersand replacement=\&]
+			{V(f)} \& {\operatorname{Spec}\mathbb{Z}} \\
+			{\operatorname{Spec} A} \& {\mathbb{A}^1}
+			\arrow[from=1-1, to=1-2]
+			\arrow[from=1-1, to=2-1]
+			\arrow["0", from=1-2, to=2-2]
+			\arrow["f"', from=2-1, to=2-2]
+		\end{tikzcd}\]
+		某种意义上这解释了 ``$V(f)$ 是 $f$ 的零点的空间'' 这一直观.
+		
+		对于一族多项式 $f_1,\cdots,f_m\in\mathbb{Z}[x_1,\cdots,x_n]$ 生成的理想 $I$,
+		定义
+		$$
+		V(I) := \operatorname{Spec}\mathbb{Z}[x_1,\cdots,x_n]/I
+		$$
+		直观上是方程组 $f_1=0,\cdots,f_m=0$ 的解的空间.
+		
+		对于理想 $I,J$,
+		$$
+		V(I)\times_{\mathbb A^n}V(J) \simeq V(I+J),
+		$$
+		意思是两个方程组的解空间相交, 给出两者的公共解的空间.
+	\end{example}
+	
+	``方程的解的空间'' 可以抽象为如下的概念.
+	\begin{definition}
+		[label={affine-scheme-closed-embedding}]
+		{(仿射概形的闭嵌入)}
+		对于环 $A$ 的理想 $I$,
+		称商映射 $A\to A/I$ 对应的仿射概形的态射 $f\colon \operatorname{Spec} (A/I)\to \operatorname{Spec} A$ 为\emph{闭嵌入}.
+	\end{definition}
+	
+	``闭嵌入'' 的概念不依赖于拓扑空间的概念. 不过在使用拓扑空间的观点时, 它确实构成概形的底层拓扑空间的闭子空间.
+	后面介绍的 ``开嵌入'' (定义 \ref{complement-open-embedding}) 同样不依赖于拓扑空间的概念; 但开嵌入的定义稍复杂一些, 并且仿射概形的开嵌入不一定是仿射概形.
+	
+%	\begin{definition}
+%		{(仿射概形的开嵌入)}
+%		
+%	\end{definition}
+	
+	\begin{example}
+		[label={standard-open-affine-localization}]
+		{(局部化)}
+		对于 $f\in A$, 定义仿射概形
+		$$
+		D(f) := \operatorname{Spec} (A[f^{-1}]) \simeq \operatorname{Spec}\big(A[x]/(xf-1)\big).
+		$$
+		其直观上是函数 $f$ 取值非零处. 这个直观有如下的 ``解释''. 元素 $f\in A$ 相当于环同态 $\mathbb{Z}[x]\to A$, 也即仿射概形的映射 $\operatorname{Spec} A\to\mathbb A^1$. 环 $A[f^{-1}]$ 可以写成 $A\otimes_{\mathbb{Z}[x]}\mathbb{Z}[x][x^{-1}]$, 而 $\operatorname{Spec} \mathbb {Z}[x][x^{-1}]$ 可以写成 $\mathbb{A}^1\setminus 0$ (例 \ref{affine-scheme-open-subspaces}). 因此 $D(f)$ 是如下的拉回.
+		% https://q.uiver.app/#q=WzAsNCxbMCwwLCJEKGYpIl0sWzAsMSwiXFxzcGVjIEEiXSxbMSwxLCJcXG1hdGhiYntBfV4xIl0sWzEsMCwiXFxHbSJdLFswLDFdLFsxLDIsImYiLDJdLFswLDNdLFszLDJdXQ==
+		\[\begin{tikzcd}[ampersand replacement=\&]
+			{D(f)} \& {\mathbb{A}^1\setminus 0} \\
+			{\operatorname{Spec} A} \& {\mathbb{A}^1}
+			\arrow[from=1-1, to=1-2]
+			\arrow[from=1-1, to=2-1]
+			\arrow[from=1-2, to=2-2]
+			\arrow["f"', from=2-1, to=2-2]
+		\end{tikzcd}\]
+		另一种看法是, $D(f)$ 是 $\operatorname{Spec} A/(f)$ 在 $\operatorname{Spec} A$ 中的补空间 (参见定义 \ref{complement-open-embedding}).
+		例如
+		$$
+		D(f)\times_{\operatorname{Spec} A}\operatorname{Spec} A/(f) \simeq \operatorname{Spec} (A[f^{-1}]\otimes_A A/(f))\simeq\operatorname{Spec} 0 = \varnothing.
+		$$
+	\end{example}
+	
+	\begin{example}
+		[label={idempotent-spec-decomposition}]
+		{}
+		设 $e,f\in A$, 满足 $e+f=1,ef=0$. 那么
+		$A/(e)\simeq A[f^{-1}]$, $A/(f)\simeq A[e^{-1}]$,
+		且 $$A\simeq A/(e) \times A/(f)\simeq A[e^{-1}]\times A[f^{-1}].$$
+		写成仿射概形即 $V(e)\simeq D(f)$, $V(f)\simeq D(e)$, 且 $$\operatorname{Spec} A \simeq V(e)\sqcup V(f)\simeq D(e)\sqcup D(f).$$
+	\end{example}
+	
+	\philoquote{Open and closed subspaces of affine schemes allow us to make sense of geometry by giving us notions of locality.}{Sam Raskin, Algebraic Geometry course}
+	
+	\begin{example}
+		{(切向量)}
+		考虑仿射概形 $D=\operatorname{Spec} \mathbb{R}[\epsilon]/(\epsilon^2)$, 它是由 $\mathbb{A}^1_{\mathbb{R}}=\operatorname{Spec}\mathbb{R}[x]$ 中 ``平方为零的元素'' 构成的子空间; 因此可以想象它是一条无穷小的线段. (这里 $\mathbb{R}$ 可以换成任何环, 没有本质的作用, 只是 $\mathbb{R}$ 比较贴近直观.)
+		环同态 $\mathbb R[\epsilon]/(\epsilon^2)\to\mathbb{R},\epsilon\mapsto 0$ 对应于 ``基点'' $0\colon \operatorname{Spec} R\to D$.
+		
+		对于 $\mathbb{R}$-概形 $X$,
+		映射 $D\to X$ 称作 $X$ 的\emph{切向量}. 切向量的基点就是 $\operatorname{Spec} \mathbb{R}\overset{0}{\to}D\to X$.
+		例如 $X=\operatorname{Spec} \mathbb{R}[x,y]/(x^2+y^2-25)$ 在点 $(x,y)=(4,3)$ 处有一切向量 $D\to X$, $\epsilon\mapsto (4-3\varepsilon,3+4\varepsilon)$, 即由环同态
+		$$
+		\mathbb{R}[x,y]/(x^2+y^2-25) \to \mathbb{R}[\epsilon]/(\epsilon^2),
+		\quad
+		x\mapsto 4-3\epsilon,\ y\mapsto 3+4\epsilon
+		$$
+		给出.
+	\end{example}
+	
+	\section{层}
+	
+	
+	我们假设读者已经了解层的概念, 本节仅回顾层论的一些基本事实.
+	
+	\begin{prop}
+		{}
+		
+	\end{prop}
+		
+	\section{点函子与概形}
+	
+	\subsection{点函子}
+	
+	对于一个几何对象 $X$, 我们常常使用它的 ``点'' 来对 $X$ 有关的对象进行构造与论证, 而常常这里的 ``点'' 的概念比想象中更灵活: 我们不需要所谈论的点真的是一个最小的不可分割的几何对象; 任何其它几何对象到 $X$ 的一个态射都可以称作一个点.
+	
+	\begin{definition}
+		[label={affine-scheme-functor-of-points}]
+		{(仿射概形的点函子)}
+		对于仿射概形 $\operatorname{Spec} A$, 定义其\emph{点函子}为
+		$$
+		\operatorname{Spec} A\colon 
+		\mathsf{Ring} \to \mathsf{Set},\quad
+		B\mapsto \operatorname{Hom}_{\mathsf{Ring}}(A,B).
+		$$
+		称 $(\operatorname{Spec} A)(B) = \operatorname{Hom}_{\mathsf{Ring}}(A,B)$ 的元素为 $\operatorname{Spec} A$ 的 $B$-点.
+		将仿射概形对应到其点函子的过程实际上就是米田嵌入
+		$\yo\colon \mathsf{Aff} \to \operatorname{Psh}(\mathsf{Aff})$.
+	\end{definition}
+	
+	常常描述一个仿射概形不如描述其点函子.
+	%此外, 我们更愿意将点函子视为 $\mathsf{Aff}^{\mathrm{op}}$ 到 $\mathsf{Set}$ 的函子, 从而谈论层条件.
+	
+	\begin{example}
+		{(一般线性群, 乘法群)}
+		一般线性群 $\mathrm{GL}_n$ 作为仿射概形的定义为
+		$$
+		\mathrm{GL}_n = \operatorname{Spec} \mathbb{Z}[x_{11},\cdots,x_{nn}][\det(x)^{-1}],
+		$$
+		其点函子为
+		$$
+		A\mapsto \mathrm{GL}_n(A)=\{x\in \mathrm{Mat}_{n\times n}(A)\mid \text{$\det(x)$ 可逆}\}.
+		$$
+		特别地, 当 $n=1$ 时记
+		$$\Gm=\mathrm{GL}_1
+		=\operatorname{Spec}\mathbb{Z}[x][x^{-1}],$$
+		其点函子为 ``乘法群''
+		$$
+		A\mapsto A^\times = \{x\in A\mid \text{$x$ 可逆}\}.
+		$$
+		由点函子容易看出 $\Gm$ 的群结构, 因为一个环的可逆元关于乘法自然构成群. 群的乘法 $\Gm\times\Gm\to\Gm$ 对应环同态 $$\mathbb{Z}[x][x^{-1}]\to\mathbb{Z}[u][u^{-1}]\otimes \mathbb{Z}[v][v^{-1}],\quad x\mapsto uv.$$
+		群的取逆 $\Gm\to\Gm$ 对应环同态 $x\mapsto x^{-1}$.
+	\end{example}
+	
+	\begin{example}
+		[label={Gm-action-Z-grading}]
+		{($\Gm$-作用与分次)}
+		环 $R$ 上的一个 $\mathbb{Z}$-分次是一个分解
+		$$
+		R =\cdots \oplus R_{-1}\oplus R_0 \oplus R_1 \oplus\cdots,
+		$$
+		满足对 $r\in R_{n}, s\in R_{m}$ 有 $rs\in R_{n+m}$.
+		这等价于 $\operatorname{Spec} R$ 上的一个 $\Gm$-作用, 也即一个映射 $\operatorname{Spec} R \times \Gm \to \operatorname{Spec} R$, 满足群作用的条件.
+		这个映射以点函子的观点可以如下描述.
+		对于环 $A$, 它给出映射
+		$$
+		\operatorname{Hom}_{\mathsf{Ring}}(R,A)\times A^\times \to \operatorname{Hom}_{\mathsf{Ring}}(R,A),\quad (\varphi,a)\mapsto
+		\big(
+		r\mapsto \varphi(r)a^{\deg r}
+		\big).
+		$$
+		(其中 $\deg r$ 为齐次元素 $r$ 的次数, 以线性延拓到非齐次元素.)
+		当然也可以用仿射概形作为环的对偶来描述,
+		这个作用对应于环同态
+		$$
+		R\to R\otimes\mathbb{Z}[x][x^{-1}] \simeq R[x][x^{-1}],\quad r\mapsto rx^{\deg r}.
+		$$
+		
+		更一般地, 对任意交换幺半群 $M$, 考虑幺半群环 $\mathbb{Z}[M]$, 也即 $M$ 自由生成的交换环, 对应的仿射概形 $\operatorname{Spec}\mathbb Z[M]$ 是 $\mathsf{Aff}$ 中的幺半群.
+		环 $R$ 的 $M$-分次 $R=\bigoplus_{m\in M}R_m$ 等同于 $\operatorname{Spec}\mathbb Z[M]$-作用.
+	\end{example}
+	
+	\subsection{Zariski 覆盖}
+	
+	\begin{definition}
+		[label={Zariski-covering}]
+		{(Zariski 覆盖)}
+		对于仿射概形 $\operatorname{Spec} A$, 定义其 \emph{Zariski 覆盖}为 $\mathsf{Aff}$ 中形如 $$\{D(f_i) \to \operatorname{Spec} A\}_{i\in I}\,(f_i\in A)$$ 的一族态射 ($D$ 的含义见例 \ref{standard-open-affine-localization}), 满足 $\{f_i\}_{i\in I}$ 生成 $A$ 的单位理想.
+	\end{definition}
+	
+	\begin{example}
+		{}
+		考虑一个极端情形, 对于 $A=0$ 为零环,
+		空集构成了 $\operatorname{Spec} A$ 的 Zariski 覆盖, 因为零个元素就生成了零环的单位理想.
+	\end{example}
+	
+	\begin{prop}
+		{}
+		对环的两个元素 $f,g\in A$ 有
+		$D(f)\times _{\operatorname{Spec} A}D(g) \simeq D(fg)$.
+	\end{prop}
+	\begin{proof}
+		这是因为
+		$$
+		\begin{aligned}
+			A[f^{-1}]\otimes_A A[g^{-1}]
+			&\simeq
+			A[x,y]/(xf-1,yg-1)\\
+			&\simeq
+			A[z]/(zfg-1)\\
+			&\simeq A[(fg)^{-1}].
+		\end{aligned}
+		$$
+	\end{proof}
+	
+	\begin{example}
+		{}
+		$D(2) \to\operatorname{Spec}\mathbb{Z}$ 和 $D(3) \to \operatorname{Spec} \mathbb{Z}$ 构成 $\operatorname{Spec} \mathbb{Z}$ 的 Zariski 覆盖.
+	\end{example}
+	
+	\begin{prop}
+		[label={Zariski-covering-subcanonical}]
+		{(Zariski 覆盖是次典范的)}
+		对任意 Zariski 覆盖 $\{D(f_i) \to \operatorname{Spec} A\}_{i\in I}\,(f_i\in A)$, 有 $\mathsf{Aff}$ 中的余等化子
+		% https://q.uiver.app/#q=WzAsMyxbMiwwLCJcXHNwZWMgQSJdLFsxLDAsIlxcY29wcm9kX2kgRChmX2kpIl0sWzAsMCwiXFxjb3Byb2Rfe2ksan1EKGZfaWZfaikiXSxbMSwwXSxbMiwxLCIiLDIseyJvZmZzZXQiOjF9XSxbMiwxLCIiLDIseyJvZmZzZXQiOi0xfV1d
+		\[\begin{tikzcd}[ampersand replacement=\&]
+			{\coprod_{i,j}D(f_if_j)} \& {\coprod_i D(f_i)} \& {\operatorname{Spec} A.}
+			\arrow[shift right, from=1-1, to=1-2]
+			\arrow[shift left, from=1-1, to=1-2]
+			\arrow[from=1-2, to=1-3]
+		\end{tikzcd}\]
+	\end{prop}
+	\begin{proof}
+		要证明有 $\mathsf{Ring}$ 中的等化子
+		% https://q.uiver.app/#q=WzAsMyxbMCwwLCJSIl0sWzEsMCwiXFxwcm9kX2kgUltmX2leey0xfV0iXSxbMiwwLCJcXHByb2Rfe2ksan1SWyhmX2lmX2opXnstMX1dIl0sWzAsMV0sWzEsMiwiIiwwLHsib2Zmc2V0IjotMX1dLFsxLDIsIiIsMCx7Im9mZnNldCI6MX1dXQ==
+		\[\begin{tikzcd}[ampersand replacement=\&]
+			A \& {\prod_i A[f_i^{-1}]} \& {\prod_{i,j}A[(f_if_j)^{-1}].}
+			\arrow[from=1-1, to=1-2]
+			\arrow[shift left, from=1-2, to=1-3]
+			\arrow[shift right, from=1-2, to=1-3]
+		\end{tikzcd}\]
+		%由条件, $\{f_i\}$ 生成单位理想, 故可设 $\sum_i a_if_i = 1\,(a_i\in A)$.
+		%注意仅有有限个 $a_i$ 非零.
+		具体地, 设 $(x_i/f_i^{n_i})_{i\in I}\in \prod_i A[f_i^{-1}]$ 在两个限制映射下的像相等, 即在 $A[(f_if_j)^{-1}]$ 中有 $x_i/f_i^{n_i} = x_j/f_j^{n_j}$.
+		我们要证明存在唯一的 $x\in A$ 使得在 $A[f_i^{-1}]$ 中有 $x/1=x_i/f_i^{n_i}$.
+		
+		先考虑 $I$ 为有限集的情形.
+		%, 那么存在有限子集 $I_0\subset I$, $\{f_i\}_{i\in I_0}$ 也生成了单位理想.
+		取正整数 $N_{ij}$,
+		$(f_if_j)^{N_{ij}} (f_j^{n_j}x_i-f_i^{n_i}x_j)=0$.
+		由有限性, 可取正整数 $N=\max\{N_{ij}\mid i,j\in I\}+\max\{n_i\mid i\in I\}$.
+		由条件, $\{f_i\}_{i\in I}$ 生成单位理想.
+		那么 $\{f_i^N\}_{i\in I}$ 也生成了单位理想.
+		设 $1=\sum_{i\in I} a_if_i^N\,(a_i\in A)$.
+		令 $x = \sum_{i\in I} a_if_i^{N-n_i}x_i$.
+		%这样, $x$ 等于 $x_i/f_i^{n_i}$.
+		对任意 $i\in I$,
+		容易验证 $x$ 在 $A[f_i^{-1}]$ 中等于 $x_i/f_i^{n_i}$.%, 即存在正整数 $M_i$ 使得
+		这是因为 $f_i^{n_i}x-x_i=0$.
+		这证明了 $x$ 的存在性.
+		而 $x$ 的唯一性是因为, 若 $x$ 在每个 $A[f_i^{-1}]$ 中都等于 $0$, 则 $x=0$.
+		
+		再来处理 $I$ 为任意集合的情形. 取有限子集 $I_0\subset I$ 使得 $\{f_i\}_{i\in I_0}$ 生成了单位理想. 对 $I_0$ 使用前述构造得到 $x$. 考虑 $i'\in I\setminus I_0$, 对 $I_0\cup \{i'\}$ 再次使用前述构造得到 $x'$. 由唯一性就得到 $x=x'$.
+	\end{proof}
+	
+	
+	
+	\subsection{概形}
+	
+	\begin{definition}
+		{(空间)}
+		定义\emph{空间}为函子 $X\colon \mathsf{Aff}^{\mathrm{op}} \to \mathsf{Set}$ (也即 $X\colon \mathsf{Ring}\to\mathsf{Set}$).
+	\end{definition}
+	
+	当然, 空间一词在数学上有太多不同的含义, 这种空间与那种空间不一定相关联. 不过代数几何使用的空间概念大多都类似这种形式.
+	
+	\begin{definition}
+		[label={scheme-definition}]
+		{(概形)}
+		称满足如下条件的空间 $X$ 为\emph{概形}:
+		\begin{itemize}
+			\item (Zariski 层条件) 对任意 Zariski 覆盖 $\{D(f_i) \to \operatorname{Spec} A\}_{i\in I}\,(f_i\in A)$, 给定一族相容的元素 $s_i\in X(D(f_i))$ (相容的意思是 $s_i,s_j$ 限制在 $D(f_if_j)$ 上相同), 存在唯一的 $s\in X(\operatorname{Spec} A)$ 限制为每个 $s_i$.
+			\item (局部仿射性) $X$ 存在仿射开覆盖 (定义 \ref{open-cover-affine-open-cover}).
+		\end{itemize}
+		概形的态射即为函子的自然变换. 记概形的范畴为 $\mathsf{Sch}$.
+	\end{definition}
+	
+	%在某些语境下, 人们会将一个函子 $\mathsf{Ring} \to \mathsf{Set}$ 称为一个 ``空间''. (当然, 空间一词在数学上有许多不同的含义, 这种空间与那种空间不一定相关联.)
+	
+	\footnotetext{这里谈论映射 $\operatorname{Spec} A_i\to X$ 的意思是将两者视为函子 $\mathsf{Ring} \to \mathsf{Set}$, 然后考虑函子之间的自然变换.}
+	
+	\begin{prop}
+		{}
+		仿射概形是概形. 换言之, 将仿射概形对应到其点函子的米田嵌入穿过概形的范畴, 给出全忠实函子 $\yo\colon \mathsf{Aff} \hookrightarrow \mathsf{Sch}$.
+	\end{prop}
+	\begin{proof}
+		%设 $X=\operatorname{Spec} A$, 对任意 Zariski 覆盖 $\{D(f_i) \to \operatorname{Spec} B\}_{i\in I}\,(f_i\in B)$,
+		这是命题 \ref{Zariski-covering-subcanonical} 以及米田引理的直接推论.
+	\end{proof}
+	
+	对于仿射概形 $\operatorname{Spec} A$, 记 $\mathcal O(\operatorname{Spec} A) = A$.
+	
+	\begin{prop}
+		{}
+		概形 $X$ 是仿射概形在空间范畴中的余极限:
+		$$
+		X \simeq \operatorname{colim}_{\operatorname{Spec} A \to X}\operatorname{Spec} A.
+		$$
+	\end{prop}
+	\begin{proof}
+		这是预层的一般事实的特例.
+	\end{proof}
+	
+%	\begin{example}
+%		{(射影空间)}
+%		对非负整数 $n$, \emph{射影空间} $\mathbb P^n$ 是如下概形:
+%		$$
+%		\mathbb P^n(A)
+%		:=
+%		\big\{(x_0,\cdots,x_n)\in A^{n+1}\mid
+%		\text{$\{x_0,\cdots,x_n\}$ 生成 $A$ 的单位理想}
+%		\big\}\big/\sim,
+%		$$
+%		其中等价关系 $\sim$ 为
+%		$$
+%		(x_0,\cdots,x_n)\sim (y_0,\cdots,y_n)
+%		\ \text{ 当且仅当 }\ 
+%		x_iy_j-x_jy_i=0\,(0\leq i,j\leq n)
+%		$$
+%	\end{example}
+	
+	\subsection{闭嵌入与开嵌入}
+	
+	\begin{definition}
+		[label={space-closed-embedding}]
+		{(闭嵌入)}
+		满足如下条件的空间映射 $X\to Y$ 称为\emph{闭嵌入}:
+		\begin{itemize}
+			\item 对任意 $\operatorname{Spec} A \to Y$, 拉回图
+			% https://q.uiver.app/#q=WzAsNCxbMCwwLCJcXHNwZWMgQVxcdGltZXNfWSBYIl0sWzEsMCwiXFxzcGVjIEEiXSxbMCwxLCJYIl0sWzEsMSwiWSJdLFswLDJdLFsyLDNdLFswLDEsIlxcdmFycGhpIl0sWzEsM11d
+			\[\begin{tikzcd}[ampersand replacement=\&]
+				{\operatorname{Spec} A\times_Y X} \& {\operatorname{Spec} A} \\
+				X \& Y
+				\arrow["\varphi", from=1-1, to=1-2]
+				\arrow[from=1-1, to=2-1]
+				\arrow[from=1-2, to=2-2]
+				\arrow[from=2-1, to=2-2]
+			\end{tikzcd}\]
+			中, 态射 $\varphi$ 为仿射概形的闭嵌入 (定义 \ref{affine-scheme-closed-embedding}), 即 $\operatorname{Spec} A\times_Y X$ 形如 $\operatorname{Spec} (A/I)\hookrightarrow \operatorname{Spec} A$.
+		\end{itemize}
+	\end{definition}
+	
+	空间的闭嵌入与前面定义的仿射概形闭嵌入是相容的. 若 $X\to Y$ 为空间的闭嵌入且 $Y=\operatorname{Spec} A$ 为仿射概形, 考虑沿 $\mathrm{id}_{\operatorname{Spec} A}$ 的拉回, 知 $X\to Y$ 是仿射概形的闭嵌入.
+	
+%	\begin{prop}
+%		{}
+%		对任意空间映射 $f\colon X\to Y$,
+%		对角线 $\Delta\colon X\to X\times_Y X$ 为闭嵌入.
+%	\end{prop}
+%	\begin{proof}
+%%		设有交换图
+%%		% https://q.uiver.app/#q=WzAsNCxbMCwxLCJYIl0sWzEsMSwiWFxcdGltZXNfWSBYIl0sWzEsMCwiXFxzcGVjIEEiXSxbMCwwLCJcXHNwZWMgQiJdLFsyLDEsIihmLGcpIl0sWzAsMV0sWzMsMl0sWzMsMF1d
+%%		\[\begin{tikzcd}[ampersand replacement=\&]
+%%			{\operatorname{Spec} B} \& {\operatorname{Spec} A} \\
+%%			X \& {X\times_Y X}
+%%			\arrow["g",from=1-1, to=1-2]
+%%			\arrow["h"',from=1-1, to=2-1]
+%%			\arrow["{(k,\ell)}", from=1-2, to=2-2]
+%%			\arrow[from=2-1, to=2-2]
+%%		\end{tikzcd}\]
+%%		那么 $fk=f\ell$, $kg=h=\ell g$.
+%		对任意 $(k,\ell)\colon \operatorname{Spec} A\to X\times_Y X$ (对应两个映射 $k,\ell\colon \operatorname{Spec} A\to X$, 满足 $fk=f\ell$),
+%		有拉回图
+%		% https://q.uiver.app/#q=WzAsNCxbMCwxLCJYIl0sWzEsMSwiWFxcdGltZXNfWSBYIl0sWzEsMCwiXFxzcGVjIEEiXSxbMCwwLCJcXG9wZXJhdG9ybmFtZXtlcX0oayxcXGVsbCkiXSxbMiwxLCIoayxcXGVsbCkiXSxbMCwxXSxbMywyXSxbMywwXV0=
+%		\[\begin{tikzcd}[ampersand replacement=\&]
+%			{\operatorname{eq}(k,\ell)} \& {\operatorname{Spec} A} \\
+%			X \& {X\times_Y X.}
+%			\arrow[from=1-1, to=1-2]
+%			\arrow[from=1-1, to=2-1]
+%			\arrow["{(k,\ell)}", from=1-2, to=2-2]
+%			\arrow[from=2-1, to=2-2]
+%		\end{tikzcd}\]
+%		只需证明 $\operatorname{eq}(k,\ell)$ 是 $\operatorname{Spec} A$ 的闭子概形.
+%	\end{proof}
+	
+	%自然地, 我们定义闭嵌入的补空间为开嵌入.
+	
+	\begin{definition}
+		[label={complement}]
+		{(补空间)}
+		设 $X\to Y$ 为空间的映射, 定义\emph{补空间} $Y\setminus X$ 为函子
+		$$
+		(Y\setminus X)(A) = \{\operatorname{Spec} A\to Y\mid \operatorname{Spec} A\times_Y X\simeq\varnothing\}.
+		$$
+	\end{definition}
+	
+	注意, $(Y\setminus X)(A)$ 不等于 $Y(A) \setminus X(A)$.
+	
+	\begin{definition}
+		[label={complement-open-embedding}]
+		{(开嵌入)}
+%		设 $X\to Y$ 为闭嵌入. 定义\emph{补空间} $Y\setminus X$ 为函子
+%		$$
+%		(Y\setminus X)(A) = \{\operatorname{Spec} A\to Y\mid \operatorname{Spec} A\times_Y X\simeq\varnothing\}.
+%		$$
+		
+		%称闭嵌入的补空间为\emph{开嵌入}.
+		设 $X\to Y$ 为空间映射.
+		\begin{itemize}
+			\item 若 $Y$ 为仿射概形, 且 $X\to Y$ 同构于一个闭子概形的补空间, 则称之为开嵌入.
+			\item 一般地, 若对任意 $\operatorname{Spec} A\to Y$, 拉回图
+			\[\begin{tikzcd}[ampersand replacement=\&]
+				{\operatorname{Spec} A\times_Y X} \& {\operatorname{Spec} A} \\
+				X \& Y
+				\arrow["\varphi", from=1-1, to=1-2]
+				\arrow[from=1-1, to=2-1]
+				\arrow[from=1-2, to=2-2]
+				\arrow[from=2-1, to=2-2]
+			\end{tikzcd}\]
+			中, 态射 $\varphi$ 为仿射概形的开嵌入, 则称 $X\to Y$ 为开嵌入.
+		\end{itemize}
+	\end{definition}
+	
+	注意对于一般的空间, 我们不是定义开嵌入为闭嵌入的补空间, 而是使用了一个较对称的定义. 例如命题 \ref{closed-open-stable-base-change} 的证明对闭嵌入和开嵌入是同理的. 但这两个概念并不完全对称.%, 例如命题 \ref{open-embedding-composition}.
+	
+	\begin{remark}
+		{(与嵌入有关的记号)}
+		对于闭嵌入或开嵌入 $i\colon U\to X$, $j\colon V\to X$, 常常记 $U\times_X V$ 为 $U\cap V$; 当 $X$ 上的某对象 (如拟凝聚层) $F$ 可以沿 $i$ 拉回到 $U$ 上时, 记 $i^*F$ 为 $F|_U$.
+	\end{remark}
+	
+	\begin{example}
+		[label={affine-scheme-open-subspaces}]
+		{(仿射概形的开子空间)}
+		仿射概形的闭嵌入 $\operatorname{Spec} (A/I)\hookrightarrow\operatorname{Spec} A$ 的补空间为
+		$$
+		\operatorname{Spec} A \setminus \operatorname{Spec} (A/I)\colon
+		B\mapsto \{A\to B\mid A/I\otimes_A B\simeq 0\}
+		$$
+		其中条件 $A/I\otimes_A B\simeq 0$ 也等价于 $B/IB\simeq 0$, 即 $IB=B$ (作为 $A$-模).
+		
+		当 $I=(f)$ 为主理想时, $A/(f)$ 的补空间为
+		$$B\mapsto \{A\to B\mid fB=B\} = \{A[f^{-1}]\to B\},$$
+		也即 $\operatorname{Spec} A[f^{-1}]=D(f)$. 例如 $\Gm$ 是 $0\colon \operatorname{Spec} \mathbb{Z}\hookrightarrow\operatorname{Spec} \mathbb{Z}[x]$ 的补空间, 简记作 $\mathbb{A}^1\setminus 0$.
+		
+		但是一般而言 $\operatorname{Spec} A \setminus \operatorname{Spec} (A/I)$ 未必是仿射概形, 例如 $\mathbb{A}^2\setminus 0$ 就不是仿射概形.
+%		由前面的讨论, $\mathbb{A}^2\setminus 0$ 是如下函子:
+%		$$
+%		B\mapsto \{(x,y)\in B^2 \mid\text{$x,y$ 生成 $B$ 的单位理想}\}.
+%		$$
+		注意到 $\mathbb A^2$ 的开子空间 $D(x),D(y)$ 都嵌入 $\mathbb A^2\setminus 0$, 且有如下交换图.
+		% https://q.uiver.app/#q=WzAsNCxbMSwxLCJcXG1hdGhiYiBBXjJcXHNldG1pbnVzIDAiXSxbMCwxLCJEKHgpIl0sWzEsMCwiRCh5KSJdLFswLDAsIihcXG1hdGhiYiBBXjFcXHNldG1pbnVzIDApXjJcXHNpbWVxIEQoeClcXGNhcCBEKHkpIl0sWzEsMF0sWzIsMF0sWzMsMV0sWzMsMl1d
+		\[\begin{tikzcd}[ampersand replacement=\&]
+			{(\mathbb A^1\setminus 0)^2\simeq D(x)\cap D(y)} \& {D(y)} \\
+			{D(x)} \& {\mathbb A^2\setminus 0}
+			\arrow[from=1-1, to=1-2]
+			\arrow[from=1-1, to=2-1]
+			\arrow[from=1-2, to=2-2]
+			\arrow[from=2-1, to=2-2]
+		\end{tikzcd}\]
+		对任意映射 $\mathbb A^2\setminus 0 \to \operatorname{Spec} A$, 有环同态 $A\to \mathbb{Z}[x,y][x^{-1},y^{-1}]$, 其像同时落在 $\mathbb{Z}[x,y][x^{-1}]$ 以及 $\mathbb{Z}[x,y][y^{-1}]$ 中, 而这两个子环的交集为 $\mathbb{Z}[x,y]$,
+		这说明映射 $\mathbb A^2\setminus 0 \to \operatorname{Spec} A$ 穿过 $\mathbb{A}^2$. 因此 $\mathbb A^2\setminus 0$ 不可能是仿射概形.
+		
+		另外, 仿射概形之间的映射何时是开嵌入, 也是一个比较复杂的问题. 答案是当且仅当对应的环同态为平坦, 有限表现同态, 且为环范畴中的满态射.
+	\end{example}
+	
+	
+	
+	\begin{prop}[label={closed-open-stable-base-change}]
+		{}
+		闭嵌入的拉回是闭嵌入, 开嵌入的拉回是开嵌入. 这就是说在拉回图
+		% https://q.uiver.app/#q=WzAsNCxbMCwwLCJYIl0sWzAsMSwiWSJdLFsxLDAsIloiXSxbMSwxLCJXIl0sWzAsMSwiZiIsMl0sWzEsM10sWzAsMl0sWzIsMywiZyJdXQ==
+		\[\begin{tikzcd}[ampersand replacement=\&]
+			X \& Z \\
+			Y \& W
+			\arrow[from=1-1, to=1-2]
+			\arrow["f"', from=1-1, to=2-1]
+			\arrow["g", from=1-2, to=2-2]
+			\arrow[from=2-1, to=2-2]
+		\end{tikzcd}\]
+		中, 若 $g$ 是闭 (开) 嵌入, 则 $f$ 是闭 (开) 嵌入.
+	\end{prop}
+	\begin{proof}
+		若 $g$ 是闭 (开) 嵌入, 则对任意 $\operatorname{Spec} A\to Y$, 下图的方块均为拉回图, $\operatorname{Spec} A\times_Y X\to \operatorname{Spec} A$ 为闭 (开) 嵌入. 这说明 $f$ 是闭 (开) 嵌入.
+		% https://q.uiver.app/#q=WzAsNixbMSwwLCJYIl0sWzEsMSwiWSJdLFsyLDAsIloiXSxbMiwxLCJXIl0sWzAsMSwiXFxzcGVjIEEiXSxbMCwwLCJcXHNwZWMgQVxcdGltZXNfWSBYIl0sWzAsMSwiZiIsMl0sWzEsM10sWzAsMl0sWzIsMywiZyJdLFs0LDFdLFs1LDRdLFs1LDBdXQ==
+		\[\begin{tikzcd}[ampersand replacement=\&]
+			{\operatorname{Spec} A\times_Y X} \& X \& Z \\
+			{\operatorname{Spec} A} \& Y \& W
+			\arrow[from=1-1, to=1-2]
+			\arrow[from=1-1, to=2-1]
+			\arrow[from=1-2, to=1-3]
+			\arrow["f"', from=1-2, to=2-2]
+			\arrow["g", from=1-3, to=2-3]
+			\arrow[from=2-1, to=2-2]
+			\arrow[from=2-2, to=2-3]
+		\end{tikzcd}\]
+		
+		%\todo{}
+%		若 $g$ 是开嵌入, 设 $g$ 是闭嵌入 $h\colon T\to W$ 的补空间, 由前面的论证, $S:= Y\times_W T$ 是 $Y$ 的闭子空间. 则
+%		$$
+%		\begin{aligned}
+%			X(A) &= Y(A)\times_{W(A)}Z(A) \\
+%			&=\{\operatorname{Spec} A\to Y \mid \operatorname{Spec} A\times_W T\simeq\varnothing\}\\
+%			&=\{\operatorname{Spec} A\to Y\mid \operatorname{Spec} A\times_Y S\simeq\varnothing\}=(Y\setminus S)(A).
+%		\end{aligned}
+%		$$
+%		因此 $X=Y\setminus S$ 是开子空间.
+	\end{proof}
+	
+	%\todo{仿射概形的仿射开子空间一定是关于乘性子集的局部化}
+	
+	\begin{prop}
+		{}
+		闭嵌入的复合是闭嵌入.
+	\end{prop}
+	
+	\begin{prop}[label={open-embedding-composition}]
+		{}
+		开嵌入的复合是开嵌入.
+	\end{prop}
+	\begin{proof}
+		\requiresAC{}
+		设 $X\to Y$, $Y\to Z$ 为开嵌入. \todo{}
+	\end{proof}
+	
+	\begin{definition}
+		[label={open-cover-affine-open-cover}]
+		{(开覆盖, 仿射开覆盖)}
+		设 $X$ 为空间. 定义 $X$ 的一个\emph{开覆盖}为一族开嵌入 $\{U_i\to X\}$, 使得对任意 $\operatorname{Spec} A\to X$ ($A\neq 0$) 都存在 $i$, $\operatorname{Spec} A\times_X U_i$ 不为空.
+		进一步, 若每个 $U_i$ 为仿射概形, 则称之为\emph{仿射开覆盖}.
+	\end{definition}
+	
+	容易验证上述覆盖的概念满足 ``覆盖'' 应有的性质:
+	若 $\{U_i\to X\}$ 为开覆盖, 而对每个 $i$ 有 $\{V_{i,j} \to U_i\mid j\in J_i\}$ 为开覆盖, 则 $\{V_{i,j} \to X\}$ 为开覆盖.
+	
+	\begin{example}
+		{(仿射概形的仿射开覆盖)}
+		设 $\{D(f_i) \to\operatorname{Spec} A\}$ 是 Zariski 覆盖 (定义 \ref{Zariski-covering}), 那么它是仿射开覆盖. 考虑 $\operatorname{Spec} B\to\operatorname{Spec} A$ ($B\neq 0$), 对应环同态 $\varphi\colon A\to B$,
+		那么存在 $f_i$ 使得 $\varphi(f_i)\neq 0$, 从而
+		$\operatorname{Spec} B\times_{\operatorname{Spec} A}D(f_i) \simeq \operatorname{Spec} (B[\varphi(f_i)^{-1}])\neq\varnothing$.	
+	
+		\todo{$\operatorname{Spec} A$ 一般的仿射开覆盖长啥样?}
+	\end{example}
+	
+	\begin{prop}
+		{}
+		仿射概形的开覆盖总可以细化为 Zariski 覆盖.
+	\end{prop}
+	\begin{proof}
+		设 $U \to \operatorname{Spec} A$ 为开嵌入.
+		由定义, $U = \operatorname{Spec} A \setminus \operatorname{Spec} (A/I)$.
+		我们证明 $U$ 被 $\{D(f)\mid f\in I\}$ 覆盖.
+		对任意 $\operatorname{Spec} B\to U$ ($B\neq 0$), 有对应的环同态 $\varphi\colon A\to B$, 且作为 $A$-模有 $B=IB$,
+	\end{proof}
+	
+%	\begin{example}
+%		{(射影空间的仿射开覆盖)}
+%		射影空间 $\mathbb P^n$ 有如下的仿射开覆盖. 对于 $0\leq i\leq n$, 考虑 $\varphi_i\colon U_i = \mathbb A^n \to\mathbb P^n$,
+%		$(a_1,\cdots,a_n)\mapsto (a_1,\cdots,a_{i},1,a_{i+1},\cdots,a_n)$.
+%	\end{example}
+
+	\begin{definition}
+		{(局部闭嵌入)}
+		对于概形映射 $X\to Y$, 若其可分解为
+		% https://q.uiver.app/#q=WzAsMyxbMCwwLCJYIl0sWzEsMCwiWiJdLFsyLDAsIlkiXSxbMCwxLCJcXHRleHR76Zet5bWM5YWlfSIsMCx7InN0eWxlIjp7InRhaWwiOnsibmFtZSI6Imhvb2siLCJzaWRlIjoidG9wIn19fV0sWzEsMiwiXFx0ZXh0e+W8gOW1jOWFpX0iLDAseyJzdHlsZSI6eyJ0YWlsIjp7Im5hbWUiOiJob29rIiwic2lkZSI6InRvcCJ9fX1dXQ==
+		\[\begin{tikzcd}[ampersand replacement=\&,column sep=large]
+			X \& Z \& Y,
+			\arrow["{\text{闭嵌入}}", hook, from=1-1, to=1-2]
+			\arrow["{\text{开嵌入}}", hook, from=1-2, to=1-3]
+		\end{tikzcd}\]
+		则称之为\emph{局部闭嵌入} (locally closed embedding).
+	\end{definition}
+	
+	\begin{example}
+		{}
+		映射 $\operatorname{Spec} k[t,t^{-1}] \hookrightarrow\operatorname{Spec} k[x,y]$, $t\mapsto (t,0)$ 为局部闭嵌入.
+	\end{example}
+	
+	\begin{prop}
+		{(对角线为局部闭嵌入)}
+		设 $f\colon X\to Y$ 为概形映射. 考虑对角线 $\Delta\colon X\to X\times_Y X$.
+		\begin{itemize}
+			\item 若 $X,Y$ 为仿射概形, 则 $\Delta$ 为闭嵌入;
+			\item 一般地, $\Delta$ 为局部闭嵌入.
+		\end{itemize}
+	\end{prop}
+	\begin{proof}~
+		\begin{itemize}
+			\item 设 $X=\operatorname{Spec} A$, $Y=\operatorname{Spec} B$,
+			则 $\Delta$ 对应于环同态 $A\otimes_B A \to A$. 它将 $a\otimes 1$ 映射到 $a$, 因此是环的商映射, 即仿射概形的闭嵌入.
+			\item 设 $Y$ 有仿射开覆盖 $\{U_i\}$, 且 $X$ 有仿射开覆盖 $\{U_{ij}\}$, $f\colon U_{ij} \to V_i$.
+			注意 $U_{ij}\times_{V_i}U_{ij}$ 是 $X\times_Y X$ 的仿射开子空间 (因为它是 $U_{ij}\times_Y X$ 和 $X\times_Y U_{ij}$ 的交). %证明略
+			\todo{}
+		\end{itemize}
+	\end{proof}
+	
+	\section{拟凝聚层}
+	
+	虽然我们将要定义的对象名为 ``拟凝聚层'', 但在定义上它\emph{不需要}层的概念;\footnote{此处参考了周子毅同学的函子式代数几何笔记, 对他表示感谢. 他参考的则是 Sam Raskin 的代数几何课, 笔记由 Arun Debray 记录.}
+	尽管它最终\emph{可以}视为某种特殊的层, 但在我们的框架下, 如下的基于模范畴的定义比传统教材中基于层的定义显得更加基本.
+	
+	\begin{definition}
+		{(拟凝聚层)}
+		设 $X\colon \mathsf{Aff}^{\mathrm{op}} \to \mathsf{Set}$ 为概形.
+		定义 $X$ 上的\emph{拟凝聚层}的范畴 $\mathsf{QCoh}(X)$ 为 $2$-范畴 $\mathsf{Cat}$ 中的极限
+		$$
+		\mathsf{QCoh}(X) := \lim _{\operatorname{Spec} A\to X} \operatorname{Mod}(A).
+		$$
+		其中 $\operatorname{Mod}(-)\colon \mathsf{Ring}\to\mathsf{Cat}$ 将环同态 $A\to B$ 对应到函子 $(-)\otimes_A B\colon \operatorname{Mod}(A) \to \operatorname{Mod}(B)$.
+		
+		由上述定义, 我们也可具体地写出一个拟凝聚层的资料. $X$ 上的一个拟凝聚层 $F$ 由如下资料构成,
+		\begin{itemize}
+			\item 对每个态射 $f\colon \operatorname{Spec} A \to X$, 指定一个 $A$-模 $F_f \in \operatorname{Mod}(A)$,
+			\item 对每个态射 $g\colon \operatorname{Spec} B\to \operatorname{Spec} A$, $f\colon \operatorname{Spec} A\to X$, 指定一个同构 $\alpha_{f,g}\colon F_{fg} \to F_f\otimes_A B$;
+		\end{itemize}
+		满足如下相容性条件,
+		\begin{itemize}
+			\item $\alpha_{f,\mathrm{id}} \colon F_f \to F_f\otimes_A A$ 是典范的那一个态射,
+			\item 对任意态射 $h\colon \operatorname{Spec} C\to\operatorname{Spec} B$, $g\colon \operatorname{Spec} B\to \operatorname{Spec} A$, $f\colon \operatorname{Spec} A \to X$, 有下图交换,
+			% https://q.uiver.app/#q=WzAsNCxbMCwwLCJGX3tmZ2h9Il0sWzEsMCwiRl97Zmd9XFxvdGltZXNfQiBDIl0sWzAsMSwiRl9mXFxvdGltZXNfQSBDIl0sWzEsMSwiRl9mXFxvdGltZXNfQSBCXFxvdGltZXNfQiBDIl0sWzAsMSwiXFxhbHBoYV97ZmcsaH0iXSxbMCwyLCJcXGFscGhhX3tmLGdofSIsMl0sWzEsMywiXFxhbHBoYV97ZixnfVxcb3RpbWVzX0IgQyJdLFsyLDMsIlxcc2ltZXEiLDJdXQ==
+			\[\begin{tikzcd}[ampersand replacement=\&]
+				{F_{fgh}} \& {F_{fg}\otimes_B C} \\
+				{F_f\otimes_A C} \& {F_f\otimes_A B\otimes_B C.}
+				\arrow["{\alpha_{fg,h}}", from=1-1, to=1-2]
+				\arrow["{\alpha_{f,gh}}"', from=1-1, to=2-1]
+				\arrow["{\alpha_{f,g}\otimes_B C}", from=1-2, to=2-2]
+				\arrow["\simeq"', from=2-1, to=2-2]
+			\end{tikzcd}\]
+		\end{itemize}
+		
+		对于概形态射 $f\colon X\to Y$, 它与每个态射 $\operatorname{Spec} A\to X$ 作复合得到 $\operatorname{Spec} A\to Y$, 因此上述定义给出一个函子, 记作
+		$$f^*\colon \mathsf{QCoh}(Y)\to \mathsf{QCoh}(X).$$
+		
+		综上, 拟凝聚层的构造给出一个函子 $\mathsf{QCoh}\colon \mathsf{Sch}^{\mathrm{op}} \to \mathsf{Cat}$, 它是如下的右 Kan 扩张.
+		% https://q.uiver.app/#q=WzAsMyxbMCwwLCJcXG1hdGhzZntBZmZ9XntcXG9wfSJdLFswLDEsIlxcbWF0aHNme1NjaH1ee1xcb3B9Il0sWzEsMCwiXFxjYXQiXSxbMCwxLCJcXHlvIiwyLHsic3R5bGUiOnsidGFpbCI6eyJuYW1lIjoiaG9vayIsInNpZGUiOiJ0b3AifX19XSxbMCwyLCJcXG9wZXJhdG9ybmFtZXtNb2R9Il0sWzEsMiwiXFxxY29oIiwyLHsic3R5bGUiOnsiYm9keSI6eyJuYW1lIjoiZGFzaGVkIn19fV1d
+		\[\begin{tikzcd}[ampersand replacement=\&]
+			{\mathsf{Aff}^{\mathrm{op}}} \& \mathsf{Cat} \\
+			{\mathsf{Sch}^{\mathrm{op}}}
+			\arrow["{\operatorname{Mod}}", from=1-1, to=1-2]
+			\arrow["\yo"', hook, from=1-1, to=2-1]
+			\arrow["\mathsf{QCoh}"', dashed, from=2-1, to=1-2]
+		\end{tikzcd}\]
+		该图交换的具体表述为命题 \ref{compatibility-qcoh-mod}.
+	\end{definition}
+	
+	概形上的拟凝聚层是环上的模的推广. 如下命题告诉我们 $\operatorname{Spec} A$ 上的拟凝聚层的确可以等同于 $A$-模.
+	
+	\begin{prop}
+		[label={compatibility-qcoh-mod}]
+		{(仿射概形上的拟凝聚层等同于环上的模)}
+		\begin{itemize}
+			\item 对于环 $A$, 有范畴等价
+			$$
+			\mathsf{QCoh}(\operatorname{Spec} A) \overset{\simeq}{\to} \operatorname{Mod}(A),\quad
+			F\mapsto F_{\mathrm{id}}\in\operatorname{Mod}(A).
+			$$
+			\item 对于环同态 $A\to B$, 记对应的仿射概形态射为 $f\colon \operatorname{Spec} B\to \operatorname{Spec} A$, 则有交换图
+			% https://q.uiver.app/#q=WzAsNCxbMCwxLCJcXG9wZXJhdG9ybmFtZXtNb2R9KEEpIl0sWzEsMSwiXFxvcGVyYXRvcm5hbWV7TW9kfShCKS4iXSxbMCwwLCJcXHFjb2goXFxzcGVjIEEpIl0sWzEsMCwiXFxxY29oKFxcc3BlYyBCKSJdLFswLDEsIigtKVxcb3RpbWVzX0EgQiIsMl0sWzIsMCwiXFxzaW1lcSIsMl0sWzMsMSwiXFxzaW1lcSJdLFsyLDMsImZeKiJdXQ==
+			\[\begin{tikzcd}[ampersand replacement=\&]
+				{\mathsf{QCoh}(\operatorname{Spec} A)} \& {\mathsf{QCoh}(\operatorname{Spec} B)} \\
+				{\operatorname{Mod}(A)} \& {\operatorname{Mod}(B).}
+				\arrow["{f^*}", from=1-1, to=1-2]
+				\arrow["\simeq"', from=1-1, to=2-1]
+				\arrow["\simeq", from=1-2, to=2-2]
+				\arrow["{(-)\otimes_A B}"', from=2-1, to=2-2]
+			\end{tikzcd}\]
+		\end{itemize}
+	\end{prop}
+	
+	\begin{definition}
+		[label={tensor-product-of-qcoh}]
+		{(拟凝聚层的张量积)}
+		对于概形 $X$ 上的拟凝聚层 $F,G$, 可定义其张量积 $F\otimes_{\mathcal O_X} G$:
+		对每个态射 $f\colon\operatorname{Spec} A\to X$, 考虑 $A$-模 $F_f\otimes_{A}G_f\in\operatorname{Mod}(A)$, 对任意 $g\colon\operatorname{Spec} B\to\operatorname{Spec} A$, 有
+		$$
+		F_{fg}\otimes_BG_{fg}\simeq (F_f\otimes_A B)\otimes_B(G_f\otimes_A B)\simeq (F_f\otimes_A G_f) \otimes_A B.
+		$$
+%		对任意仿射开子空间 $U= \operatorname{Spec} A\to X$,
+%		$$
+%		(F\otimes_{\mathcal O_X} G)|_U = F|_U\otimes_A G|_U.
+%		$$
+		事实上, $\mathsf{QCoh}(X)$ 具有\emph{对称幺半范畴}的结构 (来自模范畴 $\operatorname{Mod}(A)$ 上的张量积), 且对概形态射 $f\colon X\to Y$, 拉回函子 $f^*\colon \mathsf{QCoh}(Y)\to\mathsf{QCoh}(X)$ 保持该结构.
+	\end{definition}
+	
+	拟凝聚层是可以粘的.
+	
+	\begin{prop}
+		{(拟凝聚层的下降)}
+		对于概形 $X$ 以及开覆盖 $\mathcal  U = \{U_i \to X\}$, 可以由每个 $U_i$ 上的拟凝聚层加上一些相容条件定义出 $X$ 上的拟凝聚层. 具体地,
+		定义 $\mathsf{QCoh}(X,\mathcal U)$ 为如下资料构成的范畴,
+		\begin{itemize}
+			\item 其对象为 $((F_i),(\alpha_{i,j}))$, 其中 $F_i\in\mathsf{QCoh}(U_i)$, $\alpha_{ij}\colon F_i|_{U_i\cap U_j}\to F_j|_{U_i\cap U_j}$ 为同构, 且满足 $\alpha_{jk}\alpha_{ij} = \alpha_{ik}$ (限制在 $U_i\cap U_j\cap U_k$ 上);
+			\item 态射 $((F_i),(\alpha_{i,j})) \to ((G_i),(\beta_{i,j}))$ 为 $(\varphi_i\colon F_i\to G_i)$, 且满足 $\alpha_{ij}\varphi_i = \varphi_j\alpha_{ij}$ (限制在 $U_i\cap U_j$ 上).
+		\end{itemize}
+		有一个 ``比较函子''
+		$$
+		\mathsf{QCoh}(X) \to \mathsf{QCoh}(X,\mathcal U)
+		$$
+		将 $F\in\mathsf{QCoh}(X)$ 对应到 $(F|_{U_i})$ 以及 $F$ 到 $U_i\cap U_j$ 上两种限制之间的同构. 本命题 (Serre 定理) 说的是这个比较函子为等价.
+		使用 $2$-范畴的语言, 这个定理可以表述为 $\mathsf{QCoh}$ 是 $\mathsf{Sch}$ (覆盖结构为开覆盖) 上取值于 $\mathsf{Cat}$ 的层.
+	\end{prop}
+	
+	\begin{proof}
+		首先化归到 $X=\operatorname{Spec} A$, 开覆盖为 $\{D(f_i)\to\operatorname{Spec} A\}$ 的情形.
+	\end{proof}
+	
+	常常我们会由仿射开覆盖以及一族相容的模来构造拟凝聚层, 例如定义 \ref{qcoh-inner-hom}.
+	
+	\begin{definition}
+		[label={qcoh-inner-hom}]
+		{(拟凝聚层的内蕴同态对象)}
+		对于概形 $X$ 上的拟凝聚层 $F,G$, 可定义\emph{内蕴同态对象} (internl hom-object) $\internalhom_{\mathcal O_X}(F,G)$: 对任意仿射开子空间 $U=\operatorname{Spec} A \to X$,
+		$$
+		\internalhom_{\mathcal O_X}(F,G)|_U = \operatorname{Hom}_{A}(F|_U,G|_U).
+		$$
+		%\todo{}
+		这使得 $\mathsf{QCoh}(X)$ 具有\emph{闭对称幺半范畴} (closed symmetric monoidal category) 的结构.
+	\end{definition}
+	
+	\begin{example}
+		{(结构层)}
+		概形 $X$ 上有一个自然的拟凝聚层 $\mathcal O_X$, 称为结构层. 对任意 $f\colon \operatorname{Spec} A\to X$, 有 $$(\mathcal O_X)_f = A\in\operatorname{Mod}(A).$$
+		结构层是张量积的单位: 对任意拟凝聚层 $F\in\mathsf{QCoh}(X)$, $F\otimes_{\mathcal O_X}\mathcal O_X\simeq F$.
+	\end{example}
+	
+	
+	\begin{definition}
+		[label={qcoh-section}]
+		{(拟凝聚层的截面)}
+		定义概形 $X$ 上拟凝聚层 $F$ 的\emph{截面} (又称\emph{整体截面}) 为 $\mathcal O_X$ 到 $F$ 的态射, 记
+		$$
+		\Gamma(X,F) := \operatorname{Hom}_{\mathsf{QCoh}(X)}(\mathcal O_X,F).
+		$$
+		对于开子空间 $i\colon U\to X$, 记 $\Gamma(U,F):=\Gamma(U,i^*F)$.
+	\end{definition}
+	
+	由定义, $\Gamma(X,F)$ 是环 $\Gamma(X,\mathcal O_X)=\operatorname{End}_{\mathsf{QCoh}(X)}(\mathcal O_X)$ 上的模, 也即 $\operatorname{Spec} \Gamma(X,\mathcal O_X)$ 上的拟凝聚层.
+	
+%	对于概形态射 $f\colon X\to Y$, 有
+%	$$
+%	\Gamma(X,\mathcal O_X)=\operatorname{Hom}_{\mathsf{QCoh}(X)}(\mathcal O_X,F)
+%	$$
+
+	\begin{prop}
+		[label={global-section-functoriality-on-scheme}]
+		{}
+		对于概形态射 $f\colon X\to Y$, 以及 $F\in\mathsf{QCoh}(Y)$,
+		\begin{itemize}
+			\item 有自然映射 $\Gamma(Y,F) \to \Gamma(X,f^*F)$,
+			\item 特别地, 有自然的环同态
+			$\Gamma(Y,\mathcal O_Y) \to \Gamma(X,\mathcal O_X)$,
+			\item 并且前述映射 $\Gamma(Y,F) \to \Gamma(X,f^*F)$ 为 $\Gamma(Y,\mathcal O_Y)$-模同态.
+		\end{itemize}
+	\end{prop}
+	
+	
+	\begin{definition}
+		{(局部有限生成拟凝聚层)}
+		设 $F$ 是概形 $X$ 上的拟凝聚层, 若对任意 $f\colon \operatorname{Spec} A\to X$ 都有 $F_f$ 为有限生成 $A$-模, 则称 $F$ 为\emph{局部有限生成}的拟凝聚层.
+	\end{definition}
+	
+	\subsection{闭子概形与理想层}
+	
+	\begin{definition}
+		[label={ideal-sheaf-closed-subscheme}]
+		{(理想层决定的闭子概形)}
+		设 $I$ 是概形 $X$ 上拟凝聚层 $\mathcal O_X$ 的子对象, 称之为\emph{理想层} (ideal sheaf); 定义 $I$ 对应的闭子概形 $Z(I)$ 如下:
+		$$
+		Z(I)(A) = \{f\colon \operatorname{Spec} A\to X \mid f^*I \simeq 0\}.
+		$$
+	\end{definition}
+	
+	\begin{prop}
+		{}
+		概形 $X$ 的理想层等同于 $X$ 的闭子概形.
+	\end{prop}
+	\begin{proof}
+		对于闭子概形 $Z\subset X$, 定义理想层 $I$: 对任意 $f\colon \operatorname{Spec} A\to X$, 由闭子概形的定义, $Z\times_X\operatorname{Spec} A$ 是 $\operatorname{Spec} A$ 的闭子概形, 故对应于理想 $I_f\subset A$. 这些理想共同给出了理想层 $I\hookrightarrow \mathcal O_X$.
+		
+		因为对任意 $f\colon \operatorname{Spec} A\to X$, $f^*I=I_f$, 而 $I_f=0$ 当且仅当 $Z\times_X \operatorname{Spec} A=\operatorname{Spec} A$, 即 $f\colon \operatorname{Spec} A\to X$ 穿过子概形 $Z\subset X$, 即 $f\in Z(A)$, 所以 $I$ 决定的闭子概形 (命题 \ref{ideal-sheaf-closed-subscheme}) 正是 $Z$ 本身.
+	\end{proof}
+	
+	\subsection{中山引理}
+	
+	\begin{definition}
+		{(零化理想)}
+		设 $A$ 为环, $F$ 为 $A$-模, 定义其\emph{零化理想}为
+		$\operatorname{Ann}(F) := \{a\in A \mid a F=0\}$.
+	\end{definition}
+	
+	\begin{prop}
+		[label={qcoh-vanishing-open}]
+		{(局部有限生成拟凝聚层消失处为开子空间)}
+		设 $F$ 是概形 $X$ 上的局部有限生成拟凝聚层.
+		定义
+		$$
+		U_F\colon\mathsf{Aff}^{\mathrm{op}}\to\mathsf{Set},\quad \operatorname{Spec} B\mapsto \{f\colon \operatorname{Spec} B\to X\mid f^*F\simeq 0\},
+		$$
+		则 $U_F\to X$ 为开子概形. 直观上 $U_F$ 表示 $F$ 消失之处.
+	\end{prop}
+	\begin{proof}
+		\requiresAC{}
+		先考虑 $X=\operatorname{Spec} A$ 的情形. 我们断言 $U_F$ 是理想 $\operatorname{Ann}(F)$ 对应的闭子概形的补空间.
+		为此只需证明对任意态射 $f\colon \operatorname{Spec} B\to \operatorname{Spec} A$,
+		如下两个条件等价:
+		\begin{itemize}
+			\item $f^*F \simeq 0$, 即 $F\otimes_A B\simeq 0$;
+			\item $(A/\operatorname{Ann}(F))\otimes_A B = 0$, 也即 $\operatorname{Ann}(F)B = B$.
+		\end{itemize}
+		%不幸的是, 本人已知的证明依赖于极大理想的存在性, 从而依赖于选择公理. 我正在尝试寻找不依赖选择公理的证明.
+		
+		首先, 若 $\operatorname{Ann}(F)B = B$, 则 $F\otimes_A B\simeq F\otimes_A \operatorname{Ann}(F)B \simeq 0$.
+		
+		另一方面, 假设 $F\otimes_A B\simeq 0$, 且 $\operatorname{Ann}(F)B \neq B$. 那么存在 $B$ 的极大理想 $\mathfrak{m}$ 包含 $\operatorname{Ann}(F)B$. 记 $k=B/\mathfrak{m}$.
+	\end{proof}
+	
+	\begin{prop}
+		[label={nakayama-speck-open}]
+		{(中山引理的一个版本)}
+		设 $F$ 是概形 $X$ 上的局部有限生成拟凝聚层.
+		若对于某个域 $k$ 以及态射 $f\colon \operatorname{Spec} k\to X$ 有 $f^*F\simeq 0$, 则存在仿射开子概形 $j\colon U\to X$ 包含 $f$ (即 $f$ 穿过 $U$), 使得 $j^*F\simeq 0$.
+	\end{prop}
+	\begin{proof}
+		\requiresAC{}
+		
+	\end{proof}
+	命题 \ref{qcoh-vanishing-open}, \ref{nakayama-speck-open}可以互推.
+	
+	
+	
+	\section{相对代数几何}
+	
+	\label{relative-algebraic-geometry}
+	
+	回忆, 对于交换环 $R$, 一个 $R$-代数即是一个环 $A$ 带有一个环同态 $R\to A$, 而 $R$-代数的范畴 $R\text{-}\mathsf{Alg}$ 也即环范畴的仰范畴 $\mathsf{Ring}_{R/}$.
+	
+	如果说代数几何是以环范畴 $\mathsf{Ring}$ 为基础建立起来的, 那么对每个环 $R$, 都有一种 ``相对于 $R$ 的代数几何'', 以 $R$-代数范畴 $\mathsf{Ring}_{R/}$ 为基础. 相对于 $R$ 的代数几何也可视为 ``在 $\operatorname{Spec} R$ 之上的代数几何'', 原因如下.
+	
+	\begin{prop}
+		[label={spaces-over-a-ring}]
+		{}
+		对于交换环 $R$, 有范畴等价
+		$$
+		\mathsf{Fun}(\mathsf{Ring}_{R/},\mathsf{Set})\simeq \mathsf{Fun}(\mathsf{Ring},\mathsf{Set})_{/\operatorname{Spec} R}.
+		$$
+		%粗略地说, 以 $R$-代数为基础的空间和 $\operatorname{Spec} A$ 上的空间是等价的.
+		具体地, 对应于 $X\in\mathsf{Fun}(\mathsf{Ring},\mathsf{Set})_{/\operatorname{Spec} R}$ 的函子 $F\colon \mathsf{Ring}_{R/}\to \mathsf{Set}$ 为
+		$$
+		F(\varphi\colon R\to A) = \Bigg\{ \begin{tikzcd}[column sep=-9pt,row sep=7pt]
+			\operatorname{Spec} A\ar[rr]\ar["\varphi"',dr] && X\ar[dl]\\
+			&\operatorname{Spec} R&
+		\end{tikzcd}\Bigg\}.
+		$$
+		反之, 对应于函子 $F\colon \mathsf{Ring}_{R/}\to\mathsf{Set}$ 的空间 $X$ 为
+		$$X(A)=\{(\varphi\colon R\to A, x\in F(\varphi))\},$$
+		映射 $X(A)\to(\operatorname{Spec} R)(A)$ 即为 $(\varphi,x)\mapsto \varphi$.
+	\end{prop}
+	
+	这是如下命题的特例 ($X=\operatorname{Spec} R$, $\elements(X)=\mathsf{Ring}_{R/}$).
+	
+	\begin{prop}
+		{}
+		对于空间 $X$, 考虑范畴 $\elements(X)$, 其对象为映射 $\operatorname{Spec} A\to X$, 态射为交换三角; 则有范畴等价
+		$$
+		\mathsf{Fun}(\elements(X),\mathsf{Set}) \simeq \mathsf{Fun}(\mathsf{Ring},\mathsf{Set})_{/X}.
+		$$
+	\end{prop}
+	
+	\begin{proof}
+		这是预层范畴的一般性质的特例.
+	\end{proof}
+	
+	\begin{example}
+		{}
+		在相对于 $\mathbb{C}$ 的代数几何中, ``乘法群'' $\mathbb G_m = \operatorname{Spec} \mathbb C[x,x^{-1}]$ 同构于 ``圆圈'' $\operatorname{Spec} \mathbb C[x,y]/(x^2+y^2-1)$.
+	\end{example}
+	
+	\subsection{相对谱}
+	
+	设 $S$ 为概形, $A\in\mathsf{QCoh}(S)$ 为 $S$ 上的拟凝聚层, 且 $A$ 带有 $\mathcal O_S$-代数结构; 具体地有一个交换, 结合的乘法 $m\colon A\otimes_{\mathcal O_S}A\to A$ 以及单位 $1\colon \mathcal O_S\to A$.
+	
+	类比于环 $A$ 的谱 $\operatorname{Spec} A$, 在相对于一个底概形 $S$ 的情形, $S$ 上的 $\mathcal O_S$-代数 $A$ 也有一个相对谱 $\operatorname{Spec}_S (A)$, 它是 $S$ 上的概形 (即它是一个概形带有指向 $S$ 的一个映射).
+	
+	相对谱的概念由如下两个条件唯一决定:
+	\begin{itemize}
+		\item 对于环 $R$ 以及 $R$-代数 $A$ (视为 $\operatorname{Spec} R$ 上的 $\mathcal O_{\operatorname{Spec} R}$-代数), $\operatorname{Spec}_{\operatorname{Spec} R}A$ 就是仿射概形的映射 $\operatorname{Spec} A\to\operatorname{Spec} R$;
+		\item 相对谱的构造关于拉回稳定 (命题 \ref{relative-spectrum-base-change}), 这就是说对于概形映射 $f\colon S\to T$ 以及 $\mathcal O_T$-代数 $A$, 有 $\operatorname{Spec}_S(f^*A)$ 同构于 $f^* (\operatorname{Spec}_T A)$.
+	\end{itemize}
+	
+%	先考虑相对于仿射概形 $S=\operatorname{Spec} R$ 的特殊情形.
+%	因为 ``相对于 $\operatorname{Spec} R$ 的代数几何等同于以 $R$-代数为基础的代数几何'' (命题 \ref{spaces-over-a-ring}), 故对于 $R$-代数 $A$, 一个类比于定义 \ref{affine-scheme-functor-of-points} 的合理定义是 $$\operatorname{Spec}_{\operatorname{Spec} R}(A):= \operatorname{Hom}_{\mathsf{Ring}_{R/}}(A,-)\colon \mathsf{Ring}_{R/}\to\mathsf{Set},$$
+%	根据命题 \ref{spaces-over-a-ring} 将它视为 $\mathsf{Fun}(\mathsf{Ring},\mathsf{Set})_{/\operatorname{Spec} R}$ 的对象, 则有
+%	$$
+%	\begin{aligned}
+%		\operatorname{Spec}_{\operatorname{Spec} R}(A)(B)
+%		&= \{(\varphi\colon R\to B,x\in\operatorname{Hom}_{\mathsf{Ring}_{R/}}(A,B))\}\\
+%		&\simeq\operatorname{Hom}_{\mathsf{Ring}}(A,B) = (\operatorname{Spec} A)(B),
+%	\end{aligned}
+%	$$
+%	%映射 $\operatorname{Spec}_{\operatorname{Spec} R}(A)(B)\to(\operatorname{Spec} R)(B)$ 将交换三角对应到其中的一边 $\operatorname{Spec} B\to\operatorname{Spec} R$.
+%	因此 $\operatorname{Spec}_{\operatorname{Spec} R}(A)$ 作为空间就是 $\operatorname{Spec} A$.
+%	
+%	%$\mathsf{QCoh}$
+%	
+	假设满足上述两个条件的概念存在.
+	对于概形 $S$ 上的 $\mathcal O_S$-代数 $A$, 其沿任意 $x\colon \operatorname{Spec} B \to S$ 的拉回 $x^*A\in\mathsf{QCoh}(\operatorname{Spec} B)=\operatorname{Mod}(B)$ 是 $B$-代数, 于是 $\operatorname{Spec}_S A$ 沿 $x$ 的拉回应当是 $\operatorname{Spec} x^*A \to \operatorname{Spec} B$.% https://q.uiver.app/#q=WzAsNCxbMSwwLCJcXHNwZWNfUyhBKSJdLFswLDEsIlxcc3BlYyBCIl0sWzEsMSwiUyJdLFswLDAsIlxcc3BlYyB4XipBIl0sWzMsMV0sWzMsMF0sWzAsMl0sWzEsMCwiIiwxLHsic3R5bGUiOnsiYm9keSI6eyJuYW1lIjoiZGFzaGVkIn19fV0sWzEsMiwieCIsMl0sWzEsMywiXFxzaWdtYSIsMCx7Im9mZnNldCI6LTEsImN1cnZlIjotMSwic3R5bGUiOnsiYm9keSI6eyJuYW1lIjoiZGFzaGVkIn19fV1d
+	\[\begin{tikzcd}[ampersand replacement=\&]
+		{\operatorname{Spec} x^*A} \& {\operatorname{Spec}_S(A)} \\
+		{\operatorname{Spec} B} \& S.
+		\arrow[from=1-1, to=1-2]
+		\arrow[from=1-1, to=2-1]
+		\arrow[from=1-2, to=2-2]
+		\arrow["\sigma", shift left, bend left=10, dashed, from=2-1, to=1-1]
+		\arrow[dashed, from=2-1, to=1-2]
+		\arrow["x"', from=2-1, to=2-2]
+	\end{tikzcd}\]
+	进而任意映射 $\operatorname{Spec} B\to \operatorname{Spec}_S (A)$ 都对应于截面 $\sigma\colon\operatorname{Spec} B\to\operatorname{Spec} x^*A$.
+	等价的说法是 $\sigma\colon x^*A\to B$ 为 $B$-代数同态.
+	据此可写出 $\operatorname{Spec}_S(A)$ 的点函子定义.
+	
+	\begin{definition}
+		{(相对谱)}
+		设 $S$ 为概形, $A$ 为 $\mathcal O_S$-代数.	定义 $S$-概形 $\operatorname{Spec}_S(A)$ 为如下空间:
+		$$
+		\begin{aligned}
+		\operatorname{Spec}_S(A)(B) := \{(x,\sigma)&\mid x\colon \operatorname{Spec} B\to S,\ 
+		%\text{$\sigma\colon \operatorname{Spec} B\to\operatorname{Spec} x^*A$ 为截面}
+		\sigma\in\operatorname{Hom}_{B\text{-}\mathsf{Alg}}( x^*A,B)
+		\}
+		\end{aligned}
+		$$
+	\end{definition}
+	
+	\begin{example}
+		{(相对仿射空间)}
+		设 $X$ 为概形, 记 $\mathbb A^1_X := \operatorname{Spec}_X(\mathcal O_X) \simeq \mathbb A^1\times X$. 后一个同构是因为对任意环 $B$, 一个截面 $\sigma\colon \operatorname{Spec} B\to \mathbb A^1_B$ 等同于一个映射 $\operatorname{Spec} B\to \mathbb A^1$.
+	\end{example}
+	
+	\begin{prop}
+		[label={relative-spectrum-base-change}]
+		{(取相对谱与基变换相容)}
+		% Rising Sea , exercise 17.1.F
+		设 $f\colon X\to Y$ 为概形态射, $A\in\mathsf{QCoh}(Y)$ 带有 $\mathcal O_Y$-代数结构, 则有自然同构
+		$$
+		f^*\operatorname{Spec}_Y(A):= X\times_Y\operatorname{Spec}_Y(A) \simeq \operatorname{Spec}_X(f^*A).
+		$$
+	\end{prop}
+	
+	\section{向量丛与射影空间}
+	
+	如果说此前的定义给人一种完全抽象的感觉, 那么本节的内容将提供例子, 说明这个框架能够处理具体的几何对象.
+	
+	\begin{propdef}
+		{(投射模)}
+		设 $P$ 为 $A$-模, 若如下等价条件之一成立, 则称 $P$ 为\emph{投射} $A$-模.
+		\begin{itemize}
+			\item $P$ 是自由 $A$-模的直和项, 即 $A^{\oplus I}\simeq P\oplus Q$;
+			\item 函子 $\operatorname{Hom}_A(P,-)\colon \operatorname{Mod}(A)\to\operatorname{Mod}(A)$ 保持满射.
+		\end{itemize}
+	\end{propdef}
+	
+	\begin{prop}
+		{(有限生成投射模)}
+		设 $P$ 为 $A$-模, 则如下条件等价.
+		\begin{enumerate}
+			[(1)]
+			\item $P$ 为有限生成投射模,
+			\item $P$ 在局部上为\emph{有限生成自由模}, 即存在 Zariski 覆盖 $\{D(f_i)\to\operatorname{Spec} A\}$, 使得 $P_{f_i}$ 为有限生成自由 $A_{f_i}$-模.
+		\end{enumerate}
+	\end{prop}
+	
+	由上述命题, 环上的投射模可类比于流形上的向量丛.
+	
+	\begin{propdef}
+		{(向量丛)}
+		% Raskin 讲义, 命题 8.11
+		概形 $X$ 上的\emph{向量丛} (vector bundle) 是满足如下三个等价条件之一的拟凝聚层 $F$:
+		\begin{enumerate}
+			[(1)]
+			\item \emph{存在}仿射开覆盖 $\mathcal U = \{U_i=\operatorname{Spec} A_i\to X\}$ 使得 $F|_{U_i}$ 为\emph{有限生成投射 $A_i$-模};
+			\item \emph{对任意}仿射开子空间 $U=\operatorname{Spec} A\to X$,  $F|_{U}$ 为\emph{有限生成投射 $A$-模};
+			\item \emph{存在}仿射开覆盖 $\mathcal U = \{U_i=\operatorname{Spec} A_i\to X\}$ 使得 $F|_{U_i}$ 为\emph{有限生成自由 $A_i$-模}.
+			其中 $n$ 称为向量丛 $F$ 的\emph{秩}. 向量丛的秩在局部上为常数, 整体上不一定为常数. 秩为 $1$ 的向量丛称为\emph{线丛}.
+		\end{enumerate}
+	\end{propdef}
+	
+	向量丛的拉回与张量积均为向量丛.
+	概形 $X$ 的结构层 $\mathcal O_X$ 是一个线丛, 称为\emph{平凡线丛}.
+	平凡线丛的拉回为平凡线丛; 平凡线丛是张量积的单位元.
+	
+	
+	\begin{example}
+		{(球面的切丛和余切丛)}
+		考虑环 $A=\mathbb{R}[x,y,z]/(x^2+y^2+z^2-1)$, 它的谱 $\operatorname{Spec} A$ 是代数几何中的 ``球面''. 球面的切丛作为拟凝聚层 (即 $A$-模) 是
+		$$
+		T= \{(a,b,c)\in A^3\mid ax+by+cz=0\}
+		$$
+		在点 $p=(x_0,y_0,z_0)$ ($x_0^2+y_0^2+z_0^2=1$, 对应一个映射 $p\colon \operatorname{Spec}\mathbb{R}\to\operatorname{Spec} A$) 处,
+		$T$ 的纤维为
+		$$
+		p^*T = T\otimes_A A/(x-x_0,y-y_0,z-z_0)\simeq
+		\{(a,b,c)\in\mathbb{R}^3\mid ax_0+by_0+cz_0=0\}.
+		$$
+		这正是传统几何学上的球面的切空间.
+		
+		通过几何直观不难发现球面上的 $3$ 维平凡向量丛是切丛和 $1$ 维平凡向量丛的直和, 这在代数上体现为同构
+		$$
+		A^3 \simeq A\oplus T,\quad
+		\vec{a}\mapsto \big( \vec a - (\vec a\cdot\vec r)\vec r , (\vec a\cdot\vec r)\vec r \big)
+		\ (\vec r:=(x,y,z)).$$
+		由投射模的等价定义之一, 这说明 $T$ 是投射 $A$-模. 切丛不是平凡丛, 在代数上体现为 $T$ 作为 $A$-模不同构于 $A^2$.
+		
+		球面的余切丛作为拟凝聚层是
+		$$
+		\Omega^1 \simeq A\{dx,dy,dz\}/ (xdx+ydy+zdz) \simeq \operatorname{Hom}_A(T,A).
+		$$
+		注意对偶两次同构于自身: $\operatorname{Hom}_A(\Omega^1,A) \simeq T$.
+	\end{example}
+	
+	\begin{example}
+		{(M\"obius 带)}
+		考虑环 $A=\mathbb{R}[x,y]/(x^2+y^2-1)$, 它的谱是一个圆.
+		$A$ 的理想 $M = (x-1,y)$ 是 $\operatorname{Spec} A$ 上的向量丛, 它同构于所谓 M\"obius 带.
+		
+		首先用笨办法说明 $M$ 是投射模 (即向量丛), 使用 Zariski 覆盖. 考虑 $M$ 在 $D(x-1)$, $D(x+1)$ 上的限制:
+		$$
+		M|_{D(x-1)} = (x-1,y) \otimes_A A[(x-1)^{-1}] \simeq A[(x-1)^{-1}],
+		$$
+		$$
+		M|_{D(x+1)} = (x-1,y) \otimes_A A[(x+1)^{-1}] = \Big(\frac{y^2}{x+1},y\Big) = (y)\in A[(x+1)^{-1}],
+		$$
+		它们都是秩为 $1$ 的自由模. 这说明 $M$ 是投射模.
+		
+		%注意有同构 $M\simeq \{(a,b)\in A^2\mid ax+b(y+1)=0\}$, $m\mapsto (mx,m(y-1))$, 逆映射为 $(a,b)\mapsto a(y-1)+bx$.
+		
+%		在点 $p=(x_0,y_0)$ ($x_0^2+y_0^2 = 1$) 处, $M$ 的纤维为
+%		$$
+%		p^*M = M\otimes_A A/(x-x_0,y-y_0)
+%		\simeq (x,y-1)/(x,y-1)(x-x_0,y-y_0),
+%		$$
+%		容易发现它是 $x,y-1$ 生成的 $\mathbb{R}$-线性空间商掉 $x_0x+(y_0+1)(y-1)=0$.
+%		考虑 $A$-模同态 $A^2 \to M$, $(1,0)\mapsto x, (0,1)\mapsto (y-1)$. 它的核是 $(x,y+1)\in A^2$ 生成的一阶自由 $A$-模.
+		下面介绍一个聪明办法. 考虑矩阵
+		$$
+		Q = \frac{1}{2}\begin{pmatrix}
+			1-x & y\\
+			y & 1+x
+		\end{pmatrix},
+		$$
+		则有
+		$Q^2=Q$. 从而 $2$ 阶平凡向量丛可分解为两个线丛: $$A^2\simeq \ker(1-Q)\oplus\ker(Q) = \operatorname{im}(Q)\oplus\ker(Q).$$ 考虑投影 $\operatorname{pr}_1\colon A^2\to A$, 注意到 $M=\operatorname{pr}_1(\operatorname{im}(Q))$. 我们断言 $\operatorname{pr}_1\colon \operatorname{im}(Q)\to M$ 为同构, 也即 $\ker(\operatorname{pr}_1) \cap \operatorname{im}(Q) = 0$. 假设 $(0,a)\in \ker(\operatorname{pr}_1) \cap \operatorname{im}(Q)$, 则 $ay=0$, $(1+x)a=a$, 故 $a=(x^2+y^2)a=0$. 这证明了 $M$ 为向量丛.
+		
+		考虑 $A'=\operatorname{Spec} \mathbb{R}[X,Y]/(X^2+Y^2-1)$ 以及映射 $\varphi\colon \operatorname{Spec} A'\to\operatorname{Spec} A$, $(X,Y)\mapsto (x,y)=(X^2-Y^2,2XY)$. 几何上这是圆的二重覆叠 (考虑单位复数的平方).
+		那么 $\varphi^*M = M\otimes_A A' = (X^2-Y^2-1,2XY) = (Y^2,XY)=(Y)$, 也即 $\varphi^*M$ 为平凡线丛. 这表明 M\"obius 带被二重覆叠平凡化.
+	\end{example}
+	
+	\begin{definition}
+		{(向量丛的对偶)}
+		设 $E$ 是概形 $X$ 上的向量丛. 定义 $E$ 的\emph{对偶}为
+		$$E^{\vee} := \internalhom_{\mathcal O_X}(E,\mathcal O_X),$$
+		其在每个仿射开子空间 $U=\operatorname{Spec} A\to X$ 上为 $\operatorname{Hom}_A(E|_U,A)$.
+	\end{definition}
+	
+	\begin{prop}
+		[label={vector-bundle-identities}]
+		{}
+		对于概形 $X$ 上的向量丛 $E,F,G$, 有自然同构
+		\begin{itemize}
+			\item $E \simeq E^{\vee\vee}$;
+			\item $\internalhom_{\mathcal O_X}(E,F)\simeq E^\vee\otimes F$;
+			\item $\internalhom_{\mathcal O_X}(E\otimes F,G) \simeq \internalhom_{\mathcal O_X}(E,\internalhom_{\mathcal O_X}(F,G))$.
+		\end{itemize}
+	\end{prop}
+	
+	\begin{prop}
+		{(Picard 群)}
+		概形 $X$ 上的线丛的同构类关于张量积构成一个群, 称为 \emph{Picard 群} $\operatorname{Pic}(X)$. 其中线丛 $L$ 的逆为 $L^\vee$.
+	\end{prop}
+%	\begin{proof}
+%		由命题 \ref{vector-bundle-identities},
+%		\todo{}
+%		$$
+%		\operatorname{Hom}(L\otimes L^\vee,-)\simeq\operatorname{Hom}(L,)
+%		$$
+%	\end{proof}
+	
+	\begin{definition}
+		{(向量丛的全空间)}
+		设 $E$ 是概形 $X$ 上的向量丛. 定义其\emph{全空间}为 $X$-概形
+		$\operatorname{Spec}_X\operatorname{Sym}_{\mathcal O_X}(E^{\vee})$. 其中 $\operatorname{Sym}_{\mathcal O_X}(F)$ 是 $F$ 自由生成的 ($\mathsf{QCoh}(X)$ 中的) 交换代数, 可定义为张量代数的商 $\bigoplus_{n\geq 0}(F^{\otimes n})_{S_n}$.
+	\end{definition}
+	
+	\begin{example}
+		{}
+		$\operatorname{Spec} \mathbb{Z}$ 上平凡丛 $\mathbb{Z}^n$ 的全空间为 $\operatorname{Spec}\operatorname{Sym}\mathbb{Z}^n\simeq \operatorname{Spec}\mathbb{Z}[x_1,\cdots,x_n] \simeq\mathbb A^n$.
+	\end{example}
+	
+	射影空间 $\mathbb P^n$ 是 ``$\mathbb A^{n+1}$ 中直线的模空间'', 因此 $\mathbb P^n$ 的点函子由线丛给出.
+	
+	\begin{propdef}
+		[label={definition-projective-space}]
+		{(射影空间)}
+		$n$ 维射影空间 $\mathbb P^n$ 是如下空间:
+		$$
+		A\mapsto
+		\big\{
+		(L,s)
+		\mid
+		\text{$L$ 为 $\operatorname{Spec} A$ 上的线丛,  $s\colon L\to \mathcal O_{\operatorname{Spec} A}^{n+1}$ 处处非零}
+		\big\}
+		\big/
+		\text{同构},
+		$$
+		其中 $s$ 处处非零的意思是拉回到任何仿射概形上非零. 那么 $\mathbb P^n$ 是一个概形.
+	\end{propdef}
+	\begin{proof}
+		$\mathbb P^n$ 是 Zariski 层的原因是 ``线丛可以粘''. 下面给出 $\mathbb P^n$ 的仿射开覆盖. 考虑 $\mathbb P^n$ 的开子空间
+		$$
+		U_i\colon A\mapsto \big\{(L,(s_0,\cdots,s_n)\colon L\to\mathcal O_{\operatorname{Spec} A}^{n+1})\mid \text{$s_i$ 处处非零}\big\}\big/\text{同构}.
+		$$
+		注意到 $s_i\colon L\to\mathcal O_{\operatorname{Spec} A}$ 为同构, 从而 $(s_0,\cdots,s_n)$ (模去同构) 的信息恰等同于 $n$ 个函数 $(s_js_i^{-1})_{j\neq i}$, 这说明 $U_i$ 同构于 $\mathbb A^n$. 通常以 $x_j^{(i)}\,(j\neq i)$ 记 $U_i$ 上的坐标函数. 在 $U_i\cap U_k$ 上有
+		$$
+		x_j^{(i)} = \frac{x_j^{(k)}}{x_i^{(k)}}\quad \text{(约定 $x_i^{(i)} = 1$)}.
+		$$
+		
+		接下来说明 $U_0,\cdots,U_n$ 覆盖了 $\mathbb P^n$. 对任意映射 $\operatorname{Spec} A \to \mathbb P^n$, 对应 $\operatorname{Spec} A$ 上的线丛 $L$ 以及处处非零的映射 $(s_0,\cdots,s_n)\colon L\to\mathcal O_{\operatorname{Spec} A}^{n+1}$, 不妨设 $L$ 平凡 (化归到局部), 于是 $(s_0,\cdots,s_n)$ 处处非零意味着 $\{\operatorname{Spec} A\times_{\mathbb P^n} U_i\}$ 构成 $\operatorname{Spec} A$ 的 Zariski 覆盖, 特别地, 至少存在一个 $i$ 使得 $\operatorname{Spec} A\times_{\mathbb P^n} U_i$ 非空.
+	\end{proof}
+	
+	上述定义可推广为向量丛的射影化.
+	
+	\begin{definition}
+		{(向量丛的射影化)}
+		设 $E$ 为概形 $X$ 上的向量丛, 定义其\emph{射影化} (projectivization) $\mathbb P(E)$ 为如下空间:
+		$$
+		\begin{aligned}
+			A\mapsto \big\{
+			(L,x,i)
+			&\mid
+			\text{$L$ 为 $\operatorname{Spec} A$ 上的线丛,
+				$x\colon \operatorname{Spec} A\to X$,}\\
+			&\ \ \ 
+			\text{$i\colon L\to x^*E$ 处处非零
+			}
+			\big\}
+			\big/\text{同构}.
+		\end{aligned}
+		$$
+	\end{definition}
+	
+	\begin{example}
+		{}
+		$\mathbb P^n$ 是 $\operatorname{Spec} \mathbb{Z}$ 上的平凡丛 $\mathbb{Z}^{n+1}$ 的射影化.
+		更一般地, 概形 $X$ 上的平凡丛 $\mathcal O_X^{n+1}$ 的射影化为 $\mathbb P^n_X := \mathbb P^n\times X$. 由于向量丛局部上为平凡丛, 这说明了向量丛的射影化为概形.
+	\end{example}
+	
+	射影空间上有一类重要的向量丛.
+	首先是重言丛, 其直观为对 $\mathbb P^n$ 的每个点赋予该点对应的 $\mathbb A^{n+1}$ 中的直线.
+	
+	\begin{definition}
+		{(重言丛)}
+		定义 $\mathbb P^n$ 上的\emph{重言丛} $\mathcal O_{\mathbb P^n}(-1)$ 如下.
+		对任意映射 $f\colon \operatorname{Spec} A\to \mathbb P^n$, 对应 $\operatorname{Spec} A$ 上的线丛 $L$ 以及处处非零的映射 $(s_0,\cdots,s_n)\colon L\to \mathcal O_{\operatorname{Spec} A}^{n+1}$,
+		定义 $\mathcal O_{\mathbb P^n}(-1)_f = L.$
+	\end{definition}
+	
+	\begin{definition}
+		{}
+		对于自然数 $k$, 定义
+		$$
+		\mathcal O_{\mathbb P^n}(k):= (\mathcal O_{\mathbb P^n}^\vee)^{\otimes k},\quad
+		\mathcal O_{\mathbb P^n}(-k):=\mathcal O_{\mathbb P^n}^{\otimes k}.
+		$$
+	\end{definition}
+	
+	\begin{prop}
+		{}
+		对于自然数 $k$,
+		$\mathcal O_{\mathbb P^n}(k)$
+		的截面等同于 $x_0,\cdots,x_n$ 的整系数 $k$ 次齐次多项式.
+	\end{prop}
+	
+	\begin{prop}
+		{(Euler 正合列)}
+		考虑射影空间 $\mathbb P^n$ 上的微分层 $\Omega_{\mathbb P^n}$, 它是如下的拟凝聚层: 使用定义 \ref{definition-projective-space} 中的开覆盖 $U_0,\cdots,U_n$, 其在 $U_i$ 上为 $\{dx_j^{(i)}\}_{j\neq i}$ 生成的自由 $\mathcal O_{U_i}$-模 (即 $\mathbb{Z}[\{x_j^{(i)}\}_{j\neq i}]$-模), 在 $U_i\cap U_k$ 上有同构
+		$$
+		dx_j^{(i)} = \frac{x_i^{(k)}dx_j^{(k)} - x_j^{(k)}dx_i^{(k)}}{(x_i^{(k)})^2}.
+		$$
+		考虑拟凝聚层的同态 $\Omega_{\mathbb P^n}\to\Omega_{\mathbb P^n}^{\oplus(n+1)}$,
+		
+		\emph{Euler 正合列}是如下序列:
+		$$
+		0 \to \Omega_{\mathbb P^n} \to \mathcal O_{\mathbb P^n}(-1)^{\oplus (n+1)} \to \mathcal O_{\mathbb P^n}\to 0.
+		$$
+	\end{prop}
+	
+	\section{有限性}
+	
+	\begin{definition}
+		{(拟紧概形, 拟紧映射)}
+		称具有有限仿射开覆盖的概形为\emph{拟紧} (quasicompact) 的.
+		对于映射 $f\colon X\to Y$, 若对任意仿射概形到 $Y$ 的映射 $\operatorname{Spec} A\to Y$, $X\times_Y\operatorname{Spec} A$ 拟紧 (事实上只需对 $Y$ 的一个仿射开覆盖成立此条件), 则称映射 $f$ 拟紧.
+	\end{definition}
+	
+	当然, 仿射概形以及仿射概形之间的态射都是拟紧的.
+	
+	\begin{definition}
+		{(拟分离概形, 拟分离映射)}
+		称满足如下等价条件的概形为\emph{拟分离} (quasiseparated) 的:
+		\begin{itemize}
+			\item 对角线 $\Delta\colon X\to X\times X$ 拟紧;
+			\item $X$ 中任意两个仿射开子空间的交拟紧.
+		\end{itemize}
+		对于映射 $f\colon X\to Y$, 若 $\Delta_f\colon X\to X\times_Y X$ 拟紧, 则称 $f$ 拟分离.
+	\end{definition}
+	
+	由定义, \emph{拟紧拟分离概形}可被有限个仿射开子空间覆盖, 且两两的交仍为仿射开子空间. 这导致其上的拟凝聚层等对象的操作十分便利.
+	
+	\begin{example}
+		{(非拟紧, 非拟分离的例子)}
+		考虑 $\mathbb A^\infty :=\operatorname{Spec} \mathbb{Z}[x_1,x_2,\cdots]$,
+		则 $\mathbb A^\infty \setminus 0$ 非拟紧. 进而
+		$\mathbb A^\infty \sqcup_{\mathbb A^\infty\setminus 0}\mathbb A^\infty$ 非拟分离.
+	\end{example}
+	
+	\begin{propdef}
+		{(拟凝聚层的推前)}
+		设 $f\colon X\to Y$ 为概形的拟紧拟分离态射, $F\in\mathsf{QCoh}(X)$, 定义 $f_*F$ 如下: 对任意仿射开子空间 $U=\operatorname{Spec} A\to Y$,
+		$$
+		(f_*F)|_U = \Gamma(F|_{X\times_Y U}),\in\mathsf{QCoh}(\operatorname{Spec} A)=\operatorname{Mod}(A).
+		$$
+		其中 $\Gamma(F|_{X\times_Y U})$ 视为 $A$-模的方式是通过环同态 $A=\Gamma(U,\mathcal O_U)\to\Gamma(X\times_Y U,\mathcal O_{X\times_Y U})$ (命题 \ref{global-section-functoriality-on-scheme}).
+		那么 $f_*F$ 为良定义的拟凝聚层.
+	\end{propdef}
+	
+	\begin{example}
+		{(仿射概形之间拟凝聚层的推前)}
+		设 $f\colon \operatorname{Spec} B \to \operatorname{Spec} A$ 为仿射概形的态射,
+		则 $f_*\colon \mathsf{QCoh}(\operatorname{Spec} B)\to\mathsf{QCoh}(\operatorname{Spec} A)$ 正是将 $B$-模通过环同态 $A\to B$ 视为 $A$-模的 ``遗忘'' 函子. 它的左伴随 $f^*\colon \mathsf{QCoh}(\operatorname{Spec} A) \to\mathsf{QCoh}(\operatorname{Spec} B)$ 是 ``自由'' 函子 $(-)\otimes_A B$.
+		
+		设 $f\colon X \to Y=\operatorname{Spec} A$, 则 $f_*\colon \mathsf{QCoh}(X)\to\mathsf{QCoh}(\operatorname{Spec} A)$ 是整体截面函子 $\Gamma(X,-)$.
+	\end{example}
+	
+	\begin{prop}
+		[label={qcqs-qcoh-adjunction}]
+		{}
+		对于拟紧拟分离态射 $f\colon X\to Y$, 有伴随 $f^*\dashv f_*$, 即自然同构
+		$$
+		\operatorname{Hom}_{\mathsf{QCoh}(X)}(f^*-,-)\simeq\operatorname{Hom}_{\mathsf{QCoh}(Y)}(-,f_*-).
+		$$
+	\end{prop}
+	\begin{proof}
+		先假设 $Y=\operatorname{Spec} A$.
+		我们构造伴随的余单位 $f^*f_* \to \mathrm{id}_{\mathsf{QCoh}(X)}$.
+		设 $F\in\mathsf{QCoh}(X)$.
+		则 $f_*F = \Gamma(F)$ (视为 $A$-模).
+		对任意 $g\colon \operatorname{Spec} B\to X$,
+		$(f^*f_*F)_g = \Gamma(F)\otimes_A B$.
+		要给出 $B$-模同态 $(f^*f_*F)_g\to F_g$, 只需给出 $A$-模同态 $\Gamma(F) \to \operatorname{Hom}_B(B,F_g)$, 而由定义 $\operatorname{Hom}_B(B,F_g)=\Gamma(g^*F)$. 于是所需的同态由命题 \ref{global-section-functoriality-on-scheme} 给出.
+		
+		再构造伴随的单位 $\mathrm{id}_{\operatorname{Mod}(A)}\to f_*f^*$.
+		%即 $A$-模同态 $M \to \operatorname{Hom}_{\mathsf{QCoh}(X)}(\mathcal O_X,f^*M)$.
+		对任意 $g\colon \operatorname{Spec} B\to X$,
+		$(f^*M)_g \simeq M\otimes_A B$, 故有 $A$-模同态 $M\to \operatorname{Hom}_B(B,f^*M)$; 这些同态共同给出了一个 $A$-模同态 $M\to \operatorname{Hom}_{\mathsf{QCoh}(X)}(\mathcal O_X,f^*M)$. 这就是所需的伴随的单位. 余下的工作是机械式的验证.
+		
+		对于 $Y$ 为任意概形的情形, 所需的伴随应能由仿射概形的情形和拟凝聚层的下降给出.
+	\end{proof}
+	
+	\begin{example}
+		{}
+		由命题 \ref{qcqs-qcoh-adjunction},
+		对于拟紧拟分离态射 $f\colon X\to Y$,
+		恒等映射 $\mathrm{id}\colon \mathcal O_X=f^*\mathcal O_Y\to \mathcal O_X$ 给出 $Y$ 上拟凝聚层的态射 $\mathcal O_Y \to f_*\mathcal O_X$.
+	\end{example}
+	
+	\section{连通与不可约}
+	
+	\begin{definition}
+		{(连通, 连通分支)}
+		若一个概形不能表示为两个不交的开子概形的并, 则称其\emph{连通}.
+		概形的\emph{连通分支}是指既开又闭的连通子概形.
+	\end{definition}
+	
+	\begin{definition}
+		{(概形论意义下的像)}
+		设 $f\colon X\to Y$ 为拟紧拟分离映射,
+		则有 $Y$ 上拟凝聚层的态射 $\mathcal O_Y \to f_*\mathcal O_X$, 记其核对应的 $Y$ 的闭子概形为 $\overline{f(X)}$, 称为映射 $f$ \emph{在概形论意义下的像} (scheme-theoretic image).
+		若 $\overline{f(X)}=Y$ (也即 $\mathcal O_Y \to f_*\mathcal O_X$ 为单射), 则称 $f$ 为\emph{优势} (dominant) 映射. 若子空间的嵌入为优势映射, 则称之为\emph{稠密}子空间.
+	\end{definition}
+	
+	\begin{prop}
+		{}
+		一个子空间 $V\to X$ 稠密当且仅当它与任何开子空间 $U\to X$ 的交 $V\times_X U$ 非空.
+	\end{prop}
+	
+	\todo{}
+	
+	\begin{example}
+		{}
+		嵌入映射 $\mathbb A^1\setminus 0 \to \mathbb A^1$ 为优势映射.
+	\end{example}
+	
+	\begin{definition}
+		{(不可约)}
+		若概形 $X$ 的任意非空开子空间都稠密, 则称 $X$ \emph{不可约}.
+	\end{definition}
+	
+	\begin{prop}
+		{}
+		仿射概形 $\operatorname{Spec} A$ 不可约当且仅当 $A$ 为整环.
+	\end{prop}
+	\begin{proof}
+		
+	\end{proof}
+	
+	\section{维数}
+	
+	
+	
+	\section{映射的性质}
+	
+	\subsection{(局部) 有限型映射}
+	
+	\begin{definition}
+		[label={locally-finite-type-morphism}]
+		{((局部) 有限型映射)}
+		设 $f\colon X\to Y$ 为概形映射.
+		\begin{itemize}
+			\item 先设 $Y=\operatorname{Spec} A$ 为仿射概形. 若对任意仿射开子空间 $\operatorname{Spec} B\subset X$, 环同态 $A\to B$ 使 $B$ 成为有限生成 $A$-代数, 则称 $f\colon X\to Y$ 为\emph{局部有限型} (locally finite type).
+			\item 设 $Y$ 为任意概形. 若对任意仿射开子空间 $U=\operatorname{Spec} A\subset Y$, 映射 $X\times_Y U \to Y$ 为局部有限型, 则称 $f\colon X\to Y$ 为局部有限型.
+			\item 若 $f\colon X\to Y$ 为局部有限型, 且 $X$ 拟紧, 则称 $f$ 为\emph{有限型} (finite type).
+		\end{itemize}
+	\end{definition}
+	
+	\begin{example}
+		{(不是局部有限型的映射)}
+		\begin{itemize}
+			\item 映射 $\mathbb A^n\to\operatorname{Spec} Z$ 是局部有限型, 而映射 $\mathbb A^{\infty}=\operatorname{Spec} \mathbb{Z}[x_1,x_2,\cdots] \to \operatorname{Spec} \mathbb{Z}$ 不是局部有限型.
+			\item 考虑 $p$-进整数环 $\mathbb{Z}_p = \lim_n \mathbb{Z}/p^n\mathbb{Z}$. 映射 $\operatorname{Spec} \mathbb{Z}_p \to \operatorname{Spec} \mathbb{Z}$ 不是局部有限型.
+			这是因为 $\mathbb{Z}_p$ 不可数, 而一个有限生成 $\mathbb{Z}$-代数是可数的.
+			\item 设 $k$ 为域, 考虑形式幂级数环 $k[\![x]\!]=\lim_n k[x]/(x^n)$. 映射 $\operatorname{Spec} k[\![x]\!] \to \operatorname{Spec} k$ 不是局部有限型. 这是因为 $k[\![x]\!]$ 是无穷维 $k$-线性空间, 而一个有限生成 $k$-代数是有限维 $k$-线性空间.
+		\end{itemize}
+	\end{example}
+	
+	\subsection{整态射}
+	
+	\begin{definition}
+		{(整态射)}
+		设 $f\colon X\to Y$ 为概形态射. 若 $f$ 满足如下条件, 则称之为\emph{整态射}:
+		\begin{itemize}
+			\item 存在仿射开覆盖 $\{Y_\alpha \to Y\}$ (定义 \ref{open-cover-affine-open-cover}), 使得 $f^*Y_\alpha := X\times_Y Y_\alpha$ 为仿射概形, 且其对应的环 $\mathcal O(f^*Y_\alpha)$ 为 $\mathcal O(Y_\alpha)$ 上的整代数.
+		\end{itemize}
+	\end{definition}
+	
+	\subsection{导子, 非分歧态射与平展态射}
+	
+	导子是导数运算的推广.
+	
+	\begin{propdef}
+		{(导子, 微分模)}
+		设 $A\to B$ 为环同态, $M$ 为 $B$-模. 定义 $B$ 到 $M$ 的 $A$-\emph{导子} (derivation) 为满足如下条件的 $A$-模同态 $B\to M$:
+		\begin{itemize}
+			\item (Leibniz 法则) $d(xy)=xd(y)+d(x)y$.
+		\end{itemize}
+		记 $B$ 到 $M$ 的 $A$-导子构成的 $A$-模为 $\operatorname{Der}_A(B,M)$.
+		
+		导子有如下的等价定义. 考虑环 $B+M$, 其乘法来自 $B$ 的乘法与 $M$ 的 $B$-模结构, 约定两个 $M$ 的元素的乘积为零. 那么
+		$$
+		\operatorname{Der}_A(B,M) \simeq \operatorname{Hom}_{A\text{-}\mathsf{Alg}_{/B}}(B,B+M),
+		$$
+		即 $B$ 到 $M$ 的一个导子等同于 $\mathsf{Aff}_{/\operatorname{Spec} A}$ 中 $\operatorname{Spec} B \to \operatorname{Spec} (B+M)$ 的一个收缩.
+		
+		定义微分模 $\Omega_{B/A}$ 为满足如下万有性质的 $B$-模: 对任意 $B$-模 $M$ 有自然同构
+		$$
+		\operatorname{Hom}_B(\Omega_{B/A},M)\simeq\operatorname{Der}_A(B,M).
+		$$
+		换言之, 任何 $A$-导子 $B\to M$ 都穿过一个\emph{万有导子} $d\colon B\to\Omega_{B/A}$.
+		容易证明 $\Omega_{B/A}$ 是由 $df\,(f\in B)$ 在 Leibniz 法则下生成的 $B$-模. 注意 Leibniz 法则保证 $d(1)=0$, 进而由 $A$-线性的条件, 对 $a\in A$ 有 $d(a)=0$.
+		
+		使用对角线可给出 $\Omega_{B/A}$ 的另一个等价定义. 考虑对角线 $\Delta \colon \operatorname{Spec} B\to \operatorname{Spec} B\times_{\operatorname{Spec} A}\operatorname{Spec} B$, 它是闭嵌入, 记 $I$ 为对应的 $B\otimes_A B$ 的理想, 则 $\Omega_{B/A}$ 可定义为 $I/I^2$.
+	\end{propdef}
+	\begin{proof}
+		我们验证导子的两个定义等价.
+		若 $d(xy)=xd(y)+d(x)y$, 则
+		$$
+		(x+d(x))(y+d(y)) = xy + xd(y) + d(x)y = xy+d(xy),
+		$$
+		故映射 $B\to B+M,\,x\mapsto x+d(x)$ 为环同态. 另一方面, $A\text{-}\mathsf{Alg}_{/B}$ 中的同态 $B\to B+M$ 必然将 $x\in B$ 映射到 $x+d(x)$, $d(x)\in M$, 且由上面的计算, $d$ 满足 Leibniz 法则.
+	\end{proof}
+	
+	\begin{example}
+		{(来自微分几何的直观)}
+		\begin{itemize}
+			\item 流形 $M$ 上一点 $p$ 处的一个切向量 $X_p$ 等同于一个导子 $X_p\in \operatorname{Der}_{\mathbb R}(C^\infty(M),\mathbb R)$,
+			其中 $\mathbb R$ 的 $C^\infty(M)$-模结构来自 $C^\infty(M)/\mathfrak m_p\simeq\mathbb R$, 而 $\mathfrak m_p$ 为在 $p$ 处消失的光滑函数构成的极大理想.
+			\item 流形 $M$ 上一个切向量场 $X$ 等同于一个导子 $X\in\operatorname{Der}_{\mathbb R}(C^\infty(M),C^\infty(M))$.
+		\end{itemize}
+	\end{example}
+	
+	\begin{example}
+		{}
+		设 $k$ 为特征 $0$ 域, 考虑 $A=k[x]$ 以及曲线 $y^2=x^3$ 对应的环 $B=k[x,y]/(y^2-x^3)$,
+		此时有
+		\begin{itemize}
+			\item $
+			\Omega_{B/k} \simeq (Bdx\oplus Bdy)/(2ydy-3x^2dx)
+			$;
+			\item 
+			$\Omega_{B/A} \simeq B/(2y) \simeq k[x]/(x^3)$.
+		\end{itemize}
+		
+		注意 $\Omega_{B/k}$ 有挠: 设 $$\omega = 3ydx - 2xdy,$$ 则 $\omega\neq 0$, 但 $$y\omega = 3y^2dx - 2xydy = 3(y^2-x^3)dx = 0.$$
+		这说明在 $y$ 非零处有 $\omega = 0$.
+	\end{example}
+	
+	\begin{example}
+		{}
+		设 $k$ 为特征 $0$ 域, $A=k[x]/(x^n)$,
+		则 $\Omega_{A/k} \simeq Adt/(x^{n-1}dt)$.
+	\end{example}
+	
+	\begin{definition}
+		{(微分层)}
+		设 $f\colon X\to Y$ 为概形映射. 定义\emph{微分层} $\Omega_{X/Y}$ 为 $X$ 上的如下拟凝聚层: 对仿射开子空间 $\varphi\colon U=\operatorname{Spec} A \to X$ 与 $\psi\colon V=\operatorname{Spec} B\to Y$ 满足 $f(U)\subset V$ (即 $f\varphi$ 穿过 $\psi$),
+		$$
+		\Omega_{X/Y}|_U = \Omega_{A/B}.
+		$$
+		
+		使用对角线可给出 $\Omega_{X/Y}$ 的一个等价定义. 考虑对角线 $\Delta\colon X\to X\times_Y X$, 它是闭嵌入, 记 $I$ 为其对应的理想层, 则 $\Omega_{X/Y}$ 可定义为 $\Delta$ 的余法层, 即 $I/I^2$.
+	\end{definition}
+	
+	\begin{prop}
+		{(微分层的泛性质)}
+		设 $f\colon X\to Y$ 为概形映射. 对于 $F\in\mathsf{QCoh}(X)$, 定义 $Y$-导子为满足如下条件的 \todo{}-模同态 $\mathcal O_X\to F$:
+		\begin{itemize}
+			\item (Leibniz 法则) $d$
+		\end{itemize}
+		
+		那么有自然同构
+		$$
+		\operatorname{Hom}_{\mathcal O_X}(\Omega_{X/Y},F) \simeq \operatorname{Der}_Y(\mathcal O_X,F).
+		$$
+		换言之, 任何 $Y$-导子 $\mathcal O_X\to F$ 都穿过一个\emph{万有导子} $d\colon \mathcal O_X\to\Omega_{X/Y}$.
+	\end{prop}
+	
+	\begin{propdef}
+		{(非分歧环同态)}
+		设 $\varphi\colon A\to B$ 为环同态. 假设 $\varphi$ 为有限型 (定义 \ref{locally-finite-type-morphism}). 若 $\varphi$ 进一步满足如下等价条件之一, 则称其\emph{非分歧} (unramified):
+		\begin{enumerate}[(1)]
+			\item 对角线 $\Delta\colon \operatorname{Spec} B\to \operatorname{Spec} B\times_{\operatorname{Spec} A}\operatorname{Spec} B$ 为开嵌入 (定义 \ref{complement-open-embedding});
+			\item $\Omega_{B/A}\simeq 0$.
+		\end{enumerate}
+	\end{propdef}
+	\begin{proof}~
+		\begin{itemize}
+			\item $(2)\Rightarrow (1)$. 记 $I = \ker (B\otimes_A B \to B)$. 假设 $\Omega_{B/A}\simeq 0$, 则 $I=I^2$. 设 $B$ 作为 $A$-代数由 $\{x_i\}$ 生成, 那么 $I$ (作为 $B\otimes_A B$-模) 由有限多个元素 $x_i\otimes 1 - 1\otimes x_i$ 生成.
+			由中山引理, 存在 $e\in I$ 使得 $(1-e)I=0$, 从而 $e^2=e$, 且 $I=(e)$. 此时有分解 $$\operatorname{Spec} (B\otimes_A B) \simeq D(e) \sqcup D(1-e),$$
+			(参考例 \ref{idempotent-spec-decomposition}) 其中对角线为 $V(e)=D(1-e)$, 从而为开嵌入.
+		\end{itemize}
+		
+	\end{proof}
+	%Ciallo $\sim(\angle\cdot\omega<)$
+	
+	\begin{example}
+		{(非分歧域扩张)}
+		设 $K\to L$ 为域的有限扩张.
+		$\operatorname{Spec} L \to \operatorname{Spec} K$ 非分歧当且仅当该域扩张可分.
+		
+		假设该扩张可分, 即对任意 $\alpha\in L$ 存在多项式 $f\in K[x]$ 使得 $f(\alpha) = 0$, $f'(\alpha)\neq 0$. 对于万有导子 $d\colon K \to\Omega_{L/K}$ 有 $$0=d(f(\alpha))=f'(\alpha)d\alpha,$$
+		这表明 $d\alpha = 0$, 从而 $\Omega_{L/K}\simeq 0$.
+		
+		余下的论证参见 \cite{Mat70} 第 10 章第 27 节. %这是因为交换代数中有个引理指出 $\Omega_{L/K}$ 的阶至少为 $L$ 在 $K$ 上的超越度数. 若 $\Omega_{L/K}\simeq 0$ 则 $L$ 是 $K$ 的代数扩张.
+	\end{example}
+%	\begin{proof}
+%		
+%	\end{proof}
+	
+	\begin{definition}
+		{(非分歧态射)}
+		设 $f\colon X\to Y$ 为概形态射. 若 $f$ 满足如下条件, 则称之为\emph{非分歧态射}:
+		\begin{itemize}
+			\item 存在仿射开覆盖 $\{Y_\alpha\to Y\}$, 使得环同态 $\mathcal O(Y_\alpha) \to \mathcal O(f^*Y_\alpha)$ 非分歧.
+		\end{itemize}
+	\end{definition}
+	
+	\begin{definition}
+		{(平展环同态)}
+		设 $\varphi \colon A \to B$ 为环同态, $B$ 为有限生成 $A$-代数. 若 $\varphi$ 进一步满足如下等价条件之一, 则称其\emph{平展} (\'etale).
+		\begin{itemize}
+			\item $\varphi\colon A\to B$ 非分歧, 且 $B$ 为平坦 $A$-模.
+			\item 对任意 $A$-代数 $C$ 以及平方为零的理想 $J\subset C$, $$\operatorname{Hom}_{A\text{-}\mathsf{Alg}}(B,C) \simeq \operatorname{Hom}_{A\text{-}\mathsf{Alg}}(B,C/J).$$
+			\item 设 $B$ 可表现为 $A[x_1,\cdots,x_n]/I$,
+			那么对 $A[x_1,\cdots,x_n]$ 中包含 $I$ 的任意素理想 $\mathfrak p$, 存在 $n$ 个元素 $p_1,\cdots,p_n\in I$ 使得 $I_{\mathfrak p}$ 由这些元素的像生成, 且
+			$$\det\Big( \frac{\partial p_i}{\partial x_j} \Big) \notin\mathfrak p.$$
+		\end{itemize}
+	\end{definition}
+	
+	
+	\subsection{域上的光滑概形}
+	
+	\begin{definition}
+		{(光滑 $k$-概形)}
+		设 $k$ 为域, $X$ 为 $k$-概形.
+		若如下条件成立, 则称 $X$ \emph{光滑}:
+		\begin{itemize}
+			\item $X$ 局部有限型 (定义 \ref{locally-finite-type-morphism});
+			\item $\Omega^1_{X}$ 为向量丛;
+			\item 对 $X$ 的每个不可约分支 $Z\subset X$, $\Omega^1_X|_Z$ 的阶为 $\dim Z$.
+		\end{itemize}
+	\end{definition}
+	
+	\begin{example}
+		{}
+		\begin{itemize}
+			\item 若 $n\geq 2$, 则 $\operatorname{Spec} k[x]/(x^n)$ 不光滑, 因为其维数为 $0$, 而 $\Omega^1\neq 0$.
+		\end{itemize}
+	\end{example}
+	
+	\chapter{意象理论}
+	
+	概形是一种空间, 意象也是一种空间. (这两种空间概念的产生主要都归功于 Grothendieck.) 每个概形都会以几种稍有不同的方式产生意象. 在了解意象之前, 最好先了解它的一个简单版本, 称为位象.
+	
+	\section{位象}
+	
+	% https://mathoverflow.net/questions/250263/locales-as-geometric-objects
+	
+	位象是以\emph{开子空间}为基本要素的空间. 位象的开子空间满足与拓扑空间的开子空间相同的性质; 但位象与拓扑空间的区别在于其定义不天然包含 ``点'' 的概念, 其开子空间不是由点构成的.
+	位象相比拓扑空间更适合用来描述概形.
+	
+	\newcommand{\fm}{位格}
+	
+	\begin{definition}
+		{(位象)}
+		一个\emph{位象} $X$ 包含的资料就是一个偏序集 $\mathcal O(X)$ (其中 $\mathcal O$ 只是一个形式的记号, 没有真实含义), 其中元素称为 $X$ 的\emph{开子空间}, 满足如下条件:
+		\begin{itemize}
+			\item $\mathcal O(X)$ 具有最大元 $\top$, 最小元 $\bot$, 有限交 $\land$ 和任意并 $\bigvee$, 即有限极限和任意余极限 (偏序集视为范畴);
+			\item $\mathcal O(X)$ 中的交关于并有分配律
+			$$
+			a\land\bigvee_{i\in I}b_i = \bigvee_{i\in I}(a\land b_i).
+			$$
+		\end{itemize}
+		这样的偏序集也叫\emph{\fm{}} (frame)\footnotemark{}.
+		位象之间的态射 $f\colon X\to Y$ 是\fm{}之间的保序映射 $f^*\colon \mathcal O(Y) \to \mathcal O(X)$, 且保持有限交与任意并.
+		记位象构成的范畴为 $\mathsf{Loc}$.
+	\end{definition}
+	
+	\footnotetext{Frame 没有通行的译名, 姑且用 ``\fm{}'', 因为它是代数结构 ``格'' (lattice) 的例子. 后文不会强调这一概念, 而是强调其对偶概念 ``位象''.}
+	
+	\begin{remark}
+		{}
+		由伴随函子定理, 位象的态射 $f\colon X\to Y$ 实际上对应着一对伴随函子
+		% https://q.uiver.app/#q=WzAsMixbMCwwLCJcXG1hdGhjYWwgTyhYKSJdLFsxLDAsIlxcbWF0aGNhbCBPKFkpIl0sWzAsMSwiZl8qIiwyLHsib2Zmc2V0IjoyfV0sWzEsMCwiZl4qIiwyLHsib2Zmc2V0IjoyfV0sWzMsMiwiIiwyLHsibGV2ZWwiOjEsInN0eWxlIjp7Im5hbWUiOiJhZGp1bmN0aW9uIn19XV0=
+		\[\begin{tikzcd}[ampersand replacement=\&]
+			{\mathcal O(X)} \& {\mathcal O(Y),}
+			\arrow[""{name=0, anchor=center, inner sep=0}, "{f_*}"', shift right=2, from=1-1, to=1-2]
+			\arrow[""{name=1, anchor=center, inner sep=0}, "{f^*}"', shift right=2, from=1-2, to=1-1]
+			\arrow["\dashv"{anchor=center, rotate=-90}, draw=none, from=1, to=0]
+		\end{tikzcd}\]
+		其中 $f^*$ 保持有限极限和任意余极限.
+	\end{remark}
+	
+	\begin{example}
+		{}
+		拓扑空间可给出位象. 对于拓扑空间 $X$, 其视为位象有 $\mathcal O(X) = \{\text{$X$ 的开子集}\}$. 拓扑空间之间的连续映射 $X\to Y$ 将 $Y$ 的开子集拉回为 $X$ 的开子集, 保持有限交与任意并, 从而也给出位象的态射 $X\to Y$.
+		上述对应构成一个函子 $$\mathsf{Top} \to \mathsf{Loc}.$$
+		注意这个函子并不忠实, 不同胚的拓扑空间有可能给出同构的位象. 例如任何非空集合上的平凡拓扑都给出同一个位象. 但是限制在分离性较好的空间 (例如 Hausdorff 空间) 上这个函子是忠实的.
+	\end{example}
+	
+	\begin{example}
+		{}
+		\begin{itemize}
+			\item 空集 $\varnothing$ 作为位象, $\mathcal O(\varnothing)=\{\bot\}$, 其中 $\top=\bot$.
+			\item 单点 $\mathrm{pt}$ 作为位象, $\mathcal O(\mathrm{pt}) = \{\bot,\top\}$.
+		\end{itemize}
+	\end{example}
+	
+	\begin{prop}
+		{}
+		\begin{itemize}
+			\item 
+			$\mathsf{Loc}$ 具有始对象 $\varnothing$.
+			\item 
+			$\mathsf{Loc}$ 具有终对象 $\mathrm{pt}$.
+			\item
+			$\mathsf{Loc}$ 中存在推出,
+			$$
+			\mathcal O(X\sqcup_Y Z) \simeq \mathcal O(X)\times_{\mathcal O(Y)}\mathcal O(Z).
+			$$
+			\item 
+			$\mathsf{Loc}$ 中存在拉回,
+			$$
+			\mathcal O(X\times_Y Z) \simeq \mathcal O(X)\otimes_{\mathcal O(Y)}\mathcal O(Z).
+			$$
+			其中 $\otimes$ 的定义类似于环的张量积, 是由 ``自由代数'' 商去必要的等价关系给出.
+		\end{itemize}
+	\end{prop}
+	
+	请读者比较上述命题与命题 \ref{aff-basic-cat-prop}.
+	
+	% https://q.uiver.app/#q=WzAsNCxbMCwwLCJcXHRleHR7546vfVxcLChBLCssXFx0aW1lcywwLDEpIl0sWzEsMCwiXFx0ZXh0e1xcZm19XFwsKFxcbWF0aGNhbCBPKFgpLFxcbG9yLFxcbGFuZCxcXGJvdCxcXHRvcCkiXSxbMCwxLCJcXHRleHR75Lu/5bCE5qaC5b2ifVxcLFxcc3BlYyBBIl0sWzEsMSwiXFx0ZXh0e+S9jeixoX1cXCwgWCJdLFswLDEsIiIsMCx7InN0eWxlIjp7ImJvZHkiOnsibmFtZSI6ImRhc2hlZCJ9LCJoZWFkIjp7Im5hbWUiOiJub25lIn19fV0sWzIsMywiIiwwLHsic3R5bGUiOnsiYm9keSI6eyJuYW1lIjoiZGFzaGVkIn0sImhlYWQiOnsibmFtZSI6Im5vbmUifX19XSxbMCwyXSxbMSwzXV0=
+	\[\begin{tikzcd}[ampersand replacement=\&]
+		{\text{环}\,(A,+,\times,0,1)} \& {\text{\fm}\,(\mathcal O(X),\bigvee,\land,\bot,\top)} \\
+		{\text{仿射概形}\,\operatorname{Spec} A} \& {\text{位象}\, X}
+		\arrow[dashed, no head, from=1-1, to=1-2]
+		\arrow[from=1-1, to=2-1]
+		\arrow[from=1-2, to=2-2]
+		\arrow[dashed, no head, from=2-1, to=2-2]
+	\end{tikzcd}\]
+	
+	\begin{definition}
+		{(仿射概形作为位象)}
+		对于环 $A$, 定义位象 $\operatorname{Spec} A$,
+		$\mathcal O(\operatorname{Spec} A)$ 由 $U_{f_i}\,(f_i\in A)$ 在如下关系之下生成,
+		\begin{itemize}
+			\item $U_0=\bot$, $U_1=\top$;
+			\item $U_{fg}=U_f\land U_g$, $U_{f+g}\leq U_f\lor U_g$.
+			%\item $\big(\bigvee_{i\in I}U_{f_i}\big) \land \big(\bigvee_{j\in J}U_{g_j}\big) = \bigvee_{i\in I,j\in J}U_{f_ig_j}$;
+			%\item $\bigvee_{j\in J}\big(\bigvee_{i\in I_j}U_{f_{i,j}}\big) = \bigvee_{j\in J,i\in I_j}U_{f_{i,j}}$.
+		\end{itemize}
+	\end{definition}
+	
+	
+	
+	\begin{definition}
+		{(位象的点)}
+		定义位象 $X$ 的\emph{点}是位象态射 $p\colon \mathrm{pt} \to X$. 换言之, $X$ 的点是保持有限交和任意并的映射 $p^*\colon \mathcal O(X)\to\mathcal O(\mathrm{pt})=\{\top,\bot\}$.
+		%		, 也等同于 $\mathcal O(X)$ 的子集 $P=(f^*)^{-1}(\top)$, 满足
+		%		\begin{itemize}
+			%			\item 若 $a\in P$, $a\leq b$, 则 $b\in P$;
+			%			\item 若 $a,b\in P$, 则 $a\land b\in P$;
+			%			\item 若 $\bigvee_{i\in I} a_i\in P$, 则存在 $i\in I$ 使得 $a_i\in P$.
+			%		\end{itemize}
+		%		这样的子集叫做 $\mathcal O(X)$ 的\emph{完全素滤子} (completely prime filter).
+	\end{definition}
+	
+	\begin{remark}
+		{}
+		一般地, 位象不能由它的点的行为控制. 例如一个非平凡的位象可以没有点 (并且一些没有点的位象也有研究价值, 不是 ``病态'' 的对象).
+	\end{remark}
+	
+	\begin{prop}
+		{}
+		仿射概形 $\operatorname{Spec} A$ 作为位象, 其点一一对应于 $A$ 的素理想.
+	\end{prop}
+	\begin{proof}
+		对于位象 $\operatorname{Spec} A$ 的点 $p\colon \mathrm{pt}\to\operatorname{Spec} A$,
+		考虑
+		$\mathfrak p = \{f\in A\mid p^*(U_f)=\bot\}$, 它满足
+		\begin{itemize}
+			\item 若 $f\in\mathfrak p$, $g\in A$, 则 $fg\in \mathfrak p$;
+			\item 若 $fg\in\mathfrak p$, 则 $f\in\mathfrak p$ 或 $g\in\mathfrak p$.
+		\end{itemize}
+		因此 $\mathfrak p$ 是 $A$ 的素理想.
+		另一方面, 给定 $A$ 的素理想 $\mathfrak p$,
+		构造位象态射 $p\colon \mathrm{pt}\to \operatorname{Spec} A$,
+		$$
+		p^*(U_f)=\begin{cases}
+			\top & f\notin\mathfrak p,\\
+			\bot & f\in\mathfrak p.
+		\end{cases}
+		\,(f\in A)
+		$$
+		由于 $U_f\,(f\in A)$ 构成 $\mathcal O(\operatorname{Spec} A)$ 的生成元,
+		只需验证上面给出的 $p^*$ 保持生成关系, 即
+		\begin{itemize}
+			\item $p^*(U_0)=\bot$, $p^*(U_1)=\top$;
+			\item $p^*(U_{fg}) = p^*(U_f) \land p^*(U_g)$, $p^*(U_{f+g}) \leq p^*(U_f) \lor p^*(U_g)$.
+		\end{itemize}
+		由 $\mathfrak p$ 为素理想, 上述关系成立.
+		
+		容易验证这给出了 $\operatorname{Spec} A$ 的点与 $A$ 的素理想之间的一一对应.
+	\end{proof}
+	
+	\begin{definition}
+		{(位象上的层)}
+		位象 $X$ 上的层是满足如下层条件的函子 $F\colon \mathcal O(X)^{\mathrm{op}} \to \mathsf{Set}$:
+		对任意一族开子空间的并 $U=\bigvee_{i\in I}U_i\,(U_i\in\mathcal O(X))$,
+		给定一族相容元素 $s_i\in F(U_i)$, 存在唯一的 $s\in F(U)$ 限制为每个 $s_i$.
+		记位象 $X$ 上的层的范畴为 $\mathrm{Sh}(X)$.
+	\end{definition}
+	
+	由定义, 拓扑空间上的层当然就是它对应的位象上的层. 这也说明对于层论而言, 考虑位象是比考虑拓扑空间更直接的.
+	
+	\begin{definition}
+		{(环化位象)}
+		一个\emph{环化位象} (ringed locale) $(X,\mathcal O_X)$ 是一个位象 $X$ 带有其上的环层 $\mathcal O_X$.
+		环化位象的态射 $X\to Y$ 是位象态射 $f\colon X\to Y$ 以及环层的同态 $f^*\mathcal O_Y\to\mathcal O_X$ (也即 $\mathcal O_Y\to f_*\mathcal O_X$).
+		记环化位象的范畴为 $\ringedlocale$.
+	\end{definition}
+	
+	\section{意象}
+	
+	意象 (这里仅谈论 Grothendieck 意象) 的定义很简洁, 它是一个景上的层范畴. 有许多的视角可以理解意象, 但在这里我们仅采取如下的观点: 一个意象是一个广义的空间. 例如拓扑空间和概形都会给出意象. 它允许我们用统一的语言来谈论各个数学分支中产生的几何对象.
+	
+	
+	\chapter{数论基础}
+	
+	\begin{definition}
+		{(数域)}
+		\emph{数域}是指有理数域 $\mathbb{Q}$ 的有限扩域.
+	\end{definition}
+	
+	\begin{example}
+		{(数域)}
+		如下是一些常见的数域.
+		\begin{itemize}
+			\item 有理数域 $\mathbb Q$.
+			\item $\mathbb Q(\zeta_N)$, 其中 $\zeta_N$ 是 $N$ 次单位根.
+		\end{itemize}
+	\end{example}
+	
+	\begin{definition}
+		{(函数域)}
+		设 $p$ 为素数, $\mathbb F_q$ 为 $\mathbb F_p$ 上的有限域. 在这个语境下, 一个\emph{函数域}是指如下等价的概念之一:
+		\begin{itemize}
+			\item $\mathbb F_q$ 上超越度为 $1$ 的有限生成扩域;
+			\item 有理函数域 $\mathbb F_q(x)$ 的有限扩域;
+			\item $\mathbb F_q$ 上的 (光滑, 射影, 几何不可约) 曲线上的有理函数域.
+		\end{itemize}
+	\end{definition}
+	
+	\begin{example}
+		{(函数域)}
+		如下是一些常见的函数域.
+		\begin{itemize}
+			\item 有理函数域 $\mathbb F_q(t)$.
+			\item $\mathbb F_q(x,y)/(y^2-x^3)$, 也可记为 $\mathbb F_q(x)(\sqrt{x^3})$.
+		\end{itemize}
+	\end{example}
+	
+
+	
+	\begin{definition}
+		{(整体域)}
+		\emph{整体域}是数域与函数域的统称.
+	\end{definition}
+	
+	\begin{definition}
+		{(绝对值, 位)}
+		域 $F$ 上的\emph{绝对值} (又称\emph{乘性范数}) 是映射 $\|{-}\|\colon F \to \mathbb R_{\geq 0}$, 满足
+		\begin{itemize}
+			\item $\|x\|=0\Leftrightarrow x=0$;
+			\item $\|x+y\|\leq \|x\|+\|y\|$;
+			\item $\|xy\|=\|x\|\cdot\|y\|$.
+		\end{itemize}
+		若 $\|{-}\|$ 进一步满足 $\|x+y\|\leq \max \{ \|x\|,\|y\|\}$, 则称其\emph{非 Archimedes}.
+		
+		定义\emph{位} (又称\emph{素位}) $v$ 为绝对值的等价类, 等价关系是两个绝对值诱导 $F$ 上相同的拓扑.
+	\end{definition}
+	
+	注意到域 $F$ 上的绝对值使得 $F$ 构成度量空间, 我们可考虑其作为度量空间的完备化, 即 Cauchy 序列的等价类构成的度量空间.
+	
+	与绝对值密切相关的是赋值. 赋值的概念来源于素因子分解中的指数; 每个赋值都可以产生一个绝对值.
+	
+	\begin{definition}
+		{(赋值)}
+		域 $F$ 上的\emph{赋值} (valuation) 是映射 $v\colon F \to \mathbb R\cap \{+\infty\}$, 满足
+		\begin{itemize}
+			\item $v(x)=+\infty \Leftrightarrow x=0$;
+			\item $v(x+y)\geq\min \{v(x),v(y)\}$;
+			\item $v(xy) = v(x) + v(y)$.
+		\end{itemize}
+	\end{definition}
+	
+	对任意赋值 $v\colon F\to \mathbb R \cup \{+\infty\}$,
+	以及固定的正数 $\varepsilon\in (0,1)$,
+	可以定义一个绝对值 $\|x\| = \varepsilon^{v(x)}$.
+	
+	\begin{example}
+		{($\mathbb Q$ 的位)}
+		有理数域 $\mathbb Q$ 有如下的位.
+		\begin{itemize}
+			\item 通常的绝对值给出一个位 $|{-}|\colon \mathbb{Q}\to\mathbb{R}_{\geq 0}$, 称为无穷位, Archimedes 位. 这个位的完备化为实数域 $\mathbb{R}$.
+			\item 对于素数 $p$, 有一个位 $|{-}|_p\colon \mathbb{Q}\to \mathbb{R}_{\geq 0}$, 称为有限位, 它来自 $p$-进赋值 $v_p$, 即有理数的素因子分解中 $p$ 的指数. 赋值 $v_p$ 给出一个绝对值 $|r|_p=p^{-v_p(r)}$. 这个位的完备化为 $p$-进数域 $\mathbb{Q}_p$.
+		\end{itemize}
+	\end{example}
+	
+	\begin{example}
+		{($\mathbb F_q(t)$ 的位)}
+		有理函数域 $\mathbb F_q(t)$ 有如下的位.
+		\begin{itemize}
+			\item 无穷位 $|{-}| \colon \mathbb F_q(t) \to \mathbb R_{\geq 0}$ 来自赋值 $v\Big(\dfrac{f(t)}{g(t)}\Big)= - \deg f + \deg g$. 这个位的完备化为 $\mathbb F_q((t^{-1}))$.
+			\item 对于首一不可约多项式 $p\in \mathbb F_q[t]$, 有一个位 $|{-}|_p\colon \mathbb F_q(t) \to \mathbb R_{\geq 0}$, 它来自赋值 $v_p$, 即不可约分解中 $p$ 的指数. 这个域的完备化为 Laurent 级数域 $\mathbb F_q((p))$.
+		\end{itemize}
+	\end{example}
+	
+	
+	
+	\printbibliography
+	
+\end{document}

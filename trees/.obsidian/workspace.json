@@ -1,0 +1,195 @@
+{
+  "main": {
+    "id": "d2d3d692f83f3a25",
+    "type": "split",
+    "children": [
+      {
+        "id": "c8bbe7611cf0fa07",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "d9f6e9082616e0d5",
+            "type": "leaf",
+            "state": {
+              "type": "empty",
+              "state": {},
+              "icon": "lucide-file",
+              "title": "新标签页"
+            }
+          }
+        ]
+      }
+    ],
+    "direction": "vertical"
+  },
+  "left": {
+    "id": "9dd124ed70337f96",
+    "type": "split",
+    "children": [
+      {
+        "id": "086a000f45ec655f",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "b3120f349d3b4ca7",
+            "type": "leaf",
+            "state": {
+              "type": "file-explorer",
+              "state": {
+                "sortOrder": "alphabetical",
+                "autoReveal": false
+              },
+              "icon": "lucide-folder-closed",
+              "title": "文件列表"
+            }
+          },
+          {
+            "id": "14e1278995e3259f",
+            "type": "leaf",
+            "state": {
+              "type": "bookmarks",
+              "state": {},
+              "icon": "lucide-bookmark",
+              "title": "书签"
+            }
+          },
+          {
+            "id": "a0cfb2b2ee2a8af8",
+            "type": "leaf",
+            "state": {
+              "type": "search",
+              "state": {
+                "query": "∞-",
+                "matchingCase": false,
+                "explainSearch": false,
+                "collapseAll": false,
+                "extraContext": false,
+                "sortOrder": "alphabetical"
+              },
+              "icon": "lucide-search",
+              "title": "搜索"
+            }
+          }
+        ],
+        "currentTab": 2
+      }
+    ],
+    "direction": "horizontal",
+    "width": 300
+  },
+  "right": {
+    "id": "3444949207edb107",
+    "type": "split",
+    "children": [
+      {
+        "id": "0e8c8d66b45a97ba",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "d210443e95411d02",
+            "type": "leaf",
+            "state": {
+              "type": "backlink",
+              "state": {
+                "collapseAll": false,
+                "extraContext": false,
+                "sortOrder": "alphabetical",
+                "showSearch": false,
+                "searchQuery": "",
+                "backlinkCollapsed": false,
+                "unlinkedCollapsed": true
+              },
+              "icon": "links-coming-in",
+              "title": "反向链接"
+            }
+          },
+          {
+            "id": "07463b6fe4bb2564",
+            "type": "leaf",
+            "state": {
+              "type": "outgoing-link",
+              "state": {
+                "linksCollapsed": false,
+                "unlinkedCollapsed": true
+              },
+              "icon": "links-going-out",
+              "title": "出链"
+            }
+          },
+          {
+            "id": "ba64fe5521d7981c",
+            "type": "leaf",
+            "state": {
+              "type": "tag",
+              "state": {
+                "sortOrder": "frequency",
+                "useHierarchy": true,
+                "showSearch": false,
+                "searchQuery": ""
+              },
+              "icon": "lucide-tags",
+              "title": "标签"
+            }
+          },
+          {
+            "id": "9853cb6ff09be06f",
+            "type": "leaf",
+            "state": {
+              "type": "all-properties",
+              "state": {
+                "sortOrder": "frequency",
+                "showSearch": false,
+                "searchQuery": ""
+              },
+              "icon": "lucide-archive",
+              "title": "添加笔记属性"
+            }
+          },
+          {
+            "id": "ec82780432183061",
+            "type": "leaf",
+            "state": {
+              "type": "outline",
+              "state": {
+                "followCursor": false,
+                "showSearch": false,
+                "searchQuery": ""
+              },
+              "icon": "lucide-list",
+              "title": "大纲"
+            }
+          }
+        ]
+      }
+    ],
+    "direction": "horizontal",
+    "width": 300
+  },
+  "left-ribbon": {
+    "hiddenItems": {
+      "switcher:打开快速切换": false,
+      "graph:查看关系图谱": false,
+      "canvas:新建白板": false,
+      "daily-notes:打开/创建今天的日记": false,
+      "templates:插入模板": false,
+      "command-palette:打开命令面板": false,
+      "bases:新建数据库": false
+    }
+  },
+  "active": "d9f6e9082616e0d5",
+  "lastOpenFiles": [
+    "∞-群.md",
+    "群胚对象.md",
+    "结合代数.md",
+    "E2-代数.md",
+    "Ani.md",
+    "∞-群胚.md",
+    "探测.md",
+    "脉.md",
+    "Segal空间.md",
+    "范畴对象.md",
+    "对称幺半范畴.md",
+    "对称幺半∞-范畴.md",
+    "半单Lie代数的表示.md"
+  ]
+}

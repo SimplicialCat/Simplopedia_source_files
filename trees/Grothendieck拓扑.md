@@ -1,0 +1,32 @@
+---
+title: Grothendieck 拓扑
+taxon: 百科
+author: [SimplicialCat](SimplicialCat.md)
+---
+
+## 定义
+
+### 使用范畴上的筛
+
+小范畴 $C$ 上的 Grothendieck 拓扑是对每个对象 $c\in C$ 指定一族[筛](筛.md), 称作**覆盖筛** (covering sieve), 满足如下条件.
+
+- 最大筛 $\{f: d \to c, d\in C\}$ 是覆盖筛;
+- (稳定性) 若 $S$ 是 $c$ 的覆盖筛, 则对任意 $h\colon d\to c$, $h^*(S)$ 是 $d$ 的覆盖筛;
+- (传递性) 若 $S$ 是 $c$ 的覆盖筛, $R$ 是 $c$ 上另一个筛, 使得对任意 $h\colon d\to c$, $h^*(R)$ 都是覆盖筛, 则 $R$ 也是覆盖筛.
+
+特别地, 包含一个覆盖筛的筛也是覆盖筛.
+
+### 使用意象中的态射族
+
+参考 [ABFJ-II](ABFJ.md).
+
+**定义**. [意象](意象.md) $\mathcal{C}$ 中的 **Grothendieck 拓扑**是满足如下条件的态射族 $\tau$:
+
+- $\tau$ 关于[基变换](基变换.md)封闭;
+- $\tau$ 可被沿[满射](意象中的满射.md)的[基变换](基变换.md)探测; 具体地, 对态射 $f$ 与满射 $g$, 若 $f$ 沿 $g$ 的拉回属于 $\tau$, 则 $f$ 属于 $\tau$;
+- $\tau$ 关于复合封闭;
+- 若 $fg$ 属于 $\tau$, 则 $f$ 属于 $\tau$.
+
+## 性质
+
+- [次典范拓扑](次典范拓扑.md)
