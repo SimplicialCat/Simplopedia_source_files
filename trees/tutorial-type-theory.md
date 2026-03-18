@@ -1,5 +1,5 @@
 ---
-title: 教程 : 类型论
+title: 类型论
 taxon: 教程
 author: [SimplicialCat](SimplicialCat.md)
 ---

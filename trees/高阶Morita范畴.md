@@ -9,7 +9,7 @@ author: [SimplicialCat](SimplicialCat.md)
 设 $n\in\mathbb{N}_{\geq 0}$ 为自然数, $\mathcal C$ 为对称幺半 $(\infty ,1)$-范畴 (或更一般的 [$\mathbb E_n$-幺半](En-代数.md) $(\infty ,1)$-范畴), 可构造一个 $(\infty ,n+1)$-范畴 $\mathsf{Morita}_{n}(\mathcal C)$,
 
 - $\mathsf{Morita}_{n}(\mathcal C)$ 的对象为 $\mathcal C$ 中的 [$\mathbb E_n$-代数](En-代数.md);
-- $\mathsf{Morita}_{n}(\mathcal C)$ 的对象为 $\mathcal C$ 中两个对象 $A,B$ 之间的态射范畴为双模范畴 $\mathsf{BiMod}(A,B)$ 的低一阶的 Morita 范畴
+- $\mathsf{Morita}_{n}(\mathcal C)$ 的对象 $A,B$ 之间的态射范畴为双模范畴 $\mathsf{BiMod}(A,B)$ 的低一阶的 Morita 范畴
 $$
 \operatorname{Hom}_{\mathsf{Morita}_{n}(\mathcal C)}(A,B)=\mathsf{Morita}_{(n-1)}(\mathsf{BiMod}(A,B)).
 $$

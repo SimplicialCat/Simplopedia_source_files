@@ -1,5 +1,5 @@
 ---
-title: 教程 : 一阶语言与一阶逻辑
+title: 一阶语言与一阶逻辑
 taxon: 教程
 author: [SimplicialCat](SimplicialCat.md)
 ---

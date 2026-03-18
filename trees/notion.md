@@ -8,5 +8,7 @@ author : [SimplicialCat](SimplicialCat.md)
 
 [-](数学对象的表现.md#:embed)
 
+[-](代数-几何对偶.md#:embed)
+
 [-](语法–语义对偶.md#:embed)
 

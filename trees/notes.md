@@ -5,6 +5,7 @@ author: [SimplicialCat](SimplicialCat.md)
 ---
 
 
+- [同调代数](homalg.md) (2026 年 3 月)
 - [代数理论](alg-th.md) (2026 年 3 月)
 - [几何 Satake 等价](Geo-Sat-eq.md) (2026 年 3 月)
 - [正交多项式, 双仿射 Hecke 代数与量子特征簇](OP-DAHA-QCV.md) (2026 年 2 月)
