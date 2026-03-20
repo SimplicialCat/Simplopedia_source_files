@@ -9,7 +9,7 @@ author: [SimplicialCat](SimplicialCat.md)
 - Gaitsgory 等人 2010 春季的[几何表示论讨论班](https://people.mpim-bonn.mpg.de/gaitsgde/grad_2009/),
 - 朱歆文的讲义 [An introduction to affine Grassmannians and the geometric Satake equivalence](Zhu-GrSat.md).
 
-
+不幸的是, 这两个文献分别讨论 D-模和偏屈层, 两者的实质内容相同, 但我暂时不知道如何转换, 只能照抄原文.
 
 ## Hecke 叠: 动机
 
@@ -97,14 +97,21 @@ $$
 例如当 $X$ 本身是小圆盘时,
 $\mathrm{Gr}_{G,X^1} = \mathrm{Gr}_G\times X$.
 
-## 卷积
+## Satake 范畴
 
-定义 "球面 Hecke 范畴"
+定义 **Satake 范畴**, 又称球面 Hecke 范畴
 
 - $\mathsf{Sph}$ 为 $\mathrm{Gr}_{G}$ 上的 $G(\widehat {\mathcal O})$-等变 D-模范畴 ([朱](Zhu-GrSat.md)文作 $\mathsf{Sat}_G$);
 - $\mathsf{Sph}_n$ 为 $\mathrm{Gr}_{G,X^n}$ 上的 $G(\widehat {\mathcal O})_n$-等变 D-模范畴.
 
 名称中的 "球面" 是来源于一个粗略的类比: 两个圆盘沿着去心圆盘粘起来就是 "球面".
+
+### 半单性
+
+[朱](Zhu-GrSat.md): 记 $\mathrm{IC}_\mu$ 为仿射 Schubert 簇 $\mathrm{Gr}_{\leq\mu}$ 上的相交上同调层. 有 $\mathrm{IC}_\mu |_{\mathrm{Gr}_\mu} \simeq \overline{\mathbb{Q}}_\ell [\langle 2\rho,\mu\rangle]$ 是常值层的移位.
+范畴 $\mathsf{Sat}_G$ 半单; $\mathrm{IC}_\mu$ 之间无扩张 ([朱](Zhu-GrSat.md) 5.1.1).
+
+## 卷积
 
 粗略地说, $G(\widehat {\mathcal K})$, $G(\widehat {\mathcal K})_n$ 的群结构导致这些范畴具有[卷积](卷积.md). 然而, 由于 $G(\widehat {\mathcal K})$ 比较野蛮, 我们不能直接卷积; 实际的做法是利用等变性, 转移到较好的空间上作卷积.
 
@@ -112,10 +119,11 @@ $G(\widehat {\mathcal K})$ 的乘法映射下降为映射
 $$
 \mathrm{Conv}_G = G(\widehat {\mathcal K})\times_{G(\widehat {\mathcal O})}\mathrm{Gr}_G \overset{m}{\to} \mathrm{Gr}_G.
 $$
+([朱](Zhu-GrSat.md)文作 $\mathrm{Gr}_G \operatorname{\widetilde \times}\mathrm{Gr}_G$, 这实际上是 $G(\widehat {\mathcal O})$-主丛 $G(\widehat {\mathcal K})\to\mathrm{Gr}_G$ 的[关联丛](关联丛.md))
 
-考虑映射 $\mathrm{pr}\colon \mathrm{Conv}_G \to \mathrm{Gr}_G$, ~~先投影到第一分量, 再~~ (这是错误的) 投影到商 $G(\widehat {\mathcal K})\times_{G(\widehat {\mathcal O})}1=G(\widehat {\mathcal K}) / G(\widehat {\mathcal O}) = \mathrm{Gr}_G$.
+考虑映射 $\mathrm{pr}\colon \mathrm{Conv}_G \to \mathrm{Gr}_G$, 投影到商 $G(\widehat {\mathcal K})\times_{G(\widehat {\mathcal O})}1=G(\widehat {\mathcal K}) / G(\widehat {\mathcal O}) = \mathrm{Gr}_G$.
 
-我将 $\mathrm{Conv}_G$ 理解为如下对象的模空间:
+$\mathrm{Conv}_G$ 可理解为如下对象的模空间:
 
 - 形式圆盘 $\mathbb D$ 上的 $G$-主丛 $T_1,T_2$, 配备 $T_1$ 在去心形式圆盘 $\mathbb D^\circ$ 上的平凡化, 以及 $T_1,T_2$ 在去心形式圆盘 $\mathbb D^\circ$ 上的同构.
 
@@ -129,7 +137,7 @@ $$
 
 对于 $F\in\mathsf{Sph}$, 定义 $\widetilde F$ 为 $\mathrm{pr}_2^*q^*F$ 由 $G(\widehat {\mathcal K}) \times G(\widehat {\mathcal K})$ 下降到 $\mathrm{Conv}_G$ 的对象.
 
-> 这里有一个一般的道理, 叫做 "扭曲外张量积" ([朱](Zhu-GrSat.md) A.1.2). 对于某结构群 $K$ 的主丛 $p\colon E \to X$ 以及另一个带 $K$-作用的空间 $Y$, 可定义 $X$ 上的层 $F$ 与 $Y$ 上的 $K$-[等变](等变对象.md)层 $G$ 的扭曲外张量积 $F \operatorname{\widetilde {\boxtimes}} G$, 它是 $X$ 与 $Y$ 的扭曲乘积 $X \operatorname{\widetilde {\times}} Y := (E \times Y)/K$ 上的层.
+> 这里有一个一般的道理, 叫做 "扭曲外张量积" ([朱](Zhu-GrSat.md) A.1.2). 对于某结构群 $K$ 的主丛 $p\colon E \to X$ 以及另一个带 $K$-作用的空间 $Y$, 可定义 $X$ 上的层 $F$ 与 $Y$ 上的 $K$-[等变](等变对象.md)层 $G$ 的扭曲外张量积 $F \operatorname{\widetilde {\boxtimes}} G$, 它是 $X$ 与 $Y$ 的[扭曲乘积](关联丛.md) $X \operatorname{\widetilde {\times}} Y := (E \times Y)/K$ 上的层.
 
 对于 $F_1,F_2\in\mathsf{Sph}$, 定义
 $$
@@ -138,6 +146,10 @@ $$
 $$
 F_1 * F_2 = m_* (F_1 \operatorname{\widetilde {\boxtimes}} F_2).
 $$
+
+**注** ([朱](Zhu-GrSat.md) 1.6.1, 5.2.2). 在 $\mathbb{C}$ 上, 这个卷积有更简单的描述: 取 $G$ 的极大紧子群 $K$, 则有 $\mathrm{Gr}\simeq\Omega K$, 上述卷积等同于拓扑群 $\Omega K$ 上的卷积.
+
+我们的目标是
 
 **定理**. 上述卷积使得 $\mathsf{Sph}$ 构成刚性张量范畴, 且存在忠实正合的纤维函子 $\mathsf{Sph} \to \mathsf{Vect}$, 在[淡中对偶](淡中对偶.md)下, 将 $\mathsf{Sph}$ 等同于 $\mathsf{Rep}(^LG)$.
 
@@ -183,6 +195,8 @@ $$
 
 例如, $n=3$, $U_p = X^3 \setminus (\Delta_{13} \cup \Delta_{23})$, 有 $H^2$ 在 $F|_{U_p}$ 上的作用,
 
+todo
+
 ## Hecke 特征层
 
 回忆 **Hecke 叠** $\mathcal H_n$ 为如下对象的模空间: $X$ 上的两个 $G$-丛, 在 $X$ 的 $n$ 个点之外同构. 有两个投影映射
@@ -221,6 +235,70 @@ $$
 F = t_! b^*\colon \mathsf{Sph}\to \mathsf{Sph}_T \simeq\mathsf{Vect}^{X_*(T)}.
 $$
 
+### 幺半结构
+
+我们需要上同调函子
+$$
+H^*\colon \mathsf{Sat}_G \to \mathsf{Vect}_{\overline{\mathbb{Q}}_\ell}
+$$
+具有幺半结构 ([朱](Zhu-GrSat.md) 5.2.1).
+
+记 $R_G := H^*(\mathbf{B}G)$ 为[分类空间](逆环路空间.md)的上同调环. 对于 $A\in\mathsf{Sat}_G$, $H^*_{L^+ G}(A)$ 是自由 $R_G$-模.
+
+**引理** (5.2.3). 有一系列相容的同构 $H^*_{L^+G} (A_1 * \cdots * A_n) \simeq H^*_{L^+G} (A_1) \otimes_{R_G} \cdots \otimes_{R_G} H^*_{L^+G} (A_n)$. 从而有幺半函子
+$$
+H^*_{L^+G}\colon \mathsf{Sat}_G \to \mathsf{BiMod}(R_G,R_G).
+$$
+
+考虑如下几何对象,
+
+- $L^m G$, 即 "$m$ 阶无穷小圆盘" 上的 $G$-值函数空间, 直观上当 $m$ 越来越大时, $m$ 阶无穷小圆盘越来越大, 趋向于[形式圆盘](形式圆盘.md),
+- $L^+G^{(m)} = \ker (L^+G \to L^m G)$, 即 "$m$ 阶平凡" [弧群](弧群.md),
+- $\pi_m \colon \mathrm{Gr}^{(m)} = LG / L^+ G^{(m)} \to \mathrm{Gr}$, 它是 $\mathrm{Gr}$ 上的一个 $L^m G$-[主丛](主丛.md).
+
+我们仅说明 $n=2$ 的情形. 假设 $m$ 足够大, 使得 $L^+G$ 在 $\mathrm{Gr}_{\leq \mu_2}$ 上的作用穿过商群 $L^mG$. 此时有
+$$
+\begin{aligned}
+\mathrm{Gr}_{\leq\mu_1} \operatorname{\widetilde \times} \mathrm{Gr}_{\leq\mu_2}
+&\simeq
+(LG_{\leq\mu_1} \times \mathrm{Gr}_{\leq\mu_2})/L^+G
+\\
+&\simeq
+(\mathrm{Gr}^{(m)}_{\leq\mu_1} \times \mathrm{Gr}_{\leq\mu_2})/L^mG.
+\end{aligned}
+$$
+由等变上同调的 Kunneth 公式,
+$$
+\begin{aligned}
+H^*_{L^+G}(\mathrm{IC}_{\mu_1}) \otimes_{R_G} H^*_{L^+G}(\mathrm{IC}_{\mu_2}) &\simeq H^*_{L^+G\times L^mG}(\pi_m^*\mathrm{IC}_{\mu_1}\boxtimes\mathrm{IC}_{\mu_2})\\
+&\simeq H^*_{L^+G}
+(\mathrm{IC}_{\mu_1} * \mathrm{IC}_{\mu_2}).
+\end{aligned}
+$$
+
+### 交换性
+
+接下来说明纤维函子是对称幺半函子.
+[朱](Zhu-GrSat.md)指出对于[对称幺半范畴](对称幺半范畴.md)之间的一个幺半函子, 其交换性是[性质而非结构](结构.md), 也即提升为对称幺半函子的方式的空间可缩; 但我不知道如何证明. (对比: 一个幺半范畴构成对称幺半范畴需要额外的结构.)
+
 ## 识别对偶群
+
+我们需要说明纤维函子的自同构群是 Langlands 对偶群.
+
+- $\mathsf{Sat}_G$ 作为张量范畴由有限个 $\mathrm{IC}_\mu$ 生成.
+
+**命题** ([Deligne–Milne, Tannakian categories](Deligne–Milne-Tannakian-cat.md) 2.20). 设 $G$ 是域 $k$ 上的仿射群概形. 其如下性质反映于范畴 $\mathsf{Rep}(G)$ 的性质:
+
+- $G$ 有限当且仅当存在 $X\in\mathsf{Rep}(G)$ 使得 $\mathsf{Rep}(G)$ 的任何对象都是某个 $X^n$ 的子商;
+- $G$ 是代数的 (意思是 $G$ 对应的 $k$-代数有限生成), 当且仅当 $\mathsf{Rep}(G)$ 作为张量范畴有一个生成元;
+
+**命题** (2.21). 设 $f\colon G\to G'$ 是域 $k$ 上仿射群概形的同态, 记 $f^*\colon \mathsf{Rep}(G') \to \mathsf{Rep}(G)$ 为拉回. 那么
+
+- $f$ 忠实平坦, 当且仅当 $f^*$ 全忠实, 且任何 $f^*X'$ 的子对象均为 $X'$ 的子对象的像.
+- $f$ 为闭嵌入, 当且仅当 $\mathsf{Rep}(G)$ 的每个对象均为某个 $f^*X'$ 的子商.
+
+**推论** (2.22). 设 $G$ 是域 $k$ 上的仿射群概形. 那么
+
+- $G$ 连通当且仅当对任意 $X\in\mathsf{Rep}(G)$, 由所有 $X^n$ 的所有子商构成的全子范畴关于张量积**不**封闭.
 
 设 $P\subset G$ 为[抛物子群](抛物子群.md), $L$ 为 [](Levi分解.md)
