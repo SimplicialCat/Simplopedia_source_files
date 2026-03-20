@@ -8,7 +8,7 @@ author: [SimplicialCat](SimplicialCat.md)
 ## 定义
 
 
-对于域扩张 $K\hookrightarrow L$, 定义其 Galois 群 $\operatorname{Gal}(L/K)$ 为 $L$ 的保持 $K$ 中元素不动的自同构的群.
+对于[域扩张](域扩张.md) $K\hookrightarrow L$, 定义其 Galois 群 $\operatorname{Gal}(L/K)$ 为 $L$ 的保持 $K$ 中元素不动的自同构的群.
 
 ### 作为 pro-有限群
 

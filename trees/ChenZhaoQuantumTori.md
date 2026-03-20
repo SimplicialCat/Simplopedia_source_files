@@ -1,7 +1,7 @@
 ---
 title : The Quantum Torus as an E_M-category
 taxon: 参考资料
-author : Lin Chen, [Yifei Zhao](https://yifeizhao.com/)
+author : Lin Chen (陈麟), [Yifei Zhao](https://yifeizhao.com/) (赵易非)
 ---
 
 ```

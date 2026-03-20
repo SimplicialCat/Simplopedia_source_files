@@ -14,11 +14,11 @@ author: [SimplicialCat](SimplicialCat.md)
 
 ## 性质
 
-设 $\mathsf C$ 是小范畴, $\mathsf A$ 是 Abel 范畴, 那么函子范畴 $\mathsf {Fun}(C,A)$ 是 Abel 范畴.
+设 $\mathcal C$ 是小范畴, $\mathcal A$ 是 Abel 范畴, 那么函子范畴 $\mathsf {Fun}(\mathcal C,\mathcal A)$ 是 Abel 范畴.
 
-若进一步 $\mathsf C$ 是 [Ab-范畴](Ab-范畴.md), 则 $\mathsf C$ 到 $\mathsf A$ 的加性函子也构成 Abel 范畴.
+若进一步 $\mathcal C$ 是 [Ab-范畴](Ab-范畴.md), 则 $\mathcal C$ 到 $\mathcal A$ 的加性函子也构成 Abel 范畴.
 
-特别地, 当 $\mathsf C$ 是一个对象的 $\mathsf {Ab}$-范畴 (即一个环) 时, $\mathsf C$ 到 $\mathsf {Ab}$ 的加性函子的范畴即为左模范畴; 将 $\mathsf C$ 换成对偶范畴即得右模范畴.
+特别地, 当 $\mathcal C$ 是一个对象的 $\mathcal {Ab}$-范畴 (即一个环) 时, $\mathcal C$ 到 $\mathcal {Ab}$ 的加性函子的范畴即为[左模](结合代数上的模.md)范畴; 将 $\mathcal C$ 换成对偶范畴即得右模范畴.
 
 ## 相关概念
 

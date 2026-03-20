@@ -4,7 +4,7 @@ taxon: 笔记
 author: [SimplicialCat](SimplicialCat.md)
 ---
 
-本文是[陈–赵](ChenZhaoQuantumTori.md)文章的阅读笔记, 原文标题为 The Quantum Torus as an $\mathbb E_M$-Category.
+本文是陈–赵的一篇短文 [The Quantum Torus as an $\mathbb E_M$-Category](ChenZhaoQuantumTori.md) 的阅读笔记.
 
 记号一览:
 
