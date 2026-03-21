@@ -6,7 +6,7 @@ author: [SimplicialCat](SimplicialCat.md)
 
 ## 观念
 
-设 $G$ 为[约化](约化群.md)代数群, 其 Langlands 对偶 ${^LG}$ 是置换其[根](根.md)数据所得的另一个代数群.
+设 $G$ 为[约化](约化群.md)代数群, 其 Langlands 对偶 ${^LG}$ 是置换其[根数据](根数据.md)所得的另一个代数群.
 
 [Langlands 对应](Langlands对应.md) 将
  $G$ (准确地说是 $G(\mathbb A_F)$) 的自守表示联系到 $^LG$-值的 Galois 表示 (即同态 $\mathrm {Gal}(\overline{F}/F)\to {^LG}$).
