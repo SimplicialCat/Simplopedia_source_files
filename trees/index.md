@@ -33,6 +33,8 @@ You may also want to visit [my personal main page](https://simplicialcat.github.
 
 ## 最近
 
+[](Galois扩张.md)
+
 [算畴上的代数上的模](OpAlgMod.md)
 
 [多项式函子](多项式函子.md), [LCCC](LCCC.md), [单子](单子.md), [Kleisli 范畴](Kleisli范畴.md), [对称序列](对称序列.md)

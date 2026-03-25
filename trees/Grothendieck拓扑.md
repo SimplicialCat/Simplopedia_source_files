@@ -4,11 +4,15 @@ taxon: 百科
 author: [SimplicialCat](SimplicialCat.md)
 ---
 
+## 观念
+
+Grothendieck 拓扑, 又名**覆盖结构** (coverage), 是指定一个范畴上何时一族态射构成 "覆盖" 的方法. 如果说[景](景.md)是[意象](意象.md)的 "生成元–关系" [表现](数学对象的表现.md), 那么覆盖的作用相当于其中的 "关系".
+
 ## 定义
 
 ### 使用范畴上的筛
 
-小范畴 $C$ 上的 Grothendieck 拓扑是对每个对象 $c\in C$ 指定一族[筛](筛.md), 称作**覆盖筛** (covering sieve), 满足如下条件.
+小范畴 $C$ 上的 **Grothendieck 拓扑**是对每个对象 $c\in C$ 指定一族[筛](筛.md), 称作**覆盖筛** (covering sieve), 满足如下条件.
 
 - 最大筛 $\{f: d \to c, d\in C\}$ 是覆盖筛;
 - (稳定性) 若 $S$ 是 $c$ 的覆盖筛, 则对任意 $h\colon d\to c$, $h^*(S)$ 是 $d$ 的覆盖筛;

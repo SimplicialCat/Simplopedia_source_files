@@ -184,7 +184,32 @@ $$
 - 这些函子与 $\mathsf{Sph}_n$ 上的卷积相容.
 
 
+对于分划 $p\colon \{1,\cdots,n\} \to \{1,\cdots,m\}$, 有卷积映射
+$$
+m_p \colon \mathrm{Gr}_{p^{-1}(1)} \operatorname{\widetilde \times} \cdots \operatorname{\widetilde \times} \mathrm{Gr}_{p^{-1}(m)} \to \mathrm{Gr}_m,
+$$
+对于 $A_i\in\mathsf{Sph}_{p^{-1}(i)}$, 定义外卷积
+$$
+A_1 \operatorname{\boxed{*}} \cdots \operatorname{\boxed{*}} A_m := (m_p)_! (A_1 \operatorname{\widetilde \boxtimes} \cdots \operatorname{\widetilde \boxtimes} A_m);
+$$
+有同构
+$$
+A_1 \operatorname{\boxed{*}} \cdots \operatorname{\boxed{*}} A_m \simeq (U_p)_{!*}(A_1\boxtimes\cdots\boxtimes A_m)|_{U_p}.
+$$
+这称为融合积 (fusion product).
 
+定义内卷积
+$$
+A_1 \circledast \cdots \circledast A_m := \Delta^! (A_1 \operatorname{\boxed{*}} \cdots \operatorname{\boxed{*}} A_m).
+$$
+
+融合积展现出对称性.
+例如 $\mathrm{Gr}_2$ 的对称性给出同构
+$$
+A_1 \circledast A_2 \simeq A_2 \circledast A_1.
+$$
+
+~~~
 
 ## 群表示的分解范畴
 
@@ -204,6 +229,7 @@ $$
 \mathrm{Bun}_G \overset{\overleftarrow{h_n}}{\longleftarrow} \mathcal H_n \overset{\overrightarrow{h_n}}{\longrightarrow} X^n\times\mathrm{Bun}_G,
 $$
 
+
 ## Hecke 范畴的结构
 
 记 $1 \in \mathrm{Gr}_G$ 为 $G(\widehat {\mathcal O})\subset G(\widehat {\mathcal K})$ 对应的点. 记 $\delta_1 := 1_*\mathbb{C}$. 它是 $\mathsf{Sph}$ 上卷积的单位.
@@ -222,6 +248,7 @@ $$
 其中 $j$ 是 $\mathrm{Gr}_G^{\check\lambda}$ 的含入映射, $\mathcal O$ 为平凡 D-模.
 
 注. $\delta_1 = J(0)$.
+~~~
 
 ## 纤维函子
 
@@ -249,6 +276,8 @@ $$
 $$
 H^*_{L^+G}\colon \mathsf{Sat}_G \to \mathsf{BiMod}(R_G,R_G).
 $$
+
+上述函子复合 "增广" $R_G \to \overline{\mathbb{Q}}_\ell$ 即得 $H^* \colon \mathsf{Sat}_G \to \mathsf{Vect}$.
 
 考虑如下几何对象,
 
@@ -283,7 +312,13 @@ $$
 
 ## 识别对偶群
 
-我们需要说明纤维函子的自同构群是 Langlands 对偶群.
+我们需要说明纤维函子的自同构群
+$$
+\widetilde G := \operatorname{Aut}^\otimes H^*
+$$
+是 Langlands 对偶群.
+
+首先说明 $\widetilde G$ 是连通约化群. 这是如下几个命题的应用.
 
 - $\mathsf{Sat}_G$ 作为张量范畴由有限个 $\mathrm{IC}_\mu$ 生成.
 
@@ -301,4 +336,32 @@ $$
 
 - $G$ 连通当且仅当对任意 $X\in\mathsf{Rep}(G)$, 由所有 $X^n$ 的所有子商构成的全子范畴关于张量积**不**封闭.
 
-设 $P\subset G$ 为[抛物子群](抛物子群.md), $L$ 为 [](Levi分解.md)
+**命题** (2.23). 设 $G$ 是域 $k$ 上的连通代数群. 那么 $G$ 是约化群当且仅当 $\mathsf{Rep}(G)$ 半单.
+
+下面证明 $\widetilde G$ 的[根数据](根数据.md)与 $G$ 对偶. 
+
+先考虑 $G = T$ 为环面的情形.
+
+- $\mathrm{Gr}_T$ (的既约部分) 为离散点集, 等同于 $X_*(T)$.
+- $\mathsf{Sat}_T$ 等价于 $X_*(T)$-[分次](分次对象.md)有限维线性空间范畴;
+- $H^*\colon \mathsf{Sat}_T\to \mathsf{Vect}$ 遗忘分次.
+
+对偶环面 $T^\vee$ 的一维不可约表示对应于 $T^\vee$ 的特征, 即 $T$ 的余特征. 所以 $\mathsf{Rep}(T^\vee)$ 等价于 $X_*(T)$-分次有限维线性空间范畴.
+
+为了从环面过渡到整个约化群, 由
+$$
+\mathrm{Gr}_G \leftarrow \mathrm{Gr}_B \to \mathrm{Gr}_T
+$$
+构造 "范畴化 Satake 变换"
+$$
+\mathrm{CT}\colon \mathsf{Sat}_G \to \mathsf{Sat}_T;
+$$
+
+- 记 $S_\lambda$ 为点 $\lambda\in X_*(T)$ 在上图中对应 $\mathrm{Gr}_G$ 的子空间, 同时也是 $t^\lambda$ 在 $LU\subset LG$ 作用下的轨道 ($U$ 为 $B$ 的幂幺根). 这在 Mirković–Vilonen 理论中称为 $\mathrm{Gr}_G$ 上的 "半无限轨道".
+- $S_\lambda$ 的闭包是 $S_{\leq \lambda} = \bigcup_{\lambda'\leq\lambda} S_{\lambda'}$.
+- 若 $t^\lambda\in\mathrm{Gr}_{\leq\mu}$, 则 $S_{\lambda}\cap\mathrm{Gr}_{\mu}$ 非空, $\dim (S_{\lambda}\cap\mathrm{Gr}_{\leq\mu}) = \langle \rho,\lambda + \mu\rangle$.
+- 对于 $A\in\mathsf{Sat}_G$, 其在 $\mathsf{Sat}_T$ 中的推拉 $t_!b^* A$ 的 $\lambda$ 分量为 $H_c^*(S_\lambda,A)$, 且聚集在 $\langle 2\rho,\lambda\rangle$ 次.
+- $H^* \simeq\mathrm{CT} :=\bigoplus_\lambda H^*_c(S_{\lambda},-)\colon \mathsf{Sat}_G\to\mathsf{Vect}$.
+- 这给出群同态 $T^\vee\simeq\widetilde T \to \widetilde G$, 给出 $\widetilde G$ 的一个极大环面. 于是 $\widetilde G$ 的权格与余权格对偶于 $G$.
+
+最后看单根和单余根. 一个权 $\lambda\in X^*(T^\vee)$ 落在正根生成的半群中, 当且仅当存在最高权表示 $L_\mu$ 使得 $\mu - \lambda$ 出现在其权中, 即存在 $\mu$ 使得 $t^{\mu-\lambda}\in\mathrm{Gr}_{\leq\mu}$, 这等价于 $\lambda$ 是 $G$ 的正余根的和.

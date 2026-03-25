@@ -1,5 +1,5 @@
 ---
-title: Weyl 群
+title: Weyl 群 (极大环面)
 taxon: 百科
 author: [SimplicialCat](SimplicialCat.md)
 ---
@@ -18,7 +18,7 @@ $$
 ### 一般子群的 Weyl 群
 
 对任意的子群 $H\subset G$ 也可以定义 Weyl 群 $W_GH := N(H)/H$.
-那么 Weyl group 是能够典范地作用于一个 $G$-作用的 $H$-[不动点](不动点.md)的最大群. Weyl 群也是陪集空间 $G/H$ 在 $G$ 的轨道范畴中的自同构群.
+那么 Weyl group 是能够典范地作用于一个 $G$-作用的 $H$-[不动点](不动点.md)的最大群. Weyl 群也是陪集空间 $G/H$ 在 $G$ 的[轨道范畴](轨道范畴.md)中的自同构群. 详见 [Weyl 群 (一般子群)](Weyl群(一般子群).md)
 
 ### Lie 代数 Cartan 子代数的 Weyl 群
 

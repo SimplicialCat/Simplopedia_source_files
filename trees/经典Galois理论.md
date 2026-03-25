@@ -22,3 +22,7 @@ $$
 为等价, 其中
 - $\Pi_1 = \tau_{\leq 1}\circ\Pi_{\infty}\colon \mathsf{Topos} \to \mathsf{Pro}(\mathsf{Ani}_{\leq 1})$ 为[形](∞-意象的形.md)的基本 $1$-群胚,
 - $\beta\colon \mathsf{Pro}(\mathsf{Ani}_{\leq 1}) \to \mathsf{Topos}_1$ 为 $\Pi_1$ 的右伴随.
+
+## 相关概念
+
+- [](Galois扩张.md)
