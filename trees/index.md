@@ -1,6 +1,6 @@
 ---
 title: 单纯百科 Simplopedia
-taxon: meta
+tag: meta
 author: [SimplicialCat](SimplicialCat.md)
 ---
 
@@ -10,18 +10,20 @@ author: [SimplicialCat](SimplicialCat.md)
 
 You may also want to visit [my personal main page](https://simplicialcat.github.io/index.html?lang=en) (in English).
 
+可以试试[搜索单纯百科的页面](search.md).
+
 ## 分类
 
 单纯百科的页面分为以下几类.
 
-- "百科" (`wiki`) : 数学概念. 这类页面构成了单纯百科的主体.
-- "[观念](notion.md)" (`notion`) : 模糊而普遍的数学思想.
-- "[教学](pedagogy.md)" (`pedagogy`) : 面向基础读者的科普.
-- "[讲稿](notes.md)" (`notes`) : 一些讨论班的讲稿.
-- "文献" (`reference`) : 其它页面中引用到的参考文献.
-- "[学科](subject.md)" (`subject`) : 用于收集和分类.
-- "元" (`meta`) : 关于单纯百科本身.
-- "[非数学](nonmath.md)" (`nonmath`) : 一些不属于上述分类, 且不属于数学的东西.
+- 百科 : 数学概念. 这类页面构成了单纯百科的主体.
+- [观念](notion.md) : 模糊而普遍的数学思想.
+- [教学](pedagogy.md) : 面向基础读者的科普.
+- [讲稿, 笔记](notes.md) : 一些讨论班的讲稿.
+- 文献 : 其它页面中引用到的参考文献.
+- [学科](subject.md) : 用于收集和分类.
+- Meta : 关于单纯百科本身.
+- [非数学](nonmath.md) : 一些不属于上述分类, 且不属于数学的东西.
 
 点击 [SimplicialCat](SimplicialCat.md) 可以看到本站的所有页面.
 
@@ -32,6 +34,12 @@ You may also want to visit [my personal main page](https://simplicialcat.github.
 [术语翻译表](terminologies.md)
 
 ## 最近
+
+[](法形变.md), [](微局部化.md), [](流形上的层.md), [微局部偏屈层](microPerv.md)
+
+[](love-and-math.md)
+
+[](余完备化.md)
 
 [](Galois扩张.md)
 

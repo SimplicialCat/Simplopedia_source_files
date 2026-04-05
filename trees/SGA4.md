@@ -1,6 +1,6 @@
 ---
 title : Théorie des topos et cohomologie étale des schémas
-taxon: 参考资料
+tag: 参考资料
 author : M. Artin, A. Grothendieck, J. L. Verdier
 ---
 

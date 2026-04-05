@@ -1,6 +1,6 @@
 ---
 title: pro-有限集
-taxon: 百科
+tag: 百科
 author: [SimplicialCat](SimplicialCat.md)
 ---
 

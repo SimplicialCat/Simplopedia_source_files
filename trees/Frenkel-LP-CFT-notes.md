@@ -1,6 +1,6 @@
 ---
 title: Frenkel - Langlands 纲领与共形场论
-taxon: 笔记
+tag: 笔记
 author: [SimplicialCat](SimplicialCat.md)
 ---
 
@@ -21,7 +21,7 @@ author: [SimplicialCat](SimplicialCat.md)
 
 使得 $\mathrm{Loc}_{^L G}$ 的一点 $E$ 上的摩天大楼层对应 $\mathrm{Bun}_G$ 上以 $E$ 为特征值的 Hecke 特征层.
 
-为此, 只需构造 $\mathrm{Loc}_{^L G} \times \mathrm{Bun}_G$ 上的 "万有 Hecke 特征层" $P_G$, 以之为 "积分核" 的积分变换给出想要的非 Abel Fourier–Mukai 变换.
+为此, 只需构造 $\mathrm{Loc}_{^L G} \times \mathrm{Bun}_G$ 上的 "万有 Hecke 特征层" $P_G$, 以之为 "积分核" 的[积分变换](拉-推.md)给出想要的非 Abel Fourier–Mukai 变换.
 
 ### 6.3 双参数形变
 

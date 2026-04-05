@@ -1,6 +1,6 @@
 ---
 title: Riemann 几何
-taxon: 学科
+tag: 学科
 author: [SimplicialCat](SimplicialCat.md)
 ---
 

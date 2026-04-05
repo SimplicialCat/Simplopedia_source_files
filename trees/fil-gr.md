@@ -1,6 +1,6 @@
 ---
 title: 滤与分次的叠观点
-taxon: 百科
+tag: 百科
 subject: [代数几何](代数几何.md)
 author: [SimplicialCat](SimplicialCat.md)
 ---

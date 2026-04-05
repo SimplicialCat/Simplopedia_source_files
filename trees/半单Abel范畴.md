@@ -1,6 +1,6 @@
 ---
 title: 半单 Abel 范畴
-taxon: 百科
+tag: 百科
 author: [SimplicialCat](SimplicialCat.md)
 ---
 

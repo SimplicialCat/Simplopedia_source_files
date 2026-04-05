@@ -1,6 +1,6 @@
 ---
 title: 单纯猫
-taxon : meta
+tag : meta
 author: [SimplicialCat](SimplicialCat.md)
 ---
 
@@ -10,4 +10,4 @@ author: [SimplicialCat](SimplicialCat.md)
 
 ---
 
-这个页面的作用是: 其反向链接 (Backlinks) 中含有[单纯百科](单纯百科.md)的全部页面. 可以在这个页面搜索 (`ctrl+F`).
+这个页面的作用是: 其关联页面 (Backlinks) 中含有[单纯百科](单纯百科.md)中标记了 `SimplicialCat` 的全部页面. 可以在这个页面搜索 (`ctrl+F`).

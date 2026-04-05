@@ -1,6 +1,6 @@
 ---
 title: 仿射直线对乘法群的商
-taxon: 百科
+tag: 百科
 subject: [代数几何](代数几何.md)
 author: [SimplicialCat](SimplicialCat.md)
 ---

@@ -1,6 +1,6 @@
 ---
 title: 综合微分几何 (3) 流形与微线性对象
-taxon: 讲义
+tag: 讲义
 author: [SimplicialCat](SimplicialCat.md)
 ---
 

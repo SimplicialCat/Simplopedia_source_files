@@ -1,6 +1,6 @@
 ---
 title: Langlands 对偶群
-taxon: 百科
+tag: 百科
 author: [SimplicialCat](SimplicialCat.md)
 ---
 

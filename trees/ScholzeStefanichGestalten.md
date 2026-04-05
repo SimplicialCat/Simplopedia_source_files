@@ -1,6 +1,6 @@
 ---
 title: Geometry and Higher Category Theory
-taxon: 参考资料
+tag: 参考资料
 author: Peter Scholze, German Stefanich
 ---
 

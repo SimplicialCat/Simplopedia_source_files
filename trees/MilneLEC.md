@@ -1,6 +1,6 @@
 ---
 title: Lectures on Etale Cohomology
-taxon: 参考资料
+tag: 参考资料
 author: J. S. Milne
 ---
 

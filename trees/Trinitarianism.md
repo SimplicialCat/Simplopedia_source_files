@@ -1,6 +1,6 @@
 ---
 title: 三位一体
-taxon: 观念
+tag: 观念
 author: [SimplicialCat](SimplicialCat.md)
 ---
 

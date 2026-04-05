@@ -1,6 +1,6 @@
 ---
 title : Love and Math - The Heart of Hidden Reality
-taxon: 参考资料
+tag: 参考资料
 author : Edward Frenkel
 ---
 

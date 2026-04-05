@@ -1,6 +1,6 @@
 ---
 title : The Character Theory of a Complex Group
-taxon: 参考资料
+tag: 参考资料
 author : David Ben-Zvi, David Nadler
 ---
 

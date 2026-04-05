@@ -20,7 +20,7 @@ def process_md_files(directory):
                     title = os.path.splitext(filename)[0]
                     yaml_front_matter = f"""---
 title: "{title}"
-taxon: 百科
+tag: 百科
 author: [SimplicialCat](SimplicialCat.md)
 ---
 

@@ -1,6 +1,6 @@
 ---
 title: 综合微分几何 (0) 光滑无穷小分析的模型
-taxon: 讲义
+tag: 讲义
 author: [SimplicialCat](SimplicialCat.md)
 ---
 

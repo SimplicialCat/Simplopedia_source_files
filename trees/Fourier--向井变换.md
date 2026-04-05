@@ -1,11 +1,11 @@
 ---
-title: "Fourier--向井变换"
-taxon: 百科
+title: Fourier–Mukai 变换
+tag: 百科
 author: [SimplicialCat](SimplicialCat.md)
 ---
 
 
-Fourier--向井变换是[凝聚层的导出范畴](凝聚层的导出范畴.md)之间的函子 $D(X)\to D(Y)$, 它是通过核对象 $K\in D(X\times Y)$ 构造的 "积分变换".
+Fourier–Mukai (向井) 变换是某些层范畴 (如[凝聚层的导出范畴](凝聚层的导出范畴.md)) 之间的函子 $D(X)\to D(Y)$, 它是通过核对象 $K\in D(X\times Y)$ 构造的 "积分变换" ([拉-推](拉-推.md)).
 
 许多基本的函子, 如[直像](直像.md)与[逆像](逆像.md), 都具有这种形式.
 

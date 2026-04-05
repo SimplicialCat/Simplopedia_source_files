@@ -1,6 +1,6 @@
 ---
 title : 测试页面
-taxon : meta
+tag : meta
 author : [SimplicialCat](SimplicialCat.md)
 ---
 

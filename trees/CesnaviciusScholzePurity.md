@@ -1,6 +1,6 @@
 ---
 title: Purity for flat cohomology
-taxon: 参考资料
+tag: 参考资料
 author: Kestutis Cesnavicius, Peter Scholze
 ---
 

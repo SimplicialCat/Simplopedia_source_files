@@ -1,6 +1,6 @@
 ---
 title: 综合微分几何 (5) 微分形式, 流与 Stokes 定理
-taxon: 讲义
+tag: 讲义
 author: [SimplicialCat](SimplicialCat.md)
 ---
 

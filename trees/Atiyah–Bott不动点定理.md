@@ -1,6 +1,6 @@
 ---
 title: "Atiyah–Bott 不动点定理"
-taxon: 百科
+tag: 百科
 author: [SimplicialCat](SimplicialCat.md)
 ---
 

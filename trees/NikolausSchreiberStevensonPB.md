@@ -1,6 +1,6 @@
 ---
 title: Principal ∞-bundles — General theory
-taxon: 参考资料
+tag: 参考资料
 author: Thomas Nikolaus, Urs Schreiber, Danny Stevenson
 ---
 

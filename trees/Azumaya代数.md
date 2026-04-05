@@ -1,6 +1,6 @@
 ---
 title: Azumaya 代数
-taxon: 百科
+tag: 百科
 author: [SimplicialCat](SimplicialCat.md)
 ---
 

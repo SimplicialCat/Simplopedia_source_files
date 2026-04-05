@@ -1,6 +1,6 @@
 ---
 title : AI 与形式化数学
-taxon: 非数学
+tag: [非数学](nonmath.md)
 author : [SimplicialCat](SimplicialCat.md)
 ---
 

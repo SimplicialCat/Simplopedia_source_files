@@ -1,6 +1,6 @@
 ---
 title: 绝对 Galois 群
-taxon: 百科
+tag: 百科
 author: [SimplicialCat](SimplicialCat.md)
 ---
 

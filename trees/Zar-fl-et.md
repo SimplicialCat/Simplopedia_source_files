@@ -1,6 +1,6 @@
 ---
 title: Zariski 景, 平展景与平坦景的比较
-taxon: 百科
+tag: 百科
 author: [SimplicialCat](SimplicialCat.md)
 ---
 

@@ -1,12 +1,15 @@
 ---
 title: pro-对象
-taxon: 百科
+tag: 百科
+subject: [范畴论](范畴论.md)
 author: [SimplicialCat](SimplicialCat.md)
 ---
 
 ## 观念
 
 范畴 $\mathcal C$ 的 pro-对象是其对象的形式[余滤极限](余滤极限.md).
+
+对偶的概念是 [ind-对象](ind-对象.md).
 
 ## 定义
 

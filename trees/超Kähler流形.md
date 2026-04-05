@@ -1,6 +1,6 @@
 ---
 title: "超 Kähler 流形"
-taxon: 百科
+tag: 百科
 author: [SimplicialCat](SimplicialCat.md)
 ---
 

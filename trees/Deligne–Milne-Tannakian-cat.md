@@ -1,6 +1,6 @@
 ---
 title: Tannakian Categories
-taxon: 参考资料
+tag: 参考资料
 author: Pierre Deligne and James S. Milne
 ---
 

@@ -1,6 +1,6 @@
 ---
 title: 教学
-taxon: meta
+tag: meta
 author: [SimplicialCat](SimplicialCat.md)
 ---
 
@@ -12,4 +12,6 @@ author: [SimplicialCat](SimplicialCat.md)
 - [教程 : 类型论](tutorial-type-theory.md)
 - [教程 : 一阶逻辑](tutorial-FOL.md)
 - [教程 : 意象理论](tutorial-topos.md)
+- [](motivation-homotopy-theory.md)
+- [教程 : 稳定同伦论](tutorial-stable-homotopy.md)
 - [教程 : 高阶范畴论](tutorial-highercat.md)

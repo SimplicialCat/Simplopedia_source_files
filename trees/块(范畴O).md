@@ -1,6 +1,6 @@
 ---
 title: "块 (范畴 O)"
-taxon: 百科
+tag: 百科
 author: [SimplicialCat](SimplicialCat.md)
 ---
 

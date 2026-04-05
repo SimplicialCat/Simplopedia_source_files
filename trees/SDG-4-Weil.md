@@ -1,6 +1,6 @@
 ---
 title: 综合微分几何 (4.5) Weil 代数与形式平展性
-taxon: 讲义
+tag: 讲义
 author: [SimplicialCat](SimplicialCat.md)
 ---
 

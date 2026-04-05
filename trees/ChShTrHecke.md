@@ -1,6 +1,6 @@
 ---
 title: 几何表示论报告 : 特征层与 Hecke 范畴的迹
-taxon: 讲义
+tag: 讲义
 author: [SimplicialCat](SimplicialCat.md)
 ---
 

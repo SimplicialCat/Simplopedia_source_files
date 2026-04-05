@@ -1,6 +1,6 @@
 ---
 title: "Feynmann 路径积分"
-taxon: 百科
+tag: 百科
 author: [SimplicialCat](SimplicialCat.md)
 ---
 

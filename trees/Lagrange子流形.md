@@ -1,6 +1,6 @@
 ---
 title: "Lagrange 子流形"
-taxon: 百科
+tag: 百科
 author: [SimplicialCat](SimplicialCat.md)
 ---
 

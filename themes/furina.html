@@ -26,8 +26,8 @@
 
     --hover-color-block: var(--block-background-color);
     --logo-hover-color: #88d;
-    --span-taxon-color: #88d;
-    --article-taxon-color: #88d;
+    --span-tag-color: #88d;
+    --article-tag-color: #88d;
   }
 
   @media (prefers-color-scheme: dark) {
@@ -58,7 +58,6 @@
   h5,
   h6,
   p {
-    margin-left: var(--margin-left);
     margin: 5px;
   }
 
@@ -83,8 +82,14 @@
     font-size: small;
   }
 
+  article > section > details > summary > header > h1 {
+    font-weight: 600;
+    font-size: 1.75rem !important;
+  }
+
   h2 {
-    font-weight: 750;
+    font-weight: 500;
+    font-size: 1.5rem !important;
     color: var(--color-Furina-deep-navy);
     margin-bottom: 10px;
     border-bottom: 1px solid #88d;
@@ -171,6 +176,10 @@
     margin-bottom: 0;
   }
 
+  code, pre, .mono {
+    font-family: "Liberation Mono", "Courier New", monospace;
+    font-size: 0.9em; /* 可选微调尺寸 */
+  }
 
   @media only screen and (max-width: 1000px) {
     #grid-wrapper>nav {
@@ -186,23 +195,32 @@
 
   ul {
     margin: 5px;
+    margin-left: calc(5px + 2em);
+    padding-left: 0;
     list-style-type: none;
   }
 
   ul li {
-    margin-bottom: 8px;
-    padding-left: 16px;
+    margin-bottom: 5px;
     position: relative;
+    padding-left: 0;
     /*color: var(--text-secondary);*/
   }
 
   ul li::before {
     content: '✦';
     position: absolute;
-    left: 0;
-    top: 0.2em;
+    left : -1em;
     /*color: var(--color-Furina-vintage-gold-ultra-light);*/
     font-size: 0.9em;
+  }
+
+  .metadata {
+    color: var(--article-tag-color);
+  }
+
+  .metadata ul {
+    margin : 0;
   }
 
   .metadata li::before {

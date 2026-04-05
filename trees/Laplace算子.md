@@ -1,6 +1,6 @@
 ---
 title: "Laplace 算子"
-taxon: 百科
+tag: 百科
 author: [SimplicialCat](SimplicialCat.md)
 ---
 

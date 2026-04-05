@@ -1,6 +1,6 @@
 ---
 title: "局部几何 Langlands 对应"
-taxon: 百科
+tag: 百科
 author: [SimplicialCat](SimplicialCat.md)
 ---
 

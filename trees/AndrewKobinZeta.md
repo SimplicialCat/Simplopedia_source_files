@@ -1,6 +1,6 @@
 ---
 title: A Primer on Zeta Functions and Decomposition Spaces
-taxon: 参考资料
+tag: 参考资料
 author: Andrew Kobin
 ---
 

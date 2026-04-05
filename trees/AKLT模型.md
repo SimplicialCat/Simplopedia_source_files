@@ -1,6 +1,6 @@
 ---
 title: "AKLT 模型"
-taxon: 百科
+tag: 百科
 author: [SimplicialCat](SimplicialCat.md)
 ---
 

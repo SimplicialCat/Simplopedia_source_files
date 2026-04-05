@@ -1,6 +1,6 @@
 ---
 title : AI 会消灭数学家吗?
-taxon: 非数学
+tag: [非数学](nonmath.md)
 author : [SimplicialCat](SimplicialCat.md)
 ---
 

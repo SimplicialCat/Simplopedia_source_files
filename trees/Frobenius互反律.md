@@ -1,6 +1,6 @@
 ---
 title: "Frobenius 互反律"
-taxon: 百科
+tag: 百科
 author: [SimplicialCat](SimplicialCat.md)
 ---
 

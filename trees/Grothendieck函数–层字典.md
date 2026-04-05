@@ -1,6 +1,6 @@
 ---
 title: "Grothendieck 函数–层字典"
-taxon: 百科
+tag: 百科
 author: [SimplicialCat](SimplicialCat.md)
 ---
 

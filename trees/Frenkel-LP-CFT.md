@@ -1,6 +1,6 @@
 ---
 title : Lectures on the Langlands Program and Conformal Field Theory
-taxon: 参考资料
+tag: 参考资料
 author : Edward Frenkel
 ---
 

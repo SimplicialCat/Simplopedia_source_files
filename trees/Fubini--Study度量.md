@@ -1,6 +1,6 @@
 ---
 title: "Fubini--Study 度量"
-taxon: 百科
+tag: 百科
 author: [SimplicialCat](SimplicialCat.md)
 ---
 

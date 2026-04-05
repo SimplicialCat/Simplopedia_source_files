@@ -1,6 +1,8 @@
 ---
-title: "高等范畴"
-taxon: 百科
+title: Whittaker 系数
+tag: 百科
 author: [SimplicialCat](SimplicialCat.md)
 ---
+
+## 观念
 

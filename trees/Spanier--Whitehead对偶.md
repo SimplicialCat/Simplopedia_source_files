@@ -1,6 +1,6 @@
 ---
 title: "Spanier--Whitehead 对偶"
-taxon: 百科
+tag: 百科
 author: [SimplicialCat](SimplicialCat.md)
 ---
 

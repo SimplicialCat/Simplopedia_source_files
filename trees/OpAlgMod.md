@@ -1,6 +1,6 @@
 ---
 title: 算畴上的代数上的模
-taxon: 百科
+tag: 百科
 author: [SimplicialCat](SimplicialCat.md)
 ---
 

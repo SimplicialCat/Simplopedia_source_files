@@ -1,6 +1,6 @@
 ---
 title : 一种朴素的建立高阶范畴的尝试
-taxon : 笔记
+tag : 笔记
 author: [SimplicialCat](SimplicialCat.md)
 ---
 

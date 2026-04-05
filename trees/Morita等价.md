@@ -1,6 +1,6 @@
 ---
 title: Morita 等价
-taxon: 百科
+tag: 百科
 subject : [范畴论](范畴论.md)
 author: [SimplicialCat](SimplicialCat.md)
 ---
@@ -8,6 +8,8 @@ author: [SimplicialCat](SimplicialCat.md)
 ## 观念
 
 Morita 等价是[模范畴](高阶模.md)的等价. 通过追踪具有特殊范畴论性质的对象 ([有限生成投射生成元](紧投射生成元.md)), 可以给出 Morita 等价的具体刻画.
+
+更一般的观念见 [Morita 等价 (观念)](Morita等价(观念).md).
 
 ## 定义
 

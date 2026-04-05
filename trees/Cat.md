@@ -1,6 +1,6 @@
 ---
 title: 范畴的范畴
-taxon: 百科
+tag: 百科
 subject : [范畴论](范畴论.md)
 author: [SimplicialCat](SimplicialCat.md)
 ---

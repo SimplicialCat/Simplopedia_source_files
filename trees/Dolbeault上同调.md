@@ -1,6 +1,6 @@
 ---
 title: "Dolbeault 上同调"
-taxon: 百科
+tag: 百科
 author: [SimplicialCat](SimplicialCat.md)
 ---
 

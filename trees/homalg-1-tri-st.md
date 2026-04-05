@@ -1,6 +1,6 @@
 ---
 title: 从三角范畴到稳定范畴
-taxon: 讲义
+tag: 讲义
 author: [SimplicialCat](SimplicialCat.md)
 ---
 

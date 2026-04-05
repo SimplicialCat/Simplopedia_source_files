@@ -1,11 +1,12 @@
 ---
 title: 讲稿, 笔记
-taxon: meta
+tag: meta
 author: [SimplicialCat](SimplicialCat.md)
 ---
 
 较完整的讲稿 / 笔记:
 
+- [爱与数学](love-and-math.md)
 - [平展上同调讨论班 : 非 Abel 上同调, 主齐性空间与 Brauer 群](EC-H1-H2.md) (2025 年 11 月)
 - [几何表示论报告 : 特征层与 Hecke 范畴的迹](ChShTrHecke.md) (2025 年 12 月)
 - [综合微分几何讲稿](SDG-notes.md) (2023 年 7 月)
@@ -13,6 +14,7 @@ author: [SimplicialCat](SimplicialCat.md)
 
 计划中的讲稿 / 笔记:
 
+- [](microPerv.md)
 - [同调代数](homalg.md) (2026 年 3 月)
 - [代数理论](alg-th.md) (2026 年 3 月)
 - [几何 Satake 等价](Geo-Sat-eq.md) (2026 年 3 月)

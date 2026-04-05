@@ -1,6 +1,6 @@
 ---
 title: 类型论
-taxon: 教程
+tag: 教程
 author: [SimplicialCat](SimplicialCat.md)
 ---
 

@@ -1,6 +1,6 @@
 ---
 title: ∞-意象中的主丛
-taxon: 参考资料
+tag: 参考资料
 author: [我](https://simplicialcat.github.io)
 ---
 

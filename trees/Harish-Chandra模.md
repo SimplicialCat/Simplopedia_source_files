@@ -1,6 +1,6 @@
 ---
 title: Harish-Chandra 模
-taxon: 百科
+tag: 百科
 author: [SimplicialCat](SimplicialCat.md)
 subject: 几何表示论
 ---

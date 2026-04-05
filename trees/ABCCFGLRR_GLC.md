@@ -1,6 +1,6 @@
 ---
 title: Proof of the geometric Langlands conjecture
-taxon: 参考资料
+tag: 参考资料
 author: D. Arinkin, D. Beraldo, J. Campbell, [L. Chen](https://windshower.github.io/linchen/), J. Faergeman, D. Gaitsgory, K. Lin, S. Raskin, N. Rozenblyum
 ---
 

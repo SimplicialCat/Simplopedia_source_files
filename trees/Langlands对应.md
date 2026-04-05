@@ -1,6 +1,6 @@
 ---
 title: 经典 Langlands 对应
-taxon: 百科
+tag: 百科
 author: [SimplicialCat](SimplicialCat.md)
 ---
 

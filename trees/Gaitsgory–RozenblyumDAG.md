@@ -1,6 +1,6 @@
 ---
 title: A Study in Derived Algebraic Geometry
-taxon: 参考资料
+tag: 参考资料
 author: D. Gaitsgory, N. Rozenblyum
 ---
 

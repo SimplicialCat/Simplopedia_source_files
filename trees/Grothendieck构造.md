@@ -1,6 +1,6 @@
 ---
 title: Grothendieck 构造
-taxon: 百科
+tag: 百科
 author: [SimplicialCat](SimplicialCat.md)
 ---
 

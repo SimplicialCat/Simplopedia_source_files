@@ -1,6 +1,6 @@
 ---
 title: "Dwyer–Kan 单纯局部化"
-taxon: 百科
+tag: 百科
 author: [SimplicialCat](SimplicialCat.md)
 ---
 

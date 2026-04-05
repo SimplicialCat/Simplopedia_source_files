@@ -1,6 +1,6 @@
 ---
 title: "Hirzebruch 指标定理"
-taxon: 百科
+tag: 百科
 author: [SimplicialCat](SimplicialCat.md)
 ---
 

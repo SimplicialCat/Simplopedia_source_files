@@ -1,6 +1,6 @@
 ---
 title: 量子圆环
-taxon: 笔记
+tag: 笔记
 author: [SimplicialCat](SimplicialCat.md)
 ---
 

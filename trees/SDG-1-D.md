@@ -1,6 +1,6 @@
 ---
 title: 综合微分几何 (1) 无穷小与微分
-taxon: 讲义
+tag: 讲义
 author: [SimplicialCat](SimplicialCat.md)
 ---
 

@@ -1,6 +1,6 @@
 ---
 title: "Weil 罗塞塔石碑"
-taxon: 百科
+tag: 百科
 author: [SimplicialCat](SimplicialCat.md)
 ---
 

@@ -1,6 +1,6 @@
 ---
 title: "量子 Heisenberg 模型"
-taxon: 百科
+tag: 百科
 author: [SimplicialCat](SimplicialCat.md)
 ---
 

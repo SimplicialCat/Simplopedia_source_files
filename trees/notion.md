@@ -1,6 +1,6 @@
 ---
 title : 观念
-taxon : meta
+tag : meta
 author : [SimplicialCat](SimplicialCat.md)
 ---
 
@@ -12,3 +12,4 @@ author : [SimplicialCat](SimplicialCat.md)
 
 [-](语法–语义对偶.md#:embed)
 
+[-](形变.md#:embed)

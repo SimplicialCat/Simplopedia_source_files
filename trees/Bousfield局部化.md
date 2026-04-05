@@ -1,6 +1,6 @@
 ---
 title: Bousfield 局部化 (稳定同伦论)
-taxon: 百科
+tag: 百科
 subject: [稳定同伦论](稳定同伦论.md)
 author: [SimplicialCat](SimplicialCat.md)
 ---

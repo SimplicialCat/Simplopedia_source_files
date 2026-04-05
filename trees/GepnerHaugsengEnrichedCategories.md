@@ -1,6 +1,6 @@
 ---
 title : Enriched ∞-categories via non-symmetric ∞-operads
-taxon: 参考资料
+tag: 参考资料
 author : David Gepner, Rune Haugseng
 ---
 

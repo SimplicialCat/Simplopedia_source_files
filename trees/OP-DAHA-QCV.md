@@ -1,6 +1,6 @@
 ---
 title: 正交多项式, 双仿射 Hecke 代数与量子特征簇
-taxon: 笔记
+tag: 笔记
 author: [SimplicialCat](SimplicialCat.md)
 ---
 

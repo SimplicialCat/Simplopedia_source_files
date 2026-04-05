@@ -1,6 +1,6 @@
 ---
 title: 导出范畴
-taxon: 讲义
+tag: 讲义
 author: [SimplicialCat](SimplicialCat.md)
 ---
 

@@ -1,6 +1,6 @@
 ---
 title : An introduction to affine Grassmannians and the geometric Satake equivalence
-taxon: 参考资料
+tag: 参考资料
 author : Xinwen Zhu (朱歆文)
 ---
 

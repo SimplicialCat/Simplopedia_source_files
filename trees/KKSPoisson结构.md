@@ -1,6 +1,6 @@
 ---
 title: Kirillov–Kostant–Souriau Poisson 结构
-taxon: 百科
+tag: 百科
 author: [SimplicialCat](SimplicialCat.md)
 ---
 

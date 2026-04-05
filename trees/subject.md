@@ -1,14 +1,18 @@
 ---
 title: 学科
-taxon: meta
+tag: meta
 author: [SimplicialCat](SimplicialCat.md)
 ---
 
 偏分析的数学:
 
+- [数学分析](数学分析.md)
+- [代数分析](代数分析.md)
+  - [微局部分析](微局部分析.md)
 - [代数几何](代数几何.md)
 - [Riemann 几何](Riemann几何.md)
-- [稳定同伦论](稳定同伦论.md)
+- [同伦论](同伦论.md)
+  - [稳定同伦论](稳定同伦论.md)
 - [凝聚态数学](凝聚态数学.md)
 - [范畴论](范畴论.md)
 

@@ -1,6 +1,6 @@
 ---
 title : ∞-Operads as Analytic Monads
-taxon: 参考资料
+tag: 参考资料
 author : David Gepner, Rune Haugseng, Joachim Kock
 ---
 

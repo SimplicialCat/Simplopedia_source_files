@@ -1,6 +1,6 @@
 ---
 title: 综合数学是抽象代数的范畴化
-taxon: 非数学
+tag: [非数学](nonmath.md)
 author: [SimplicialCat](SimplicialCat.md)
 ---
 

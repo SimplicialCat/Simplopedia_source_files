@@ -1,6 +1,6 @@
 ---
 title: Electric-Magnetic Duality And The Geometric Langlands Program
-taxon: 参考资料
+tag: 参考资料
 author: Anton Kapustin, Edward Witten
 ---
 

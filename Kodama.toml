@@ -14,7 +14,7 @@ max-width = "max-content"
 edit = "[edit]"
 toc = "目录"
 references = "参考资料"
-backlinks = "反向链接"
+backlinks = "关联页面"
 
 [build]
 typst-root = "./"

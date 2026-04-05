@@ -1,6 +1,6 @@
 ---
 title: 偏屈 t-结构
-taxon: 百科
+tag: 百科
 author: [SimplicialCat](SimplicialCat.md)
 ---
 

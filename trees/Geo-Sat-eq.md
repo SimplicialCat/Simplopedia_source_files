@@ -1,6 +1,6 @@
 ---
 title: 几何 Satake 等价
-taxon: 讲义
+tag: 讲义
 author: [SimplicialCat](SimplicialCat.md)
 ---
 

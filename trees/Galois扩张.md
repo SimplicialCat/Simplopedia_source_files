@@ -1,6 +1,6 @@
 ---
 title: Galois 扩张
-taxon: 百科
+tag: 百科
 author: [SimplicialCat](SimplicialCat.md)
 ---
 
@@ -29,11 +29,11 @@ Galois 扩张是域的平展景上以离散群为结构群的 [Galois 主丛](Ga
 $$
 \{F\subset E\text{ 的中间域}\} \leftrightarrow \{\operatorname{Gal}(E/F) \text{ 的子群}\},
 $$
-将中间域 $F\subset M\subset E$ 对应到子群 $\operatorname{Aut}(E/M)\subset\operatorname{Gal}(E/F)$; 且对于[正规](正规扩张.md)情形有
-$$
-\{\text{正规的中间域}\} \leftrightarrow \{\text{正规子群}\}.
-$$
-设 $F\subset M\subset E$ 是[正规](正规扩张.md)的中间域, 则 $E/F$ 的任何自同构将 $M$ 映射到 $M$ 自身, 有[短正合列](群短正合列.md)
+将中间域 $F\subset M\subset E$ 对应到子群 $\operatorname{Aut}(E/M)\subset\operatorname{Gal}(E/F)$; 且
+
+- $M/F$ 为[正规扩张](正规扩张.md)当且仅当 $\operatorname{Aut}(E/M)\subset\operatorname{Gal}(E/F)$ 为[正规子群](正规子群.md).
+
+此时有[短正合列](群短正合列.md)
 $$
 1\to \operatorname{Aut}(E/M) \to \operatorname{Gal}(E/F) \to \operatorname{Gal}(M/F) \to 1.
 $$

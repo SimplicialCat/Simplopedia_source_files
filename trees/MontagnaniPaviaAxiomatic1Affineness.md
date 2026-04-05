@@ -1,6 +1,6 @@
 ---
 title: An axiomatic approach to analytic 1-affineness
-taxon: 参考资料
+tag: 参考资料
 author: Matteo Montagnani, Emanuele Pavia
 ---
 

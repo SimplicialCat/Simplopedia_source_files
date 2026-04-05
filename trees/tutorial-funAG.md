@@ -1,6 +1,6 @@
 ---
 title: 函子式代数几何
-taxon: 教程
+tag: 教程
 author: [SimplicialCat](SimplicialCat.md)
 ---
 

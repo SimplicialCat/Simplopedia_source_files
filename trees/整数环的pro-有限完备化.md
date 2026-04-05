@@ -1,6 +1,6 @@
 ---
 title: "整数环的 pro-有限完备化"
-taxon: 百科
+tag: 百科
 author: [SimplicialCat](SimplicialCat.md)
 ---
 

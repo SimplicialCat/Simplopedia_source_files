@@ -1,6 +1,6 @@
 ---
 title: 综合微分几何讲稿
-taxon: 讲义
+tag: 讲义
 author: [SimplicialCat](SimplicialCat.md)
 ---
 

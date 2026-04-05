@@ -1,6 +1,6 @@
 ---
 title : Higher Quasicoherent Sheaves
-taxon: 参考资料
+tag: 参考资料
 author : Germán Stefanich
 ---
 

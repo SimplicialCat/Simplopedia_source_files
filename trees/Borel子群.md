@@ -1,6 +1,6 @@
 ---
 title: Borel 子群
-taxon: 百科
+tag: 百科
 author: [SimplicialCat](SimplicialCat.md)
 ---
 

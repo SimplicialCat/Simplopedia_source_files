@@ -1,6 +1,6 @@
 ---
 title: 一阶语言与一阶逻辑
-taxon: 教程
+tag: 教程
 author: [SimplicialCat](SimplicialCat.md)
 ---
 

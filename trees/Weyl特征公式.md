@@ -1,6 +1,6 @@
 ---
 title: "Weyl 特征公式"
-taxon: 百科
+tag: 百科
 author: [SimplicialCat](SimplicialCat.md)
 ---
 

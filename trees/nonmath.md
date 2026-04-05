@@ -1,6 +1,6 @@
 ---
 title: 非数学
-taxon: meta
+tag: meta
 author: [SimplicialCat](SimplicialCat.md)
 ---
 

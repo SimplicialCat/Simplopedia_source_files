@@ -1,6 +1,6 @@
 ---
 title : 单纯百科: 献予过去与未来之诗
-taxon: 非数学
+tag: [非数学](nonmath.md)
 author : [SimplicialCat](SimplicialCat.md)
 ---
 

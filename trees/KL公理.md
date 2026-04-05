@@ -1,6 +1,6 @@
 ---
 title: Kock–Lawvere 公理
-taxon: 百科
+tag: 百科
 subject: [综合微分几何](综合微分几何.md)
 author: [SimplicialCat](SimplicialCat.md)
 ---
