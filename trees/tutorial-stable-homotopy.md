@@ -6,9 +6,7 @@ author: [SimplicialCat](SimplicialCat.md)
 
 本文的目的是, 以尽可能少的前置知识, 解释[谱](谱.md) ([稳定 $\infty$-范畴](稳定无穷范畴.md)) 这一概念的意义和必要性, 从而使读者能够接受其抽象定义. 为此我试图解释[稳定化](稳定化.md)的动机, 也即为什么要将[纬悬](纬悬.md) $\Sigma$ 变为可逆函子.
 
-让我们从同伦论的最初动机开始.
-
-[](motivation-homotopy-theory.md#:embed)
+前置知识: [同伦论的动机](motivation-homotopy-theory.md).
 
 同伦论中的最基本对象是球面 $S^0, S^1, S^2, \cdots$; 其具有如下递推关系:
 $$

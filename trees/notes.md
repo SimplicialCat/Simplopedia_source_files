@@ -14,6 +14,8 @@ author: [SimplicialCat](SimplicialCat.md)
 
 计划中的讲稿 / 笔记:
 
+- [](on-P1.md)
+- [](GeoLang2.md)
 - [](microPerv.md)
 - [同调代数](homalg.md) (2026 年 3 月)
 - [代数理论](alg-th.md) (2026 年 3 月)

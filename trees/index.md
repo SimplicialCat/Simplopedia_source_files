@@ -19,9 +19,9 @@ You may also want to visit [my personal main page](https://simplicialcat.github.
 - 百科 : 数学概念. 这类页面构成了单纯百科的主体.
 - [观念](notion.md) : 模糊而普遍的数学思想.
 - [教学](pedagogy.md) : 面向基础读者的科普.
-- [讲稿, 笔记](notes.md) : 一些讨论班的讲稿.
+- [讲稿, 笔记](notes.md) : 一些讨论班的讲稿, 文献的阅读笔记, 以及零散的见闻.
 - 文献 : 其它页面中引用到的参考文献.
-- [学科](subject.md) : 用于收集和分类.
+- [学科](subject.md) : 用于部分页面的收集和分类.
 - Meta : 关于单纯百科本身.
 - [非数学](nonmath.md) : 一些不属于上述分类, 且不属于数学的东西.
 

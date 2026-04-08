@@ -1,8 +1,13 @@
 ---
 title : 测试页面
 tag : meta
-author : [SimplicialCat](SimplicialCat.md)
 ---
+
+2026-04-05
+
+页面的 `parent` 似乎无法指定为中文名称的页面.
+
+[](测试二.md)
 
 2026-02-20
 
