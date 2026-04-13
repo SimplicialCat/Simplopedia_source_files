@@ -36,6 +36,14 @@ $$
 
 ## 5. 谱作用
 
+定理 (Nadler–恽). 设 $\mathcal C \in \mathsf{Pr}^{\mathrm{L}}_e$, 则其上的 $D_{\mathrm{qc}}(\mathrm{LocSys}_{\check G}^{\text{Betti}})$-作用等同于一族正合函子
+$$
+\mathsf{Rep}(\check{G}^I) \to \operatorname{End}(\mathcal C)^{\mathbf{B}\pi_1^I},
+$$
+其中 $I$ 为有限集.
+
+$\mathrm{LocSys}_{\check G}^{\text{Betti}}$ 作为[](term-gestalt.md)是映射空间 $\operatorname{Map}(*/\pi_1,*/\check{G})$.
+
 ## 6. $G = \mathbb G_m$ 的情形
 
 ## 7. Beilinson 谱投影函子

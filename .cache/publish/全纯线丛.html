@@ -1,0 +1,1102 @@
+<!DOCTYPE html>
+<html lang="en-US"><head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<meta name="viewport" content="width=device-width"><title>“全纯线丛”</title><link rel="icon" href="/assets/favicon.ico" /><style>
+  @font-face {
+    font-family: 'NewCM10';
+    src: url(assets/NewCM10-Book.otf) format('opentype');
+    font-weight: 400;
+    font-style: normal;
+  }
+
+  @font-face {
+    font-family: 'NewCM10';
+    src: url(assets/NewCM10-Italic.otf) format('opentype');
+    font-weight: 400;
+    font-style: italic;
+  }
+
+  @font-face {
+    font-family: 'NewCM10';
+    src: url(assets/NewCM10-Bold.otf) format('opentype');
+    font-weight: 700;
+    font-style: normal;
+  }
+
+  body {
+    --text-font-family: "NewCM10", serif !important;
+  }
+</style><template id="inline-section">
+  <section class="inline block" data-taxon="">
+    <details open="">
+      <summary>
+        <header>
+          <h1>
+            <span class="taxon"></span>
+            <div id="title"></div>
+          </h1>
+        </header>
+      </summary>
+      <div id="content"></div>
+    </details>
+  </section>
+</template>
+
+<script>
+  function inlineSection(template, section, taxon, title) {
+    taxon = taxon || section.getAttribute("taxon") || null;
+    title = title || section.getAttribute("title") || "";
+
+    const clone = template.content.cloneNode(true);
+    clone.querySelector("section").dataset.taxon = taxon;
+    clone.querySelector(".taxon").textContent = taxon ? `${taxon}. ` : "";
+    clone.querySelector("#title").replaceWith(title);
+    clone.querySelector("#content").replaceWith(...section.childNodes);
+
+    if (section.hasAttribute("close")) {
+      clone.querySelector("details").removeAttribute("open");
+    }
+    
+    section.replaceWith(clone);
+  }
+
+  const tagTaxonTable = {
+    "exegesis": "Exegesis",
+    "definition": "Definition",
+    "proposition": "Proposition",
+    "remark": "Remark",
+    "conjecture": "Conjecture",
+    "postulate": "Postulate",
+    "claim": "Claim",
+    "observation": "Observation",
+    "fact": "Fact",
+    "hypothesis": "Hypothesis",
+    "axiom": "Axiom",
+    "lemma": "Lemma",
+    "theorem": "Theorem",
+    "corollary": "Corollary",
+    "example": "Example", 
+    "proof": "Proof",
+  };
+
+  document.addEventListener("DOMContentLoaded", () => {
+    const template = document.getElementById("inline-section");
+
+    [...document.getElementsByTagName("block")].forEach(section => inlineSection(template, section));
+
+    Object.entries(tagTaxonTable).forEach(([tag, taxon]) => {
+      [...document.getElementsByTagName(tag)].forEach(section => inlineSection(template, section, taxon));
+    });
+  });
+</script><script>
+  function toggleDetailsOpen() {
+    const details = document.querySelector("#toc>div>details");
+    if (!details) return;
+
+    if (window.matchMedia("(max-width: 1000px)").matches) {
+      details.removeAttribute("open");
+    } else {
+      details.setAttribute("open", "");
+    }
+  }
+
+  document.addEventListener("DOMContentLoaded", toggleDetailsOpen);
+  window.addEventListener("resize", toggleDetailsOpen);
+</script><style>
+  theme-option {
+    display: inline-block;
+  }
+
+  theme-option>input {
+    display: none;
+  }
+
+  theme-option>label {
+    color: var(--slug-color);
+  }
+
+  theme-option>label:hover {
+    background-color: var(--hover-color-link);
+  }
+
+  theme-option:has(input:checked)>label {
+    color: var(--link-color);
+  }
+
+  theme-option>label::before {
+    content: "[";
+    color: rgba(0, 0, 0, 0);
+  }
+
+  theme-option>label::after {
+    content: "]";
+    color: rgba(0, 0, 0, 0);
+  }
+
+  theme-option:has(input:checked)>label::before {
+    color: var(--link-color);
+  }
+
+  theme-option:has(input:checked)>label::after {
+    color: var(--link-color);
+  }
+</style>
+
+<template id="theme-option-template">
+  <input type="radio" name="theme" />
+  <label></label>
+</template>
+
+<script>
+  const THEME_KEY = `kodama-theme`;
+
+  function storeSelectedTheme(name) {
+    localStorage.setItem(THEME_KEY, name);
+  }
+
+  function getCurrentTheme() {
+    return localStorage.getItem(THEME_KEY) || window.primaryTheme;
+  }
+
+  function selectTheme(themeName) {
+    storeSelectedTheme(themeName);
+    requestAnimationFrame(applyDynamicColorInvert);
+  }
+
+  function applyFavorTheme() {
+    const favoredTheme = getCurrentTheme();
+    if (favoredTheme) {
+      const selector = `input[type='radio'][id='${favoredTheme}']`;
+      const favoredOption = window.themeOptions.querySelector(selector);
+
+      if (favoredOption) {
+        favoredOption.checked = true;
+      } else if (window.primaryOption) {
+        // Fallback to primary theme, if the favored theme is not found
+        // e.g., when the theme options have changed, and the stored theme is no longer available.
+        window.primaryOption.checked = true;
+      }
+    }
+    applyDynamicColorInvert();
+  }
+
+  document.addEventListener("DOMContentLoaded", function () {
+    window.themeOptions = document.getElementById("theme-options");
+    const templateContent = document.getElementById("theme-option-template").content;
+
+    customElements.define(
+      "theme-option",
+      class extends HTMLElement {
+        constructor() {
+          super();
+
+          const node = templateContent.cloneNode(true);
+          const themeName = this.getAttribute("name");
+
+          const input = node.querySelector("input");
+          input.setAttribute("id", themeName);
+          input.setAttribute("value", themeName);
+
+          const label = node.querySelector("label");
+          label.setAttribute("for", themeName);
+          label.addEventListener("click", () => selectTheme(themeName));
+
+          while (this.firstChild) {
+            label.appendChild(this.firstChild);
+          }
+          this.appendChild(node);
+        }
+      },
+    );
+
+    window.primaryOption = window.themeOptions.querySelector("input[type='radio']");
+    window.primaryTheme = primaryOption?.value;
+
+    applyFavorTheme();
+  });
+</script>
+
+<script>
+  const clamp = (value) => Math.max(0, Math.min(255, value));
+
+  const multiply = ([r, g, b], matrix) => {
+    const nr = clamp(r * matrix[0] + g * matrix[1] + b * matrix[2]);
+    const ng = clamp(r * matrix[3] + g * matrix[4] + b * matrix[5]);
+    const nb = clamp(r * matrix[6] + g * matrix[7] + b * matrix[8]);
+    return [nr, ng, nb];
+  };
+
+  const hueRotate = ([r, g, b], angle = 0) => {
+    const rad = (angle / 180) * Math.PI;
+    const sin = Math.sin(rad);
+    const cos = Math.cos(rad);
+    const matrix = [
+      0.213 + cos * 0.787 - sin * 0.213,
+      0.715 - cos * 0.715 - sin * 0.715,
+      0.072 - cos * 0.072 + sin * 0.928,
+      0.213 - cos * 0.213 + sin * 0.143,
+      0.715 + cos * 0.285 + sin * 0.140,
+      0.072 - cos * 0.072 - sin * 0.283,
+      0.213 - cos * 0.213 - sin * 0.787,
+      0.715 - cos * 0.715 + sin * 0.715,
+      0.072 + cos * 0.928 + sin * 0.072,
+    ];
+    return multiply([r, g, b], matrix);
+  };
+
+  const grayscale = ([r, g, b], value = 1) => {
+    const matrix = [
+      0.2126 + 0.7874 * (1 - value),
+      0.7152 - 0.7152 * (1 - value),
+      0.0722 - 0.0722 * (1 - value),
+      0.2126 - 0.2126 * (1 - value),
+      0.7152 + 0.2848 * (1 - value),
+      0.0722 - 0.0722 * (1 - value),
+      0.2126 - 0.2126 * (1 - value),
+      0.7152 - 0.7152 * (1 - value),
+      0.0722 + 0.9278 * (1 - value),
+    ];
+    return multiply([r, g, b], matrix);
+  };
+
+  const sepia = ([r, g, b], value = 1) => {
+    const matrix = [
+      0.393 + 0.607 * (1 - value),
+      0.769 - 0.769 * (1 - value),
+      0.189 - 0.189 * (1 - value),
+      0.349 - 0.349 * (1 - value),
+      0.686 + 0.314 * (1 - value),
+      0.168 - 0.168 * (1 - value),
+      0.272 - 0.272 * (1 - value),
+      0.534 - 0.534 * (1 - value),
+      0.131 + 0.869 * (1 - value),
+    ];
+    return multiply([r, g, b], matrix);
+  };
+
+  const saturate = ([r, g, b], value = 1) => {
+    const matrix = [
+      0.213 + 0.787 * value,
+      0.715 - 0.715 * value,
+      0.072 - 0.072 * value,
+      0.213 - 0.213 * value,
+      0.715 + 0.285 * value,
+      0.072 - 0.072 * value,
+      0.213 - 0.213 * value,
+      0.715 - 0.715 * value,
+      0.072 + 0.928 * value,
+    ];
+    return multiply([r, g, b], matrix);
+  };
+
+  const linear = ([r, g, b], slope = 1, intercept = 0) => {
+    const scale = 255;
+    return [
+      clamp(r * slope + intercept * scale),
+      clamp(g * slope + intercept * scale),
+      clamp(b * slope + intercept * scale),
+    ];
+  };
+
+  const brightness = (rgb, value = 1) => linear(rgb, value);
+  const contrast = (rgb, value = 1) => linear(rgb, value, -0.5 * value + 0.5);
+
+  const invert = ([r, g, b], value = 1) => {
+    const nr = (value + r / 255 * (1 - 2 * value)) * 255;
+    const ng = (value + g / 255 * (1 - 2 * value)) * 255;
+    const nb = (value + b / 255 * (1 - 2 * value)) * 255;
+    return [clamp(nr), clamp(ng), clamp(nb)];
+  };
+
+  // Code taken from https://stackoverflow.com/a/9493060/2688027, licensed under CC BY-SA.
+  const rgbToHsl = (r, g, b) => {
+    r /= 255; g /= 255; b /= 255;
+    const max = Math.max(r, g, b);
+    const min = Math.min(r, g, b);
+    let h, s, l = (max + min) / 2;
+    if (max === min) {
+      h = s = 0;
+    } else {
+      const d = max - min;
+      s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
+      switch (max) {
+        case r: h = (g - b) / d + (g < b ? 6 : 0); break;
+        case g: h = (b - r) / d + 2; break;
+        case b: h = (r - g) / d + 4; break;
+      }
+      h /= 6;
+    }
+    return { h: h * 100, s: s * 100, l: l * 100 };
+  };
+
+  const applyFilters = (rgb, [inv, sep, sat, hue, bri, con]) => {
+    let color = [...rgb];
+    color = invert(color, inv / 100);
+    color = sepia(color, sep / 100);
+    color = saturate(color, sat / 100);
+    color = hueRotate(color, hue * 3.6);
+    color = brightness(color, bri / 100);
+    color = contrast(color, con / 100);
+    return color;
+  };
+
+  const lossFn = (targetRgb, filters) => {
+    const resultRgb = applyFilters([0, 0, 0], filters);
+    const targetHsl = rgbToHsl(...targetRgb);
+    const resultHsl = rgbToHsl(...resultRgb);
+    return (
+      Math.abs(resultRgb[0] - targetRgb[0]) +
+      Math.abs(resultRgb[1] - targetRgb[1]) +
+      Math.abs(resultRgb[2] - targetRgb[2]) +
+      Math.abs(resultHsl.h - targetHsl.h) +
+      Math.abs(resultHsl.s - targetHsl.s) +
+      Math.abs(resultHsl.l - targetHsl.l)
+    );
+  };
+
+  const fix = (value, idx) => {
+    let max = 100;
+    if (idx === 2) max = 7500;                  // saturate
+    else if (idx === 4 || idx === 5) max = 200; // brightness, contrast
+    if (idx === 3) { // hue-rotate
+      if (value > max) return value % max;
+      if (value < 0) return max + (value % max);
+      return value;
+    }
+    return Math.max(0, Math.min(max, value));
+  };
+
+  const spsa = (targetRgb, A, a, c, initial, iters) => {
+    const alpha = 1;
+    const gamma = 1 / 6;
+    let values = [...initial];
+    let best = [...values];
+    let bestLoss = Infinity;
+
+    for (let k = 0; k < iters; k++) {
+      const ck = c / Math.pow(k + 1, gamma);
+      const deltas = Array(6).fill().map(() => (Math.random() > 0.5 ? 1 : -1));
+      const highArgs = values.map((v, i) => v + ck * deltas[i]);
+      const lowArgs = values.map((v, i) => v - ck * deltas[i]);
+      const lossDiff = lossFn(targetRgb, highArgs) - lossFn(targetRgb, lowArgs);
+
+      values = values.map((v, i) => {
+        const g = (lossDiff / (2 * ck)) * deltas[i];
+        const ak = a[i] / Math.pow(A + k + 1, alpha);
+        return fix(v - ak * g, i);
+      });
+
+      const loss = lossFn(targetRgb, values);
+      if (loss < bestLoss) {
+        best = [...values];
+        bestLoss = loss;
+      }
+    }
+    return { values: best, loss: bestLoss };
+  };
+
+  // Threshold for acceptable color loss. This value determines when the SPSA algorithm stops early.
+  // A loss below this value is considered visually indistinguishable for most use cases.
+  // The value 25 was determined empirically to balance performance and color accuracy.
+  const ACCEPTABLE_COLOR_LOSS = 25;
+
+  const solveWide = (targetRgb) => {
+    const A = 5;
+    const c = 15;
+    const a = [60, 180, 18000, 600, 1.2, 1.2];
+    let best = { loss: Infinity, values: null };
+    for (let i = 0; best.loss > ACCEPTABLE_COLOR_LOSS && i < 3; i++) {
+      const initial = [50, 20, 3750, 50, 100, 100];
+      const result = spsa(targetRgb, A, a, c, initial, 1000);
+      if (result.loss < best.loss) best = result;
+    }
+    return best;
+  };
+
+  const solveNarrow = (targetRgb, wideResult) => {
+    const A = wideResult.loss;
+    const c = 2;
+    const A1 = A + 1;
+    const a = [0.25 * A1, 0.25 * A1, A1, 0.25 * A1, 0.2 * A1, 0.2 * A1];
+    return spsa(targetRgb, A, a, c, wideResult.values, 500);
+  };
+
+  const cssFilterString = (filters) => {
+    const [inv, sep, sat, hue, bri, con] = filters.map(Math.round);
+    const hueDeg = Math.round(hue * 3.6);
+    return `filter: invert(${inv}%) sepia(${sep}%) saturate(${sat}%) hue-rotate(${hueDeg}deg) brightness(${bri}%) contrast(${con}%);`;
+  };
+
+  const solveColor = (targetRgb) => {
+    const wide = solveWide(targetRgb);
+    const narrow = solveNarrow(targetRgb, wide);
+    return {
+      values: narrow.values,
+      loss: narrow.loss,
+      filter: cssFilterString(narrow.values),
+    };
+  };
+
+  // Reuse a single canvas / context to avoid memory leaks
+  const colorParseCanvas = document.createElement('canvas');
+  colorParseCanvas.width = 1;
+  colorParseCanvas.height = 1;
+  const colorParseContext = colorParseCanvas.getContext('2d');
+
+  const toRGBArray = (cssColor) => {
+    colorParseContext.fillStyle = cssColor;
+    colorParseContext.fillRect(0, 0, 1, 1);
+
+    // The `getImageData().data` returns a Uint8ClampedArray with 4 values per pixel (RGBA). 
+    // also see: https://developer.mozilla.org/zh-CN/docs/Web/API/ImageData/data
+    const rgba = colorParseContext.getImageData(0, 0, 1, 1).data;
+    return Array.from(rgba.slice(0, 3));
+  };
+
+  const DYNAMIC_STYLE_ID = 'dynamic-color-invert-style';
+  const SOLVED_COLOR_KEY = "solved-";
+
+  function memorizedSolvedFilter(color) {
+    const colorKey = SOLVED_COLOR_KEY + color;
+    const storedFilterOption = localStorage.getItem(colorKey);
+    if (storedFilterOption) {
+      return storedFilterOption;
+    } else {
+      const filter = solveColor(color).filter;
+      localStorage.setItem(colorKey, filter);
+      return filter;
+    }
+  }
+
+  function applyDynamicColorInvert() {
+    const textColor = getComputedStyle(document.body).getPropertyValue('--text-color');
+    if (textColor && textColor.length > 0) {
+      const rgb = toRGBArray(textColor);
+      const filter = memorizedSolvedFilter(rgb);
+
+      const existingStyle = document.getElementById(DYNAMIC_STYLE_ID);
+      if (existingStyle) {
+        existingStyle.textContent = `.color-invert {${filter}}`;
+      } else {
+        const style = document.createElement('style');
+        style.id = DYNAMIC_STYLE_ID;
+        style.textContent = `.color-invert {${filter}}`;
+        document.head.appendChild(style);
+      }
+    }
+  }
+</script><script>
+  (() => {
+    const url = "/kodama.json";
+    const interval = 1000; // 1 second
+
+    let lastModified = null;
+
+    async function check() {
+      try {
+        const res = await fetch(url + "?t=" + Date.now(), {
+          method: "HEAD",
+          cache: "no-store",
+        });
+
+        const lm = res.headers.get("last-modified");
+
+        if (lastModified && lm && lm !== lastModified) {
+          location.reload();
+          return;
+        }
+
+        lastModified = lm || lastModified;
+      } catch (e) {
+        // Ignore
+        console.warn("Reload check failed:", e);
+      }
+
+      setTimeout(check, interval);
+    }
+
+    check();
+  })();
+</script><!-- Also see: https://katex.org/docs/autorender -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.25/dist/katex.min.css" integrity="sha384-WcoG4HRXMzYzfCgiyfrySxx90XSl2rxY5mnVY5TwtWE6KLrArNKn0T/mOgNL0Mmi" crossorigin="anonymous">
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.25/dist/katex.min.js" integrity="sha384-J+9dG2KMoiR9hqcFao0IBLwxt6zpcyN68IgwzsCSkbreXUjmNVRhPFTssqdSGjwQ" crossorigin="anonymous"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.25/dist/contrib/auto-render.min.js" integrity="sha384-hCXGrW6PitJEwbkoStFjeJxv+fSOOQKOPbJxSfM6G5sWZjAyWhXiTIIAmQqnlLlh" crossorigin="anonymous"></script>
+<!-- Also see: https://github.com/KaTeX/KaTeX/tree/main/contrib/copy-tex -->
+<script src="https://cdn.jsdelivr.net/npm/katex@0.16.25/dist/contrib/copy-tex.min.js" integrity="sha384-HORx6nWi8j5/mYA+y57/9/CZc5z8HnEw4WUZWy5yOn9ToKBv1l58vJaufFAn9Zzi" crossorigin="anonymous"></script>
+
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    renderMathInElement(document.body, {
+      delimiters: [
+        { left: "$$", right: "$$", display: true },
+        { left: "$", right: "$", display: false },
+        { left: "\\(", right: "\\)", display: false },
+        { left: "\\[", right: "\\]", display: true },
+      ],
+      trust: true,
+      strict: false,
+      throwOnError: false,
+      minRuleThickness: 0.05,
+    });
+  });
+</script>
+<link rel="stylesheet" href="/main.css"><style>
+@media only screen and (min-width: 1000px) {
+  #grid-wrapper { grid-template-columns: var(--article-max-width) var(--toc-max-width); }
+  nav#toc { max-width: max-content; }
+}
+</style></head><body><header class="header"><nav class="nav"><div class="logo"><span class="cursor-pointer" onclick="window.location.href='/index.html'" title="单纯百科 Simplopedia">« 单纯百科 Simplopedia</span></div></nav></header><div id="grid-wrapper" style="grid-template-areas: 'article toc';" data-base-url="./"><nav id="toc" class="sticky-nav mobile-sticky-nav"><div id="theme-options"><style>
+  body:has(input[value="furina"]:checked) {
+    --article-max-width: 110ex; /* default: 90ex */
+
+    --color-Furina-deep-navy: #253085;
+    --color-Furina-royal-blue: #465BCF;
+    --color-Furina-aqua-cyan: #6AC6E8;
+    --color-Furina-frost-white: #FAFBFC;
+    --color-Furina-misty-blue: #C4D7ED;
+    --color-Furina-vivid-sapphire: #5670E9;
+    --color-Furina-luminous-hydro: #70DBFF;
+    --color-Furina-bright-periwinkle: #8DA4F1;
+    --color-Furina-vintage-gold: #BD9368;
+    --color-Furina-vintage-gold-light: #DDB368;
+    --color-Furina-vintage-gold-ultra-light: #FDF388;
+
+    --background-color: var(--color-Furina-frost-white);
+    --link-color: var(--color-Furina-vivid-sapphire);
+    --slug-color: var(--color-Furina-aqua-cyan);
+    --logo-color: var(--color-Furina-deep-navy);
+
+    --block-background-color: #FFFFFF;
+    --shadow-color: rgba(27, 63, 143, 0.06);
+    --radius: 5px;
+    --margin-left: 14px;
+
+    --hover-color-block: var(--block-background-color);
+    --logo-hover-color: #88d;
+    --span-tag-color: #88d;
+    --article-tag-color: #88d;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    body:has(input[value="furina"]:checked) {
+      --color-Furina-deep-navy: #B5C0F5;
+      --color-Furina-royal-blue: #D6EBFF;
+
+      --background-color: #2f2f2f;
+      --block-background-color: #3a3a3a;
+    }
+  }
+
+  .block {
+    /*2026-3-16 21:10 新增*/
+    padding: 15px;
+    margin-top: 6px;
+    margin-bottom: 6px;
+
+    border-radius: var(--radius);
+    background-color: var(--block-background-color);
+    box-shadow: 0 2px 12px var(--shadow-color);
+  }
+
+  .footnote-definition {
+    margin-left: var(--margin-left);
+  }
+
+  h5,
+  h6,
+  p {
+    margin: 5px;
+  }
+
+  tr {
+    border-bottom: 1px solid var(--color-Furina-bright-periwinkle);
+  }
+
+  /* 可选：去除表头下方的重复横线（如果表头需要特殊样式） */
+  thead tr {
+    border-bottom: 2px solid var(--color-Furina-deep-navy);
+  }
+
+  /* 去除最后一行的边框 */
+  tbody tr:last-child {
+    border-bottom: none;
+  }
+
+  .footnote-definition>p {
+    display: inline;
+    margin-left: 0;
+    color: var(--color-Furina-bright-periwinkle);
+    font-size: small;
+  }
+
+  article > section > details > summary > header > h1 {
+    font-weight: 600;
+    font-size: 1.75rem !important;
+  }
+
+  h2 {
+    font-weight: 500;
+    font-size: 1.5rem !important;
+    color: var(--color-Furina-deep-navy);
+    margin-bottom: 10px;
+    border-bottom: 1px solid #88d;
+    padding-bottom: 1px;
+    /* 增加底部内边距让横线和文字有间距 */
+  }
+
+  h2::before {
+    content: "\2726";
+    /* ✦ 的Unicode转义码 */
+    display: inline-block;
+    margin-right: 0.3em;
+    /*color: var(--color-Furina-vintage-gold-light);*/
+    /* 替换 color 属性，改为以下背景和裁剪属性 */
+    background: linear-gradient(150deg,
+        var(--color-Furina-vintage-gold-ultra-light) 30%,
+        var(--color-Furina-vintage-gold-light) 60%,
+        var(--color-Furina-vintage-gold) 90%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    /* 将文字颜色设为透明以显示背景 */
+    /* 组合径向渐变（中心高光）和线性渐变（基础色调） */
+    /*background: radial-gradient(
+      ellipse at center,
+      var(--color-Furina-vintage-gold-ultra-light) 20%,
+      transparent 70%
+    ),
+    linear-gradient(
+      to bottom,
+      var(--color-Furina-vintage-gold-light),
+      var(--color-Furina-vintage-gold)
+    );
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent; */
+    filter: drop-shadow(0px 1px 1px rgba(184, 150, 131, 0.5));
+    /* 可选：增加与主色呼应的柔和投影 */
+    font-weight: normal;
+  }
+
+
+  h3 {
+    font-weight: 700;
+    color: var(--color-Furina-royal-blue);
+    margin-bottom: 5px;
+  }
+
+  h3::before {
+    content: "\2726";
+    /* ✦ 的Unicode转义码 */
+    display: inline-block;
+    margin-left: 0.06em;
+    margin-right: 0.36em;
+    /*color: var(--color-Furina-vintage-gold-ultra-light);*/
+    background: linear-gradient(150deg,
+        var(--color-Furina-vintage-gold-ultra-light) 20%,
+        var(--color-Furina-vintage-gold-light) 90%,
+        var(--color-Furina-vintage-gold) 95%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    font-weight: normal;
+  }
+
+  h4 {
+    text-indent: var(--marginleft);
+    font-weight: 700;
+    color: #696cd9;
+    margin-bottom: 0;
+  }
+
+  h5 {
+    text-indent: var(--marginleft);
+    font-weight: 700;
+    color: #8a8ff4;
+    margin-bottom: 0;
+  }
+
+  h6 {
+    text-indent: var(--marginleft);
+    font-weight: 700;
+    color: #aaaff4;
+    margin-bottom: 0;
+  }
+
+  code, pre, .mono {
+    font-family: "Liberation Mono", "Courier New", monospace;
+    font-size: 0.9em; /* 可选微调尺寸 */
+  }
+
+  @media only screen and (max-width: 1000px) {
+    #grid-wrapper>nav {
+      display: none !important;
+    }
+  }
+
+  #toc,
+  #toc .block {
+    background: none !important;
+    box-shadow: none !important;
+  }
+
+  ul {
+    margin: 5px;
+    margin-left: calc(5px + 2em);
+    padding-left: 0;
+    list-style-type: none;
+  }
+
+  ul li {
+    margin-bottom: 5px;
+    position: relative;
+    padding-left: 0;
+    /*color: var(--text-secondary);*/
+  }
+
+  ul li::before {
+    content: '✦';
+    position: absolute;
+    left : -1em;
+    /*color: var(--color-Furina-vintage-gold-ultra-light);*/
+    font-size: 0.9em;
+  }
+
+  .metadata {
+    color: var(--article-tag-color);
+  }
+
+  .metadata ul {
+    margin : 0;
+  }
+
+  .metadata li::before {
+    content: none;
+  }
+
+  .music-player button {
+    text-decoration: none;
+  }
+
+  .music-player button:hover {
+    text-decoration: underline;
+    text-decoration-color: var(--color-Furina-vintage-gold-light);
+    /* 金色 */
+    text-underline-offset: 6px;
+    /* 调整下划线与文字距离 */
+    text-decoration-thickness: 1px;
+    /* 线条粗细 */
+  }
+</style>
+
+<theme-option name="furina" style="display: none;">furina</theme-option></div></nav>
+
+<article><section class="block" data-taxon=""><details open><summary id="全纯线丛"><header><h1><span class="taxon"></span>“全纯线丛” <a class="slug" href="/全纯线丛.html">[全纯线丛]</a><a class="edit" href="vscode://file/E:/Simplopedia_source/trees/%E5%85%A8%E7%BA%AF%E7%BA%BF%E4%B8%9B.md">[edit]</a></h1><div class="metadata"><ul><li class="meta-item">百科</li><li class="meta-item"><span class="link local"><a href="/SimplicialCat.html" title="单纯猫 [SimplicialCat]">SimplicialCat</a></span></li></ul></div></header></summary>
+<p>复一维<span class="link local"><a href="/全纯向量丛.html" title="“全纯向量丛” [全纯向量丛]">全纯向量丛</a></span>.</p>
+<p>另见<span class="link local"><a href="/线丛.html" title="线丛 [线丛]">线丛</a></span>.</p>
+<h2>陈类</h2>
+<p><strong>定理</strong>. 设 $L\to M$ 为全纯线丛, 带有 Hermite 结构 $h$, 则有 (不依赖于平凡化!)
+$$
+\Omega = - \partial \bar\partial \log h.
+$$
+<strong>推论</strong>. 全纯线丛的第一<span class="link local"><a href="/陈类.html" title="“陈类” [陈类]">陈类</a></span>
+$$
+c_1 = \frac{i}{2\pi}\Omega = - \frac{i}{2\pi} \partial \bar\partial  \log h.
+$$
+见<span class="link local"><a href="/陈联络.html" title="“陈联络” [陈联络]">陈联络</a></span>.</p>
+<h2>Picard 群</h2>
+<p>复几何中, 复流形 $X$ 的 <span class="link local"><a href="/Picard群.html" title="Picard 群 [Picard群]">Picard 群</a></span> $\operatorname{Pic}(X)$ 是 $X$ 上全纯线丛的同构类在张量积下构成的群, 也等同于<span class="link local"><a href="/除子.html" title="“除子” [除子]">除子</a></span>的等价类构成的群.</p>
+<p>全纯线丛的分类见<span class="link local"><a href="/全纯向量丛.html" title="“全纯向量丛” [全纯向量丛]">全纯向量丛</a></span>.</p>
+<h2>例</h2>
+<h3>射影空间</h3>
+<p><strong>命题</strong>. $\mathbb P^1(\mathbb{C})$ 的<span class="link local"><a href="/全纯切丛.html" title=" [全纯切丛]">全纯(余)切丛</a></span> $T'\mathbb P^1(\mathbb{C}) = \mathcal O(2) = [2H]$, 其中 $H$ 是超平面 (即一个点) 对应的除子.</p>
+<p><strong>证明</strong>. 考虑开集 $U_\lambda = \{x_\lambda\neq 0\}$. 考虑 $T'\mathbb P^1(\mathbb{C})$ 在 $U_0$ (坐标函数为 $s$) 上的截面 $\frac{\partial}{\partial s}$, $U_1$ (坐标函数为 $t$) 上的截面 $-\frac{\partial}{\partial t}$, 在 $U_0\cap U_1$ 上有 $s=1/t$,
+$$
+-\frac{\partial}{\partial t}=\frac{1}{t^2}\frac{\partial}{\partial s}=s^2\frac{\partial}{\partial s}.
+$$
+这说明 $T'\mathbb P^1(\mathbb{C})=\mathcal O(2)$.</p>
+<p><strong>命题</strong>. 对于 $k\in\mathbb{Z}_+$, $\mathbb{CP}^n$ 上的线丛 $\mathcal O(k)$ 的截面是 $k$ 次齐次多项式.</p>
+</details></section><footer><section class="block link-list" id="backlinks"><details open><summary><header><h1>关联页面</h1></header></summary><section class="block" data-taxon=""><details ><summary id="Picard群"><header><h1><span class="taxon"></span>Picard 群 <a class="slug" href="/Picard群.html">[Picard群]</a><a class="edit" href="vscode://file/E:/Simplopedia_source/trees/Picard%E7%BE%A4.md">[edit]</a></h1><div class="metadata"><ul><li class="meta-item">百科</li><li class="meta-item"><span class="link local"><a href="/SimplicialCat.html" title="单纯猫 [SimplicialCat]">SimplicialCat</a></span></li></ul></div></header></summary>
+<h2>观念</h2>
+<p>空间的 Picard 群是其上<span class="link local"><a href="/线丛.html" title="线丛 [线丛]">线丛</a></span>的同构类关于张量积构成的群.</p>
+<h2>定义</h2>
+<h3>复流形</h3>
+<p>紧复流形 $M$ 的 Picard 群 $\text{Pic}(M)$ 是<span class="link local"><a href="/全纯线丛.html" title="“全纯线丛” [全纯线丛]">全纯线丛</a></span>的同构类关于张量积构成的群. $\text{Pic}(M)$ 的单位元是平凡丛, 也即全纯函数层 $\mathcal O_M$.</p>
+<p>定义 $\text{Pic}^0(M)$ 为 $\text{Pic}(M)$ 中由第一<span class="link local"><a href="/陈类.html" title="“陈类” [陈类]">陈类</a></span>等于零的线丛构成的子群.</p>
+<h3>概形</h3>
+<p><span class="link local"><a href="/概形.html" title="概形 [概形]">概形</a></span> (或<span class="link local"><a href="/环化空间.html" title="环化空间 [环化空间]">环化空间</a></span>) $X$ 的 Picard 群 $\operatorname{Pic}(X)$ 是 $X$ 上秩为 $1$ 的局部自由 $\mathcal O_X$-模的同构类在张量积下构成的群. 它也同构于<span class="link local"><a href="/平展上同调.html" title="平展上同调 [平展上同调]">平展上同调</a></span> $H^1(X_{\mathrm{\'et}},\mathbb G_m)$.</p>
+<h3>对称幺半范畴</h3>
+<p><span class="link local"><a href="/对称幺半范畴.html" title="对称幺半范畴 [对称幺半范畴]">对称幺半范畴</a></span>的 Picard 群是其中可逆对象的同构类构成的 Abel 群.</p>
+<h2>性质</h2>
+<p>$\text{Pic}(M) \simeq H^1(M,\mathcal O_M^*)$.</p>
+<p>$\text{Pic}^0(M) \simeq H^1(M,\mathcal O_M) / H^1(M,\mathbb{Z})$. (参见<span class="link local"><a href="/指数序列.html" title="“指数序列” [指数序列]">指数序列</a></span>)</p>
+<p><span class="link local"><a href="/Dedekind整环.html" title="“Dedekind 整环” [Dedekind整环]">Dedekind 整环</a></span>的谱的 Picard 群是这个环的<span class="link local"><a href="/理想类群.html" title="“理想类群” [理想类群]">理想类群</a></span>.</p>
+</details></section><section class="block" data-taxon=""><details ><summary id="全纯向量丛"><header><h1><span class="taxon"></span>“全纯向量丛” <a class="slug" href="/全纯向量丛.html">[全纯向量丛]</a><a class="edit" href="vscode://file/E:/Simplopedia_source/trees/%E5%85%A8%E7%BA%AF%E5%90%91%E9%87%8F%E4%B8%9B.md">[edit]</a></h1><div class="metadata"><ul><li class="meta-item">百科</li><li class="meta-item"><span class="link local"><a href="/SimplicialCat.html" title="单纯猫 [SimplicialCat]">SimplicialCat</a></span></li></ul></div></header></summary>
+<p>$n$ 维<strong>全纯向量丛</strong> (holomorphic vector bundle) 是<span class="link local"><a href="/复流形.html" title="“复流形” [复流形]">复流形</a></span>上以<strong>全纯映射</strong> $U_{ij}\to GL(n,\mathbb{C})$ 为转移函数的<span class="link local"><a href="/复向量丛.html" title="“复向量丛” [复向量丛]">复向量丛</a></span>. 全纯向量丛也可等价地定义为投影映射 $E\to X$ 是复流形全纯映射的复向量丛.</p>
+<p><strong>注</strong>. 复向量丛可在一般的空间上定义, 而全纯向量丛依赖于底流形的复结构, 即全纯向量丛只能在<strong>复流形</strong>上定义.</p>
+<h2>度数</h2>
+<p><span class="link local"><a href="/全纯线丛.html" title="“全纯线丛” [全纯线丛]">全纯线丛</a></span>的度数是除子的 “系数之和”, 与第一<span class="link local"><a href="/陈类.html" title="“陈类” [陈类]">陈类</a></span>有关.</p>
+<p>全纯向量丛 $E$ 的<strong>度数</strong> (degree) 定义为其行列式丛 $\wedge^r E$ 的度数.</p>
+<p><strong>命题</strong>. 对两个全纯向量丛 $E_1,E_2$,
+$$
+\deg (E_1\otimes E_2) = \deg(E_1)\operatorname{rank}(E_2) + \operatorname{rank}(E_1)\deg(E_2).
+$$</p>
+<h2>全纯截面</h2>
+<p>全纯向量丛 $E$ 上的<strong>全纯截面</strong> (holomorphic section) 是指局部 (在某个平凡化中) 全纯的截面. 全纯截面构成一个<span class="link local"><a href="/层.html" title="拓扑空间上的层 [层]">层</a></span> $\mathcal O(E)$. 有时人们不区分全纯向量丛与其对应的层.</p>
+<h2>$\bar\partial$ 算子</h2>
+<p>全纯向量丛上的<strong>光滑截面</strong>上可定义算子
+$$\bar\partial_E \colon
+C^\infty(M,E)\to C^\infty(M,E\otimes {T^*}''M).
+$$
+具体地, 给定局部的全纯截面 $\sigma_i$, 对光滑截面 $s= f^i \sigma_i$ 有 $\bar\partial_E s = (\bar\partial f^i) \sigma_i.$ 由于转移函数是全纯的, 这个表达式不依赖于 $\sigma_i$ 的选取.</p>
+<p>例如复流形上的微分形式有算子
+$$
+\bar\partial \colon C^\infty (\wedge^{p,q}M)\to C^\infty(\wedge^{p,q+1}M).
+$$</p>
+<h2>等价定义</h2>
+<p>(待补充)</p>
+<h2>联络</h2>
+<p>见<span class="link local"><a href="/陈联络.html" title="“陈联络” [陈联络]">陈联络</a></span>.</p>
+<h2>分类</h2>
+<p><strong>定理</strong> 设 $X$ 是 $\mathbb P^1$ 或 <span class="link local"><a href="/椭圆曲线.html" title="“椭圆曲线” [椭圆曲线]">椭圆曲线</a></span>, 则 $X$ 上的全纯向量丛等同于代数向量丛, 也即局部自由层. 参见 <span class="link local"><a href="/GAGA.html" title="“GAGA” [GAGA]">GAGA</a></span>.</p>
+<p><strong>定理</strong> (Grothendieck) $\mathbb P^1$ 上的全纯向量丛都可写成
+$$
+\mathcal O(d_1)^{n_1}\oplus \cdots \oplus \mathcal O(d_k)^{n_k}.
+$$</p>
+<p><strong>定理</strong>. <span class="link local"><a href="/椭圆曲线.html" title="“椭圆曲线” [椭圆曲线]">椭圆曲线</a></span> $X$ 的 <span class="link local"><a href="/Picard群.html" title="Picard 群 [Picard群]">Picard 群</a></span>同构于 $X$ 本身.</p>
+<h2>例</h2>
+<p>复流形的切丛是全纯向量丛.</p>
+<p>另见 <span class="link local"><a href="/Hermite向量丛.html" title="“Hermite 向量丛” [Hermite向量丛]">Hermite 向量丛</a></span>, <span class="link local"><a href="/线丛.html" title="线丛 [线丛]">线丛</a></span>.</p>
+</details></section><section class="block" data-taxon=""><details ><summary id="小平消失定理"><header><h1><span class="taxon"></span>“小平消失定理” <a class="slug" href="/小平消失定理.html">[小平消失定理]</a><a class="edit" href="vscode://file/E:/Simplopedia_source/trees/%E5%B0%8F%E5%B9%B3%E6%B6%88%E5%A4%B1%E5%AE%9A%E7%90%86.md">[edit]</a></h1><div class="metadata"><ul><li class="meta-item">百科</li><li class="meta-item"><span class="link local"><a href="/SimplicialCat.html" title="单纯猫 [SimplicialCat]">SimplicialCat</a></span></li></ul></div></header></summary>
+<h2>陈述</h2>
+<p>设 $M$ 是紧 <span class="link local"><a href="/Kähler流形.html" title="Kähler 流形 [Kähler流形]">Kähler 流形</a></span>, $L\to M$ 是<span class="link local"><a href="/全纯线丛.html" title="“全纯线丛” [全纯线丛]">全纯线丛</a></span>, 第一<span class="link local"><a href="/陈类.html" title="“陈类” [陈类]">陈类</a></span> $c_1(L) &lt;0$ (意思是存在 <span class="link local"><a href="/Hermite结构.html" title=" [Hermite结构]">Hermite 向量丛</a></span> $h$ 使得 $- \frac{i}{2\pi} \partial \bar\partial h$ 是负定形式), 则
+$$
+H^0 (M, \mathcal O(L)) = 0.
+$$</p>
+<p>另一陈述是, 若 $L$ 是<span class="link local"><a href="/正线丛.html" title="“正线丛” [正线丛]">正线丛</a></span>, $K_M$ 是<span class="link local"><a href="/典范丛.html" title="“典范丛” [典范丛]">典范丛</a></span>, 则
+$$
+H^q(M, K_M \otimes L) = 0\, (q&gt;0).
+$$</p>
+<h3>代数几何版本</h3>
+<p>小平消失定理可不依赖于 Kähler 度量等超越对象, 用纯代数几何的方式表述. 正线丛在代数几何上对应<span class="link local"><a href="/丰沛线丛.html" title="丰沛线丛 [丰沛线丛]">丰沛线丛</a></span>.</p>
+<h2>证明</h2>
+<p>设 $L$ 上有 Hermite 结构 $h$, 设 $-\partial \bar\partial \log h = \gamma_{i\bar j} dz^i \wedge d\bar z^j$, 其中 $(\gamma_{i \bar j})$ 为负定矩阵.</p>
+<p>设 $\nabla$ 是由 $h$ 和 <span class="link local"><a href="/Kähler形式.html" title=" [Kähler形式]">基本形式</a></span> $\omega$ 决定的联络.</p>
+<p>设 $e_1$ 为局部标架, $s = s^1 e_1$. 那么
+$$
+\begin{aligned}
+	0&amp;\leq \int_M |\nabla s|^2 \omega^m\\
+	&amp;=\int_M g^{i \bar j} \nabla_i s^1 \overline{\nabla_j s^1} \,\omega^m\\
+	&amp;= - \int_M g^{i \bar j} \nabla_{\bar j}\nabla_i s^1 \overline{s^1} \,\omega^m\\
+	&amp;= - \int_M g^{i \bar j}
+	\big( \nabla_i \underbrace{\nabla_{\bar j}s^1}_{=0} + \gamma_{\bar j i}{}^1{}_1 s^1 \big)\overline{s^1}\, \omega^m\\
+	&amp;=\int_M g^{i \bar j} \gamma_{i \bar j}s^1 \overline{s^1}\,\omega^m\leq 0,
+\end{aligned}
+$$
+因此只有 $s \equiv 0$.</p>
+</details></section><section class="block" data-taxon=""><details ><summary id="正线丛"><header><h1><span class="taxon"></span>“正线丛” <a class="slug" href="/正线丛.html">[正线丛]</a><a class="edit" href="vscode://file/E:/Simplopedia_source/trees/%E6%AD%A3%E7%BA%BF%E4%B8%9B.md">[edit]</a></h1><div class="metadata"><ul><li class="meta-item">百科</li><li class="meta-item"><span class="link local"><a href="/SimplicialCat.html" title="单纯猫 [SimplicialCat]">SimplicialCat</a></span></li></ul></div></header></summary>
+<p>“正性” 与存在很多全局截面这件事有关, 而存在很多全局截面意味着一个代数簇可以映射到 (甚至嵌入) <span class="link local"><a href="/射影空间.html" title="射影空间 (代数几何) [射影空间]">射影空间</a></span>.</p>
+<h2>定义</h2>
+<p>复流形上的<span class="link local"><a href="/全纯线丛.html" title="“全纯线丛” [全纯线丛]">全纯线丛</a></span>称为<strong>正线丛</strong>是指其<span class="link local"><a href="/曲率形式.html" title="“曲率形式” [曲率形式]">曲率形式</a></span>乘以 $\sqrt{-1}$ 后是一个正定 $(1,1)$-形式.</p>
+<h2>性质</h2>
+<p><span class="link local"><a href="/小平嵌入定理.html" title="“小平嵌入定理” [小平嵌入定理]">小平嵌入定理</a></span>表明正线丛是<span class="link local"><a href="/丰沛线丛.html" title="丰沛线丛 [丰沛线丛]">丰沛线丛</a></span>.</p>
+<p><span class="link local"><a href="/小平消失定理.html" title="“小平消失定理” [小平消失定理]">小平消失定理</a></span></p>
+</details></section><section class="block" data-taxon=""><details ><summary id="线丛"><header><h1><span class="taxon"></span>线丛 <a class="slug" href="/线丛.html">[线丛]</a><a class="edit" href="vscode://file/E:/Simplopedia_source/trees/%E7%BA%BF%E4%B8%9B.md">[edit]</a></h1><div class="metadata"><ul><li class="meta-item">百科</li><li class="meta-item"><span class="link local"><a href="/SimplicialCat.html" title="单纯猫 [SimplicialCat]">SimplicialCat</a></span></li></ul></div></header></summary>
+<h2>定义</h2>
+<h3>代数几何</h3>
+<p><span class="link local"><a href="/环化空间.html" title="环化空间 [环化空间]">环化空间</a></span> $(X,A)$ 上的<strong>线丛</strong>是指秩为 $1$ 的局部自由 $A$-模.</p>
+<h2>性质</h2>
+<h3>分类</h3>
+<p>复流形 $X$ 上的<span class="link local"><a href="/全纯线丛.html" title="“全纯线丛” [全纯线丛]">全纯线丛</a></span>被 $H^1(X,\mathcal O_X^\times)$ 分类, 因为给定线丛无非是给定一些转移函数, 而这些转移函数构成 Čech 上圈, 见 <span class="link local"><a href="/Čech上同调.html" title="Čech 上同调 [Čech上同调]">Čech 上同调</a></span>.</p>
+<h3>与除子的关系</h3>
+<p>除子 $D$ 对应的线丛 $\mathcal O_X(D)$ 是 “允许在 $D$ 上有奇点” 的函数层.</p>
+<p>设 $D$ 是光滑除子, $\mathcal O_D$ 是其正则函数层. 正合列
+$$
+0 \to \mathcal O_X(-D) \to \mathcal O_X \to \mathcal O_D\to 0
+$$
+诱导的长正合列给出 <span class="link local"><a href="/Euler示性数.html" title="Euler 示性数 [Euler示性数]">Euler 示性数</a></span>的加性
+$$
+\chi(\mathcal O_X(-D)) + \chi(\mathcal O_D) = \chi(\mathcal O_X).
+$$
+某种意义上可将 $\mathcal O_D$ 看成 $\mathcal O_X$ 和 $\mathcal O_X(-D)$ 的差.</p>
+<p>另见<span class="link local"><a href="/除子.html" title="“除子” [除子]">除子</a></span>.</p>
+<h3>陈类</h3>
+<p>第一<span class="link local"><a href="/陈类.html" title="“陈类” [陈类]">陈类</a></span>给出了 $X$ 上的复线丛与 $H^2(X,\mathbb{Z})$ 的元素的一一对应, 且将张量积对应到上同调类的和. 见<span class="link local"><a href="/陈类.html" title="“陈类” [陈类]">陈类</a></span>.</p>
+</details></section><section class="block" data-taxon=""><details ><summary id="陈类"><header><h1><span class="taxon"></span>“陈类” <a class="slug" href="/陈类.html">[陈类]</a><a class="edit" href="vscode://file/E:/Simplopedia_source/trees/%E9%99%88%E7%B1%BB.md">[edit]</a></h1><div class="metadata"><ul><li class="meta-item">百科</li><li class="meta-item"><span class="link local"><a href="/SimplicialCat.html" title="单纯猫 [SimplicialCat]">SimplicialCat</a></span></li></ul></div></header></summary>
+<p>陈省身 1945 年在 Annals 上的文章用</p>
+<ul>
+<li>$\operatorname{exp}$ 正合列,</li>
+<li>曲率,</li>
+<li>阻碍</li>
+</ul>
+<p>三种方式定义了陈类.</p>
+<blockquote>
+<p>历史: 1933 年 Kähler 第一次写下 “陈形式”, 证明其与度量无关.</p>
+</blockquote>
+<h2>联络与曲率</h2>
+<p>(有问题, 重写)</p>
+<p>给定流形 $X$ 上的向量丛 $E\to X$, 其上一个 (线性) <span class="link local"><a href="/联络.html" title="联络 [联络]">联络</a></span>可视为微分同胚群的提升, 即群正合列
+$$
+1 \to \operatorname{Aut}(E) \to \operatorname{Diffeo}(E) \to \operatorname{Diffeo}(M) \to 1
+$$
+的无穷小版本
+$$
+0 \to \operatorname{aut}(E) \to \operatorname{Lie}(E)\to \operatorname{Lie}(M) \to 0
+$$
+的截面
+$$
+A\colon \operatorname{Lie}(M)\to \operatorname{Lie}(E).
+$$</p>
+<h2>阻碍</h2>
+<p>陈类是 $GL_n(\mathbb{C})$-主丛的整体截面的阻碍.</p>
+<p>陈类 $c_k(E)$ (在 <span class="link local"><a href="/Poincaré对偶.html" title=" [Poincaré对偶]">Poincaré–Verdier 对偶</a></span>的意义下) 对应于 $E$ 的 $k$ 个整体截面线性相关的那些点确定的同调类.</p>
+<p><strong>例</strong>. 复流形的最高陈类对应于一般向量场的零点.</p>
+<h2>分类空间</h2>
+<p>陈类是<span class="link local"><a href="/分类空间.html" title="分类空间 [分类空间]">分类空间</a></span> $BU(n)=BGL_n(\mathbb{C})$ 的上同调类.</p>
+<h2>线丛的陈类</h2>
+<p><span class="link local"><a href="/线丛.html" title="线丛 [线丛]">线丛</a></span> (复 $1$ 维向量丛) 只有一个非平凡的陈类 $c_1$, 它也等于线丛的 <span class="link local"><a href="/Euler类.html" title="“Euler 类” [Euler类]">Euler 类</a></span>. 对于比较好的空间 $X$ (例如CW复形), $c_1$ 给出了 $X$ 上线丛的同构类与 $H^2(X;\mathbb Z)$ 的元素的一一对应, 且有
+$$
+c_1(L\otimes L')=c_1(L)+c_1(L').
+$$</p>
+<p>线丛的第一陈类等于<span class="link local"><a href="/指数序列.html" title="“指数序列” [指数序列]">指数序列</a></span>
+$$
+0\to \mathbb{Z} \to \mathcal O_X \overset{\exp(2\pi i -)}{\longrightarrow} \mathcal O_X^\times \to 0
+$$
+给出的长正合列中的同态
+$$
+H^1(X,\mathcal O_X^\times) \overset{c_1}{\to} H^2(X,\mathbb{Z}),
+$$
+$$
+(U_{ij},f_{ij})\mapsto \Big(U_{ijk}, \frac{1}{2\pi i}(\log f_{ij}-\log f_{ik}+ \log f_{jk})\Big).
+$$</p>
+<p>这个陈类与曲率通过如下同态相联系:
+$$
+H^2(M;\mathbb{Z}) \to H^2(M;\mathbb{R}) \to H^2_{dR}(M),
+$$
+$$
+c_1(L) \to \cdots \to \Big[\frac{i}{2\pi}\Omega\Big]
+$$</p>
+<h2>归纳定义</h2>
+<p>(见 Milnor–Stasheff)</p>
+<h2>周环</h2>
+<p>在抽象情形可使用<span class="link local"><a href="/周环.html" title="“周环” [周环]">周环</a></span>代替上同调构造陈类. 设 $E$ 为光滑代数簇 $X$ 上秩为 $r$ 的局部自由层, 考虑射影丛 $\pi\colon \mathbb P(E)\to X$ 与 $\mathbb P(E)$ 上的可逆层 $\mathcal O(1)$. 令 $\xi$ 为 $A^1(\mathbb P(E))$ 中由 $\mathcal O(1)$ 定义的<span class="link local"><a href="/除子.html" title="“除子” [除子]">除子</a></span>类. 我们知道 $A(\mathbb P(E))$ 是由 $1,\xi,\cdots,\xi^{r-1}$ 生成的自由 $A(X)$-模, 于是有
+$$
+\xi^r -c_1\xi^{r-1}+\cdots+ (-1)^r c_r\xi^0 = 0.
+$$
+其中的系数 $c_i$ 定义为 $E$ 的陈类. 总陈类 $c(E):= 1+c_1(E)+\cdots + c_r(E)$ 满足 Whitney 条件: 对任意短正合列 $0\to c(E')\to c(E)\to c(E'')\to 0$ 有 $c(E)= c(E')c(E'')$.</p>
+<p>对 $X$ 上的除子 $D$, 有 $c(\mathcal O_X(D))=1+D$.</p>
+<p>若 $E$ 为可逆层 $\mathcal O(D_1),\cdots,\mathcal O(D_r)$ 的直和, 那么 $c(E)=\prod_i (1+D_i)$.</p>
+<h2>陈–Weil 理论</h2>
+<p>陈类可表示为<span class="link local"><a href="/曲率形式.html" title="“曲率形式” [曲率形式]">曲率形式</a></span>的特征多项式:
+$$
+\det\left(I + \frac{it}{2\pi}\Omega\right) = \sum_k c_k t^k.
+$$
+见<span class="link local"><a href="/陈--Weil理论.html" title="“陈–Weil 理论” [陈--Weil理论]">陈–Weil 理论</a></span>.</p>
+<h2>全纯丛</h2>
+<p><span class="link local"><a href="/全纯线丛.html" title="“全纯线丛” [全纯线丛]">全纯线丛</a></span>的陈类</p>
+</details></section><section class="block" data-taxon=""><details ><summary id="陈联络"><header><h1><span class="taxon"></span>“陈联络” <a class="slug" href="/陈联络.html">[陈联络]</a><a class="edit" href="vscode://file/E:/Simplopedia_source/trees/%E9%99%88%E8%81%94%E7%BB%9C.md">[edit]</a></h1><div class="metadata"><ul><li class="meta-item">百科</li><li class="meta-item"><span class="link local"><a href="/SimplicialCat.html" title="单纯猫 [SimplicialCat]">SimplicialCat</a></span></li></ul></div></header></summary>
+<p>陈联络在 <span class="link local"><a href="/Kähler流形.html" title="Kähler 流形 [Kähler流形]">Kähler 流形</a></span>上尤其重要.</p>
+<p><strong>定义</strong>. 设 $(E,h)$ 为 <span class="link local"><a href="/Hermite向量丛.html" title="“Hermite 向量丛” [Hermite向量丛]">Hermite 向量丛</a></span>, 其上的<strong>陈联络</strong>是指满足 $\nabla h =0$, $(\nabla^{0,1})^2=0$ 的<span class="link local"><a href="/联络.html" title="联络 [联络]">联络</a></span>.</p>
+<p><strong>定理</strong>. 对任意<span class="link local"><a href="/全纯向量丛.html" title="“全纯向量丛” [全纯向量丛]">全纯向量丛</a></span> $(E,\bar\partial_E)$, 给定其上的 Hermite 结构 $h$, 存在唯一的陈联络 $\nabla$ 满足 $\nabla^{0,1}=\bar\partial_E$.</p>
+<p>$\nabla h=0$ 等价于对 $E$ 的<strong>光滑截面</strong> $s,t$,
+$$
+d(h(\bar s,t)) = h(\overline{\nabla s},t)+ h(\bar s,\nabla t),
+$$</p>
+<p><strong>定理</strong>. 对于全纯向量丛 $E$ 上的 Hermite 结构 $h$, 陈联络的联络形式为
+$$
+\omega = h^{-1} \partial h = (h^{i \bar k}\partial h_{\bar k j}).
+$$
+<strong>证明</strong>. 回忆联络形式 $\omega^i_j$ 的定义为
+$$
+\nabla e_j = e_i \otimes \omega^i_j,
+$$
+其中 $\omega^i_j$ 是 $(1,0)$-形式. 则
+$$
+\underbrace{\partial h_{\bar i j}}+ \bar\partial h_{\bar i j} = dh_{\bar i j}=h_{\bar k j}\overline{\omega^k_i}+ \underbrace{h_{\bar i k}\omega^k_j}.
+$$
+$$
+\omega^i_{j}=h^{i \bar k}\partial h_{\bar k j},\quad \omega = h^{-1}\partial h.
+$$</p>
+<h2>曲率</h2>
+<p><strong>定理</strong>. 带有 Hermite 结构的全纯向量丛上的陈联络的<span class="link local"><a href="/曲率.html" title="“曲率” [曲率]">曲率</a></span>是一个 $(1,1)$-形式
+$$
+\Omega = \bar\partial (h^{-1}\partial h)= \bar\partial\omega.
+$$
+<strong>证明</strong>.
+$$
+\begin{aligned}
+	\Omega &amp;= d\omega + \omega\wedge\omega\\
+	&amp;= (\partial+\bar\partial)(h^{-1}\partial h) +h^{-1}\partial h \wedge h^{-1}\partial h\\
+	&amp;=\cdots = \bar\partial (h^{-1}\partial h).
+\end{aligned}
+$$
+<strong>定理</strong>. 设 $L\to M$ 为<span class="link local"><a href="/全纯线丛.html" title="“全纯线丛” [全纯线丛]">全纯线丛</a></span>, 则有 (不依赖于平凡化!)
+$$
+\Omega = - \partial \bar\partial \log h.
+$$
+<strong>推论</strong>. <span class="link local"><a href="/全纯线丛.html" title="“全纯线丛” [全纯线丛]">全纯线丛</a></span>的第一<span class="link local"><a href="/陈类.html" title="“陈类” [陈类]">陈类</a></span>
+$$
+c_1 = \frac{i}{2\pi}\Omega = - \frac{i}{2\pi} \partial \bar\partial  \log h.
+$$</p>
+</details></section><section class="block" data-taxon=""><details ><summary id="除子"><header><h1><span class="taxon"></span>“除子” <a class="slug" href="/除子.html">[除子]</a><a class="edit" href="vscode://file/E:/Simplopedia_source/trees/%E9%99%A4%E5%AD%90.md">[edit]</a></h1><div class="metadata"><ul><li class="meta-item">百科</li><li class="meta-item"><span class="link local"><a href="/SimplicialCat.html" title="单纯猫 [SimplicialCat]">SimplicialCat</a></span></li></ul></div></header></summary>
+<p>除子是 “余一维子流形” 概念的推广, 也是交换环中 “因子” 概念的推广.</p>
+<h2>直观</h2>
+<h3>交换代数</h3>
+<p>整环 $A$ 的除子理论涉及构造某个半群的态射 $\varphi\colon A^* \to D_0$, 其中 $D_0$ 是唯一分解半群. 此时 $A$ 中的素因子分解问题 (分解可能不唯一) 即可化为 $D_0$ 中的素因子分解问题. 对于 $a\in A^*$, 其像 $\varphi(a)\in D_0$ 称为<span class="link local"><a href="/主除子.html" title="“主除子” [主除子]">主除子</a></span>, 记作 $(a)$. 对于除子 $\mathfrak{a}\in D_0$, 若 $\mathfrak{a}$ 在 $D_0$ 中整除 $(a)$, 则称除子 $\mathfrak{a}$ 整除 $a$.</p>
+<p>一般的 <span class="link local"><a href="/Dedekind整环.html" title="“Dedekind 整环” [Dedekind整环]">Dedekind 整环</a></span>里都有除子理论. “Dedekind 整环就是模仿代数曲线构造的.” <sup class="footnote-reference" id="除子_Dieudonne85-back"><a href="#除子_Dieudonne85">1</a></sup></p>
+<div class="footnote-definition" id="除子_Dieudonne85">
+  <sup class="footnote-definition-label"><a href="#除子_Dieudonne85-back">1</a></sup>
+<p>Dieudonne, History of Algebraic Geometry, VI</p>
+</div>
+<h3>复几何</h3>
+<p>复流形 $M$ 上的<strong>非奇异除子</strong> (nonsingular divisor) $D$ 是余一维的复子流形, 其对应的线丛 $[D]$ 定义如下. 取开覆盖 $\{U_\lambda\}$ 与 $U_\lambda$ 上的全纯函数 $f_\lambda$, 使得 $f_\lambda$ 在 $U_\lambda$ 上沿 $D$ 一阶消失, $U_\lambda \cap D = \{f_\lambda =0\}$. 定义 $[D]$ 是 $f_{\lambda \mu}=\dfrac{f_\lambda }{f_\mu}$ 为转移函数的<span class="link local"><a href="/全纯线丛.html" title="“全纯线丛” [全纯线丛]">全纯线丛</a></span>.</p>
+<h2>Weil 除子与 Cartier 除子</h2>
+<p>拓扑上, Weil 除子像是同调类 (余 $1$ 维的圈), 而 Cartier 除子像是上同调类.</p>
+<h3>Weil 除子</h3>
+<p>设 $X$ 为 (光滑不可约) 代数簇. $X$ 上的 Weil 除子是余 $1$ 维子簇的 $\mathbb{Z}$-线性组合. Weil 除子的群正是 $(n-1)$-圈 $Z_{n-1}(X)$.</p>
+<p><strong>有效</strong> (effective)  除子是指系数全为正的 Weil 除子.</p>
+<p>余 $1$ 维子簇局部上是一个函数的零点. 因此反过来, 由一个有理函数 (一般地, <strong>线丛的有理截面</strong>) 也可定义一个 Weil 除子 (称为<span class="link local"><a href="/主除子.html" title="“主除子” [主除子]">主除子</a></span>)
+$$
+\operatorname{div}g = (g) := \sum_{V} \operatorname{ord}_V(g)\cdot V.
+$$
+相差一个主除子的关系称为<strong>线性等价</strong> (linear equivalence, 或有理等价). Weil 除子模掉这个等价关系就得到 <strong>Weil 类群</strong> (Weil class group) $\operatorname{WCl}(X)$.</p>
+<p>对于线丛 $L$ 的有理截面 $s$ 和 $M$ 的有理截面 $t$, 其<strong>张量积</strong> $s\otimes t$ 是 $L\otimes M$ 的有理截面, 对应的除子 $\operatorname{div} (s\otimes t) = \operatorname{div}s+\operatorname{div}t$.</p>
+<h3>Cartier 除子</h3>
+<p>Cartier 除子体现了一种 “将定理变成定义” 的思想. 我们定义 Cartier 除子 “就是线丛的有理截面” ; 但要做出一些限制 (截面不能为零截面), 并规定哪些截面给出相同的除子.</p>
+<p><strong>定义</strong>. (“古典” 定义) 复流形 (或代数簇) $X$ 上的 Cartier 除子是如下的资料: 一个开覆盖 $\{U_\alpha\}$, 每个 $U_\alpha$ 上的亚纯函数 (有理函数) $f_\alpha$, 满足在 $U_\alpha\cap U_\beta$ 上 $f_\alpha$ 与 $f_\beta$ 之比没有零点与极点.</p>
+<p><strong>定义</strong>. $X$ 上的 Cartier 除子是 $\mathcal D_X$ 的全局截面. 两个 Cartier 除子有理等价 (rationally equivalent) 是指 $\sigma / \tau \in \Gamma(X,\mathcal Mer(X)^*)$. 其中, $\mathcal Mer(X)^*$ 是 $\mathcal Mer(X)$ 的可逆元.</p>
+<h2>除子与线丛</h2>
+<p>除子和<span class="link local"><a href="/全纯线丛.html" title="“全纯线丛” [全纯线丛]">线丛</a></span>有关. 对于 <span class="link local"><a href="/Riemann面.html" title="“Riemann 面” [Riemann面]">Riemann 面</a></span> $M$ 上恒不为零的全纯函数层 $\mathcal{O}^*$ 与恒不为零的亚纯函数层 $\mathcal{M}^*$ 有短正合列
+$$
+0\to \mathcal{O}^* \to \mathcal{M}^* \to \mathcal{M}^*/\mathcal{O}^* \to 0,
+$$
+其诱导的长正合列为
+$$
+\underbrace{H^0(M,\mathcal{M}^*)\overset{h}{\to} H^0(M,\mathcal{M}^*/\mathcal{O}^*)}_{\text{除子}} \overset{\delta}{\to} \underbrace{H^1(M,\mathcal{O}^*)}_{\text{线丛}} \to\cdots,
+$$
+映射 $\delta$ 表明如何由除子过渡到<span class="link local"><a href="/线丛.html" title="线丛 [线丛]">线丛</a></span>, 而映射 $h$ 定义了除子的线性等价关系 (相差一个 $h$ 的像就称为线性等价).</p>
+<p>设 $D$ 为除子, 其对应的<span class="link local"><a href="/线丛.html" title="线丛 [线丛]">线丛</a></span>由如下转移函数给出:
+$$
+f_{ij}=f_i/f_j\colon U_{ij}\to \mathbb{C}^\times.
+$$
+除子的<strong>和</strong>对应线丛的<strong>张量积</strong>.</p>
+<blockquote>
+<p>为什么只做除子, 不做更高余维数的子簇? 搞清楚推广遇到什么困难, 才有研究好做. — Yau 2023年3月2日于院长讨论班</p>
+</blockquote>
+<p><strong>定义</strong>. 称除子 $D$ 光滑 (nonsingular), 是指存在某种表示 $(U_i,f_i)$, 使得 $f_i\equiv 1$ 或 $f_i$ 可扩展为局部坐标系. (换言之, 当 $f_i=0$ 时 $f_i'\neq 0$.)</p>
+<h3>法丛</h3>
+<p>除子 (余一维子流形) 对应的线丛在其自身上的限制同构于<span class="link local"><a href="/法丛.html" title="(余) 法丛 [法丛]">法丛</a></span>.</p>
+<h2>除子与子概形</h2>
+<p>若 $D$ 是 $X$ 的子概形对应的除子, 则有短正合列
+$$
+0\to \mathcal O(-D) \to \mathcal O_X \to \mathcal O_D\to 0.
+$$
+其中 $\mathcal O(-D)$ 同构于 $D$ 对应的<span class="link local"><a href="/理想层.html" title="理想层 [理想层]">理想层</a></span>.</p>
+<h2>可逆层</h2>
+<p>设 $X$ 为 $K$ 上的光滑代数簇, $X$ 上的<span class="link local"><a href="/可逆层.html" title="“可逆层” [可逆层]">可逆层</a></span>是指秩为 $1$ 的局部自由 $\mathcal{O}_X$-模. 详见该页面.</p>
+<h2>例</h2>
+<p>复射影空间 $\mathbb P^n(\mathbb{C})$ 上的超平面 $H=\{z^0=0\}$ 可视为除子, 它对应的线丛记为 $\mathcal O(1)$, 称为<span class="link local"><a href="/超平面丛.html" title="“超平面丛” [超平面丛]">超平面丛</a></span> (hyperplane bundle). 对任意整数 $k$, 除子 $kH$ 对应线丛 $\mathcal O(k)$.</p>
+<p>$\mathbb P^n(\mathbb{C})$ 上的<span class="link local"><a href="/重言丛.html" title="“重言丛” [重言丛]">重言丛</a></span> (tautological line bundle) 同构于 $\mathcal O(-1)$.</p>
+<h2>相关概念</h2>
+<p><span class="link local"><a href="/主除子.html" title="“主除子” [主除子]">主除子</a></span></p>
+</details></section></details></section></footer></article></div></body></html>

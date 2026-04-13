@@ -1,0 +1,1121 @@
+<!DOCTYPE html>
+<html lang="en-US"><head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<meta name="viewport" content="width=device-width"><title>“复流形”</title><link rel="icon" href="/assets/favicon.ico" /><style>
+  @font-face {
+    font-family: 'NewCM10';
+    src: url(assets/NewCM10-Book.otf) format('opentype');
+    font-weight: 400;
+    font-style: normal;
+  }
+
+  @font-face {
+    font-family: 'NewCM10';
+    src: url(assets/NewCM10-Italic.otf) format('opentype');
+    font-weight: 400;
+    font-style: italic;
+  }
+
+  @font-face {
+    font-family: 'NewCM10';
+    src: url(assets/NewCM10-Bold.otf) format('opentype');
+    font-weight: 700;
+    font-style: normal;
+  }
+
+  body {
+    --text-font-family: "NewCM10", serif !important;
+  }
+</style><template id="inline-section">
+  <section class="inline block" data-taxon="">
+    <details open="">
+      <summary>
+        <header>
+          <h1>
+            <span class="taxon"></span>
+            <div id="title"></div>
+          </h1>
+        </header>
+      </summary>
+      <div id="content"></div>
+    </details>
+  </section>
+</template>
+
+<script>
+  function inlineSection(template, section, taxon, title) {
+    taxon = taxon || section.getAttribute("taxon") || null;
+    title = title || section.getAttribute("title") || "";
+
+    const clone = template.content.cloneNode(true);
+    clone.querySelector("section").dataset.taxon = taxon;
+    clone.querySelector(".taxon").textContent = taxon ? `${taxon}. ` : "";
+    clone.querySelector("#title").replaceWith(title);
+    clone.querySelector("#content").replaceWith(...section.childNodes);
+
+    if (section.hasAttribute("close")) {
+      clone.querySelector("details").removeAttribute("open");
+    }
+    
+    section.replaceWith(clone);
+  }
+
+  const tagTaxonTable = {
+    "exegesis": "Exegesis",
+    "definition": "Definition",
+    "proposition": "Proposition",
+    "remark": "Remark",
+    "conjecture": "Conjecture",
+    "postulate": "Postulate",
+    "claim": "Claim",
+    "observation": "Observation",
+    "fact": "Fact",
+    "hypothesis": "Hypothesis",
+    "axiom": "Axiom",
+    "lemma": "Lemma",
+    "theorem": "Theorem",
+    "corollary": "Corollary",
+    "example": "Example", 
+    "proof": "Proof",
+  };
+
+  document.addEventListener("DOMContentLoaded", () => {
+    const template = document.getElementById("inline-section");
+
+    [...document.getElementsByTagName("block")].forEach(section => inlineSection(template, section));
+
+    Object.entries(tagTaxonTable).forEach(([tag, taxon]) => {
+      [...document.getElementsByTagName(tag)].forEach(section => inlineSection(template, section, taxon));
+    });
+  });
+</script><script>
+  function toggleDetailsOpen() {
+    const details = document.querySelector("#toc>div>details");
+    if (!details) return;
+
+    if (window.matchMedia("(max-width: 1000px)").matches) {
+      details.removeAttribute("open");
+    } else {
+      details.setAttribute("open", "");
+    }
+  }
+
+  document.addEventListener("DOMContentLoaded", toggleDetailsOpen);
+  window.addEventListener("resize", toggleDetailsOpen);
+</script><style>
+  theme-option {
+    display: inline-block;
+  }
+
+  theme-option>input {
+    display: none;
+  }
+
+  theme-option>label {
+    color: var(--slug-color);
+  }
+
+  theme-option>label:hover {
+    background-color: var(--hover-color-link);
+  }
+
+  theme-option:has(input:checked)>label {
+    color: var(--link-color);
+  }
+
+  theme-option>label::before {
+    content: "[";
+    color: rgba(0, 0, 0, 0);
+  }
+
+  theme-option>label::after {
+    content: "]";
+    color: rgba(0, 0, 0, 0);
+  }
+
+  theme-option:has(input:checked)>label::before {
+    color: var(--link-color);
+  }
+
+  theme-option:has(input:checked)>label::after {
+    color: var(--link-color);
+  }
+</style>
+
+<template id="theme-option-template">
+  <input type="radio" name="theme" />
+  <label></label>
+</template>
+
+<script>
+  const THEME_KEY = `kodama-theme`;
+
+  function storeSelectedTheme(name) {
+    localStorage.setItem(THEME_KEY, name);
+  }
+
+  function getCurrentTheme() {
+    return localStorage.getItem(THEME_KEY) || window.primaryTheme;
+  }
+
+  function selectTheme(themeName) {
+    storeSelectedTheme(themeName);
+    requestAnimationFrame(applyDynamicColorInvert);
+  }
+
+  function applyFavorTheme() {
+    const favoredTheme = getCurrentTheme();
+    if (favoredTheme) {
+      const selector = `input[type='radio'][id='${favoredTheme}']`;
+      const favoredOption = window.themeOptions.querySelector(selector);
+
+      if (favoredOption) {
+        favoredOption.checked = true;
+      } else if (window.primaryOption) {
+        // Fallback to primary theme, if the favored theme is not found
+        // e.g., when the theme options have changed, and the stored theme is no longer available.
+        window.primaryOption.checked = true;
+      }
+    }
+    applyDynamicColorInvert();
+  }
+
+  document.addEventListener("DOMContentLoaded", function () {
+    window.themeOptions = document.getElementById("theme-options");
+    const templateContent = document.getElementById("theme-option-template").content;
+
+    customElements.define(
+      "theme-option",
+      class extends HTMLElement {
+        constructor() {
+          super();
+
+          const node = templateContent.cloneNode(true);
+          const themeName = this.getAttribute("name");
+
+          const input = node.querySelector("input");
+          input.setAttribute("id", themeName);
+          input.setAttribute("value", themeName);
+
+          const label = node.querySelector("label");
+          label.setAttribute("for", themeName);
+          label.addEventListener("click", () => selectTheme(themeName));
+
+          while (this.firstChild) {
+            label.appendChild(this.firstChild);
+          }
+          this.appendChild(node);
+        }
+      },
+    );
+
+    window.primaryOption = window.themeOptions.querySelector("input[type='radio']");
+    window.primaryTheme = primaryOption?.value;
+
+    applyFavorTheme();
+  });
+</script>
+
+<script>
+  const clamp = (value) => Math.max(0, Math.min(255, value));
+
+  const multiply = ([r, g, b], matrix) => {
+    const nr = clamp(r * matrix[0] + g * matrix[1] + b * matrix[2]);
+    const ng = clamp(r * matrix[3] + g * matrix[4] + b * matrix[5]);
+    const nb = clamp(r * matrix[6] + g * matrix[7] + b * matrix[8]);
+    return [nr, ng, nb];
+  };
+
+  const hueRotate = ([r, g, b], angle = 0) => {
+    const rad = (angle / 180) * Math.PI;
+    const sin = Math.sin(rad);
+    const cos = Math.cos(rad);
+    const matrix = [
+      0.213 + cos * 0.787 - sin * 0.213,
+      0.715 - cos * 0.715 - sin * 0.715,
+      0.072 - cos * 0.072 + sin * 0.928,
+      0.213 - cos * 0.213 + sin * 0.143,
+      0.715 + cos * 0.285 + sin * 0.140,
+      0.072 - cos * 0.072 - sin * 0.283,
+      0.213 - cos * 0.213 - sin * 0.787,
+      0.715 - cos * 0.715 + sin * 0.715,
+      0.072 + cos * 0.928 + sin * 0.072,
+    ];
+    return multiply([r, g, b], matrix);
+  };
+
+  const grayscale = ([r, g, b], value = 1) => {
+    const matrix = [
+      0.2126 + 0.7874 * (1 - value),
+      0.7152 - 0.7152 * (1 - value),
+      0.0722 - 0.0722 * (1 - value),
+      0.2126 - 0.2126 * (1 - value),
+      0.7152 + 0.2848 * (1 - value),
+      0.0722 - 0.0722 * (1 - value),
+      0.2126 - 0.2126 * (1 - value),
+      0.7152 - 0.7152 * (1 - value),
+      0.0722 + 0.9278 * (1 - value),
+    ];
+    return multiply([r, g, b], matrix);
+  };
+
+  const sepia = ([r, g, b], value = 1) => {
+    const matrix = [
+      0.393 + 0.607 * (1 - value),
+      0.769 - 0.769 * (1 - value),
+      0.189 - 0.189 * (1 - value),
+      0.349 - 0.349 * (1 - value),
+      0.686 + 0.314 * (1 - value),
+      0.168 - 0.168 * (1 - value),
+      0.272 - 0.272 * (1 - value),
+      0.534 - 0.534 * (1 - value),
+      0.131 + 0.869 * (1 - value),
+    ];
+    return multiply([r, g, b], matrix);
+  };
+
+  const saturate = ([r, g, b], value = 1) => {
+    const matrix = [
+      0.213 + 0.787 * value,
+      0.715 - 0.715 * value,
+      0.072 - 0.072 * value,
+      0.213 - 0.213 * value,
+      0.715 + 0.285 * value,
+      0.072 - 0.072 * value,
+      0.213 - 0.213 * value,
+      0.715 - 0.715 * value,
+      0.072 + 0.928 * value,
+    ];
+    return multiply([r, g, b], matrix);
+  };
+
+  const linear = ([r, g, b], slope = 1, intercept = 0) => {
+    const scale = 255;
+    return [
+      clamp(r * slope + intercept * scale),
+      clamp(g * slope + intercept * scale),
+      clamp(b * slope + intercept * scale),
+    ];
+  };
+
+  const brightness = (rgb, value = 1) => linear(rgb, value);
+  const contrast = (rgb, value = 1) => linear(rgb, value, -0.5 * value + 0.5);
+
+  const invert = ([r, g, b], value = 1) => {
+    const nr = (value + r / 255 * (1 - 2 * value)) * 255;
+    const ng = (value + g / 255 * (1 - 2 * value)) * 255;
+    const nb = (value + b / 255 * (1 - 2 * value)) * 255;
+    return [clamp(nr), clamp(ng), clamp(nb)];
+  };
+
+  // Code taken from https://stackoverflow.com/a/9493060/2688027, licensed under CC BY-SA.
+  const rgbToHsl = (r, g, b) => {
+    r /= 255; g /= 255; b /= 255;
+    const max = Math.max(r, g, b);
+    const min = Math.min(r, g, b);
+    let h, s, l = (max + min) / 2;
+    if (max === min) {
+      h = s = 0;
+    } else {
+      const d = max - min;
+      s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
+      switch (max) {
+        case r: h = (g - b) / d + (g < b ? 6 : 0); break;
+        case g: h = (b - r) / d + 2; break;
+        case b: h = (r - g) / d + 4; break;
+      }
+      h /= 6;
+    }
+    return { h: h * 100, s: s * 100, l: l * 100 };
+  };
+
+  const applyFilters = (rgb, [inv, sep, sat, hue, bri, con]) => {
+    let color = [...rgb];
+    color = invert(color, inv / 100);
+    color = sepia(color, sep / 100);
+    color = saturate(color, sat / 100);
+    color = hueRotate(color, hue * 3.6);
+    color = brightness(color, bri / 100);
+    color = contrast(color, con / 100);
+    return color;
+  };
+
+  const lossFn = (targetRgb, filters) => {
+    const resultRgb = applyFilters([0, 0, 0], filters);
+    const targetHsl = rgbToHsl(...targetRgb);
+    const resultHsl = rgbToHsl(...resultRgb);
+    return (
+      Math.abs(resultRgb[0] - targetRgb[0]) +
+      Math.abs(resultRgb[1] - targetRgb[1]) +
+      Math.abs(resultRgb[2] - targetRgb[2]) +
+      Math.abs(resultHsl.h - targetHsl.h) +
+      Math.abs(resultHsl.s - targetHsl.s) +
+      Math.abs(resultHsl.l - targetHsl.l)
+    );
+  };
+
+  const fix = (value, idx) => {
+    let max = 100;
+    if (idx === 2) max = 7500;                  // saturate
+    else if (idx === 4 || idx === 5) max = 200; // brightness, contrast
+    if (idx === 3) { // hue-rotate
+      if (value > max) return value % max;
+      if (value < 0) return max + (value % max);
+      return value;
+    }
+    return Math.max(0, Math.min(max, value));
+  };
+
+  const spsa = (targetRgb, A, a, c, initial, iters) => {
+    const alpha = 1;
+    const gamma = 1 / 6;
+    let values = [...initial];
+    let best = [...values];
+    let bestLoss = Infinity;
+
+    for (let k = 0; k < iters; k++) {
+      const ck = c / Math.pow(k + 1, gamma);
+      const deltas = Array(6).fill().map(() => (Math.random() > 0.5 ? 1 : -1));
+      const highArgs = values.map((v, i) => v + ck * deltas[i]);
+      const lowArgs = values.map((v, i) => v - ck * deltas[i]);
+      const lossDiff = lossFn(targetRgb, highArgs) - lossFn(targetRgb, lowArgs);
+
+      values = values.map((v, i) => {
+        const g = (lossDiff / (2 * ck)) * deltas[i];
+        const ak = a[i] / Math.pow(A + k + 1, alpha);
+        return fix(v - ak * g, i);
+      });
+
+      const loss = lossFn(targetRgb, values);
+      if (loss < bestLoss) {
+        best = [...values];
+        bestLoss = loss;
+      }
+    }
+    return { values: best, loss: bestLoss };
+  };
+
+  // Threshold for acceptable color loss. This value determines when the SPSA algorithm stops early.
+  // A loss below this value is considered visually indistinguishable for most use cases.
+  // The value 25 was determined empirically to balance performance and color accuracy.
+  const ACCEPTABLE_COLOR_LOSS = 25;
+
+  const solveWide = (targetRgb) => {
+    const A = 5;
+    const c = 15;
+    const a = [60, 180, 18000, 600, 1.2, 1.2];
+    let best = { loss: Infinity, values: null };
+    for (let i = 0; best.loss > ACCEPTABLE_COLOR_LOSS && i < 3; i++) {
+      const initial = [50, 20, 3750, 50, 100, 100];
+      const result = spsa(targetRgb, A, a, c, initial, 1000);
+      if (result.loss < best.loss) best = result;
+    }
+    return best;
+  };
+
+  const solveNarrow = (targetRgb, wideResult) => {
+    const A = wideResult.loss;
+    const c = 2;
+    const A1 = A + 1;
+    const a = [0.25 * A1, 0.25 * A1, A1, 0.25 * A1, 0.2 * A1, 0.2 * A1];
+    return spsa(targetRgb, A, a, c, wideResult.values, 500);
+  };
+
+  const cssFilterString = (filters) => {
+    const [inv, sep, sat, hue, bri, con] = filters.map(Math.round);
+    const hueDeg = Math.round(hue * 3.6);
+    return `filter: invert(${inv}%) sepia(${sep}%) saturate(${sat}%) hue-rotate(${hueDeg}deg) brightness(${bri}%) contrast(${con}%);`;
+  };
+
+  const solveColor = (targetRgb) => {
+    const wide = solveWide(targetRgb);
+    const narrow = solveNarrow(targetRgb, wide);
+    return {
+      values: narrow.values,
+      loss: narrow.loss,
+      filter: cssFilterString(narrow.values),
+    };
+  };
+
+  // Reuse a single canvas / context to avoid memory leaks
+  const colorParseCanvas = document.createElement('canvas');
+  colorParseCanvas.width = 1;
+  colorParseCanvas.height = 1;
+  const colorParseContext = colorParseCanvas.getContext('2d');
+
+  const toRGBArray = (cssColor) => {
+    colorParseContext.fillStyle = cssColor;
+    colorParseContext.fillRect(0, 0, 1, 1);
+
+    // The `getImageData().data` returns a Uint8ClampedArray with 4 values per pixel (RGBA). 
+    // also see: https://developer.mozilla.org/zh-CN/docs/Web/API/ImageData/data
+    const rgba = colorParseContext.getImageData(0, 0, 1, 1).data;
+    return Array.from(rgba.slice(0, 3));
+  };
+
+  const DYNAMIC_STYLE_ID = 'dynamic-color-invert-style';
+  const SOLVED_COLOR_KEY = "solved-";
+
+  function memorizedSolvedFilter(color) {
+    const colorKey = SOLVED_COLOR_KEY + color;
+    const storedFilterOption = localStorage.getItem(colorKey);
+    if (storedFilterOption) {
+      return storedFilterOption;
+    } else {
+      const filter = solveColor(color).filter;
+      localStorage.setItem(colorKey, filter);
+      return filter;
+    }
+  }
+
+  function applyDynamicColorInvert() {
+    const textColor = getComputedStyle(document.body).getPropertyValue('--text-color');
+    if (textColor && textColor.length > 0) {
+      const rgb = toRGBArray(textColor);
+      const filter = memorizedSolvedFilter(rgb);
+
+      const existingStyle = document.getElementById(DYNAMIC_STYLE_ID);
+      if (existingStyle) {
+        existingStyle.textContent = `.color-invert {${filter}}`;
+      } else {
+        const style = document.createElement('style');
+        style.id = DYNAMIC_STYLE_ID;
+        style.textContent = `.color-invert {${filter}}`;
+        document.head.appendChild(style);
+      }
+    }
+  }
+</script><script>
+  (() => {
+    const url = "/kodama.json";
+    const interval = 1000; // 1 second
+
+    let lastModified = null;
+
+    async function check() {
+      try {
+        const res = await fetch(url + "?t=" + Date.now(), {
+          method: "HEAD",
+          cache: "no-store",
+        });
+
+        const lm = res.headers.get("last-modified");
+
+        if (lastModified && lm && lm !== lastModified) {
+          location.reload();
+          return;
+        }
+
+        lastModified = lm || lastModified;
+      } catch (e) {
+        // Ignore
+        console.warn("Reload check failed:", e);
+      }
+
+      setTimeout(check, interval);
+    }
+
+    check();
+  })();
+</script><!-- Also see: https://katex.org/docs/autorender -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.25/dist/katex.min.css" integrity="sha384-WcoG4HRXMzYzfCgiyfrySxx90XSl2rxY5mnVY5TwtWE6KLrArNKn0T/mOgNL0Mmi" crossorigin="anonymous">
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.25/dist/katex.min.js" integrity="sha384-J+9dG2KMoiR9hqcFao0IBLwxt6zpcyN68IgwzsCSkbreXUjmNVRhPFTssqdSGjwQ" crossorigin="anonymous"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.25/dist/contrib/auto-render.min.js" integrity="sha384-hCXGrW6PitJEwbkoStFjeJxv+fSOOQKOPbJxSfM6G5sWZjAyWhXiTIIAmQqnlLlh" crossorigin="anonymous"></script>
+<!-- Also see: https://github.com/KaTeX/KaTeX/tree/main/contrib/copy-tex -->
+<script src="https://cdn.jsdelivr.net/npm/katex@0.16.25/dist/contrib/copy-tex.min.js" integrity="sha384-HORx6nWi8j5/mYA+y57/9/CZc5z8HnEw4WUZWy5yOn9ToKBv1l58vJaufFAn9Zzi" crossorigin="anonymous"></script>
+
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    renderMathInElement(document.body, {
+      delimiters: [
+        { left: "$$", right: "$$", display: true },
+        { left: "$", right: "$", display: false },
+        { left: "\\(", right: "\\)", display: false },
+        { left: "\\[", right: "\\]", display: true },
+      ],
+      trust: true,
+      strict: false,
+      throwOnError: false,
+      minRuleThickness: 0.05,
+    });
+  });
+</script>
+<link rel="stylesheet" href="/main.css"><style>
+@media only screen and (min-width: 1000px) {
+  #grid-wrapper { grid-template-columns: var(--article-max-width) var(--toc-max-width); }
+  nav#toc { max-width: max-content; }
+}
+</style></head><body><header class="header"><nav class="nav"><div class="logo"><span class="cursor-pointer" onclick="window.location.href='/index.html'" title="单纯百科 Simplopedia">« 单纯百科 Simplopedia</span></div></nav></header><div id="grid-wrapper" style="grid-template-areas: 'article toc';" data-base-url="./"><nav id="toc" class="sticky-nav mobile-sticky-nav"><div id="theme-options"><style>
+  body:has(input[value="furina"]:checked) {
+    --article-max-width: 110ex; /* default: 90ex */
+
+    --color-Furina-deep-navy: #253085;
+    --color-Furina-royal-blue: #465BCF;
+    --color-Furina-aqua-cyan: #6AC6E8;
+    --color-Furina-frost-white: #FAFBFC;
+    --color-Furina-misty-blue: #C4D7ED;
+    --color-Furina-vivid-sapphire: #5670E9;
+    --color-Furina-luminous-hydro: #70DBFF;
+    --color-Furina-bright-periwinkle: #8DA4F1;
+    --color-Furina-vintage-gold: #BD9368;
+    --color-Furina-vintage-gold-light: #DDB368;
+    --color-Furina-vintage-gold-ultra-light: #FDF388;
+
+    --background-color: var(--color-Furina-frost-white);
+    --link-color: var(--color-Furina-vivid-sapphire);
+    --slug-color: var(--color-Furina-aqua-cyan);
+    --logo-color: var(--color-Furina-deep-navy);
+
+    --block-background-color: #FFFFFF;
+    --shadow-color: rgba(27, 63, 143, 0.06);
+    --radius: 5px;
+    --margin-left: 14px;
+
+    --hover-color-block: var(--block-background-color);
+    --logo-hover-color: #88d;
+    --span-tag-color: #88d;
+    --article-tag-color: #88d;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    body:has(input[value="furina"]:checked) {
+      --color-Furina-deep-navy: #B5C0F5;
+      --color-Furina-royal-blue: #D6EBFF;
+
+      --background-color: #2f2f2f;
+      --block-background-color: #3a3a3a;
+    }
+  }
+
+  .block {
+    /*2026-3-16 21:10 新增*/
+    padding: 15px;
+    margin-top: 6px;
+    margin-bottom: 6px;
+
+    border-radius: var(--radius);
+    background-color: var(--block-background-color);
+    box-shadow: 0 2px 12px var(--shadow-color);
+  }
+
+  .footnote-definition {
+    margin-left: var(--margin-left);
+  }
+
+  h5,
+  h6,
+  p {
+    margin: 5px;
+  }
+
+  tr {
+    border-bottom: 1px solid var(--color-Furina-bright-periwinkle);
+  }
+
+  /* 可选：去除表头下方的重复横线（如果表头需要特殊样式） */
+  thead tr {
+    border-bottom: 2px solid var(--color-Furina-deep-navy);
+  }
+
+  /* 去除最后一行的边框 */
+  tbody tr:last-child {
+    border-bottom: none;
+  }
+
+  .footnote-definition>p {
+    display: inline;
+    margin-left: 0;
+    color: var(--color-Furina-bright-periwinkle);
+    font-size: small;
+  }
+
+  article > section > details > summary > header > h1 {
+    font-weight: 600;
+    font-size: 1.75rem !important;
+  }
+
+  h2 {
+    font-weight: 500;
+    font-size: 1.5rem !important;
+    color: var(--color-Furina-deep-navy);
+    margin-bottom: 10px;
+    border-bottom: 1px solid #88d;
+    padding-bottom: 1px;
+    /* 增加底部内边距让横线和文字有间距 */
+  }
+
+  h2::before {
+    content: "\2726";
+    /* ✦ 的Unicode转义码 */
+    display: inline-block;
+    margin-right: 0.3em;
+    /*color: var(--color-Furina-vintage-gold-light);*/
+    /* 替换 color 属性，改为以下背景和裁剪属性 */
+    background: linear-gradient(150deg,
+        var(--color-Furina-vintage-gold-ultra-light) 30%,
+        var(--color-Furina-vintage-gold-light) 60%,
+        var(--color-Furina-vintage-gold) 90%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    /* 将文字颜色设为透明以显示背景 */
+    /* 组合径向渐变（中心高光）和线性渐变（基础色调） */
+    /*background: radial-gradient(
+      ellipse at center,
+      var(--color-Furina-vintage-gold-ultra-light) 20%,
+      transparent 70%
+    ),
+    linear-gradient(
+      to bottom,
+      var(--color-Furina-vintage-gold-light),
+      var(--color-Furina-vintage-gold)
+    );
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent; */
+    filter: drop-shadow(0px 1px 1px rgba(184, 150, 131, 0.5));
+    /* 可选：增加与主色呼应的柔和投影 */
+    font-weight: normal;
+  }
+
+
+  h3 {
+    font-weight: 700;
+    color: var(--color-Furina-royal-blue);
+    margin-bottom: 5px;
+  }
+
+  h3::before {
+    content: "\2726";
+    /* ✦ 的Unicode转义码 */
+    display: inline-block;
+    margin-left: 0.06em;
+    margin-right: 0.36em;
+    /*color: var(--color-Furina-vintage-gold-ultra-light);*/
+    background: linear-gradient(150deg,
+        var(--color-Furina-vintage-gold-ultra-light) 20%,
+        var(--color-Furina-vintage-gold-light) 90%,
+        var(--color-Furina-vintage-gold) 95%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    font-weight: normal;
+  }
+
+  h4 {
+    text-indent: var(--marginleft);
+    font-weight: 700;
+    color: #696cd9;
+    margin-bottom: 0;
+  }
+
+  h5 {
+    text-indent: var(--marginleft);
+    font-weight: 700;
+    color: #8a8ff4;
+    margin-bottom: 0;
+  }
+
+  h6 {
+    text-indent: var(--marginleft);
+    font-weight: 700;
+    color: #aaaff4;
+    margin-bottom: 0;
+  }
+
+  code, pre, .mono {
+    font-family: "Liberation Mono", "Courier New", monospace;
+    font-size: 0.9em; /* 可选微调尺寸 */
+  }
+
+  @media only screen and (max-width: 1000px) {
+    #grid-wrapper>nav {
+      display: none !important;
+    }
+  }
+
+  #toc,
+  #toc .block {
+    background: none !important;
+    box-shadow: none !important;
+  }
+
+  ul {
+    margin: 5px;
+    margin-left: calc(5px + 2em);
+    padding-left: 0;
+    list-style-type: none;
+  }
+
+  ul li {
+    margin-bottom: 5px;
+    position: relative;
+    padding-left: 0;
+    /*color: var(--text-secondary);*/
+  }
+
+  ul li::before {
+    content: '✦';
+    position: absolute;
+    left : -1em;
+    /*color: var(--color-Furina-vintage-gold-ultra-light);*/
+    font-size: 0.9em;
+  }
+
+  .metadata {
+    color: var(--article-tag-color);
+  }
+
+  .metadata ul {
+    margin : 0;
+  }
+
+  .metadata li::before {
+    content: none;
+  }
+
+  .music-player button {
+    text-decoration: none;
+  }
+
+  .music-player button:hover {
+    text-decoration: underline;
+    text-decoration-color: var(--color-Furina-vintage-gold-light);
+    /* 金色 */
+    text-underline-offset: 6px;
+    /* 调整下划线与文字距离 */
+    text-decoration-thickness: 1px;
+    /* 线条粗细 */
+  }
+</style>
+
+<theme-option name="furina" style="display: none;">furina</theme-option></div></nav>
+
+<article><section class="block" data-taxon=""><details open><summary id="复流形"><header><h1><span class="taxon"></span>“复流形” <a class="slug" href="/复流形.html">[复流形]</a><a class="edit" href="vscode://file/E:/Simplopedia_source/trees/%E5%A4%8D%E6%B5%81%E5%BD%A2.md">[edit]</a></h1><div class="metadata"><ul><li class="meta-item">百科</li><li class="meta-item"><span class="link local"><a href="/SimplicialCat.html" title="单纯猫 [SimplicialCat]">SimplicialCat</a></span></li></ul></div></header></summary>
+<p>复流形是以 $\mathbb{C}^n$ 中的开圆盘为局部坐标卡, 以全纯函数为转移函数的流形.</p>
+<h2>复结构的性质</h2>
+<p>由于全纯函数的刚性远远强于光滑函数, 紧复流形的性质相比微分流形更接近代数簇.</p>
+<p>例如, 紧连通复流形上的全纯函数一定是常值函数 (极大模原理); 复流形很少能全纯地嵌入 $\mathbb{C}^n$ 中, 这种能嵌入 $\mathbb{C}^n$ 的复流形称作 <span class="link local"><a href="/Stein流形.html" title="“Stein 流形” [Stein流形]">Stein 流形</a></span>, 例如光滑仿射代数簇.</p>
+<p>一个 (拓扑) 流形上常常有不可数多种复结构, 例如 <span class="link local"><a href="/Riemann面.html" title="“Riemann 面” [Riemann面]">Riemann 面</a></span>. 曲面上所有复结构本身构成一个空间, 称为<span class="link local"><a href="/模空间.html" title="模空间 [模空间]">模空间</a></span>.</p>
+<h2>定向</h2>
+<p>复流形上有典范的定向.</p>
+<h2>例</h2>
+<p><span class="link local"><a href="/Calabi--丘流形.html" title="“Calabi–丘流形” [Calabi--丘流形]">Calabi–丘流形</a></span>, <span class="link local"><a href="/Riemann面.html" title="“Riemann 面” [Riemann面]">Riemann 面</a></span></p>
+<h2>相关概念</h2>
+<p><span class="link local"><a href="/近复结构.html" title="近复结构 [近复结构]">近复结构</a></span>, <span class="link local"><a href="/Kähler流形.html" title="Kähler 流形 [Kähler流形]">Kähler 流形</a></span></p>
+</details></section><footer><section class="block link-list" id="backlinks"><details open><summary><header><h1>关联页面</h1></header></summary><section class="block" data-taxon=""><details ><summary id="Kähler势"><header><h1><span class="taxon"></span>“Kähler 势” <a class="slug" href="/Kähler势.html">[Kähler势]</a><a class="edit" href="vscode://file/E:/Simplopedia_source/trees/K%C3%A4hler%E5%8A%BF.md">[edit]</a></h1><div class="metadata"><ul><li class="meta-item">百科</li><li class="meta-item"><span class="link local"><a href="/SimplicialCat.html" title="单纯猫 [SimplicialCat]">SimplicialCat</a></span></li></ul></div></header></summary>
+<h2>定义</h2>
+<p>设 $\rho$ 是<span class="link local"><a href="/复流形.html" title="“复流形” [复流形]">复流形</a></span> $M$ 上的实值光滑函数. 若实闭 $(1,1)$-形式
+$$
+\omega = \frac{\sqrt{-1}}{2}\partial \bar\partial \rho
+$$
+是<span class="link local"><a href="/正形式.html" title="“正形式” [正形式]">正形式</a></span>, 也即是 <span class="link local"><a href="/Kähler形式.html" title=" [Kähler形式]">基本形式</a></span>, 则称 $\rho$ 为其 Kähler 势.</p>
+<h2>性质</h2>
+<p>Kähler 形式整体上不一定可表示为 $\displaystyle \frac{\sqrt{-1}}{2}\partial \bar\partial \rho$ 的形式, 但若两个 Kähler 形式在同一个 de Rham 上同调类中, 它们的差可表示为这种形式. 另一个 Kähler 形式 $\omega' = \omega + d\beta$</p>
+</details></section><section class="block" data-taxon=""><details ><summary id="Kähler流形"><header><h1><span class="taxon"></span>Kähler 流形 <a class="slug" href="/Kähler流形.html">[Kähler流形]</a><a class="edit" href="vscode://file/E:/Simplopedia_source/trees/K%C3%A4hler%E6%B5%81%E5%BD%A2.md">[edit]</a></h1><div class="metadata"><ul><li class="meta-item">百科</li><li class="meta-item"><span class="link local"><a href="/SimplicialCat.html" title="单纯猫 [SimplicialCat]">SimplicialCat</a></span></li></ul></div></header></summary>
+<p>“Kähler = 复 $\cap$ <span class="link local"><a href="/辛.html" title=" [辛]">辛流形</a></span> $\cap$ Riemann”</p>
+<p>“Kähler = Riemann $\cap$ 陈”</p>
+<p>另见<span class="link local"><a href="/超Kähler流形.html" title="“超 Kähler 流形” [超Kähler流形]">超 Kähler 流形</a></span>.</p>
+<h2>定义</h2>
+<p>设 $M$ 为<span class="link local"><a href="/复流形.html" title="“复流形” [复流形]">复流形</a></span>, 带有 <span class="link local"><a href="/Hermite度量.html" title=" [Hermite度量]">Hermite 向量丛</a></span>
+$$
+g\in C^\infty ({T^*}' M \otimes {T^*}''M).
+$$
+(注. $g$ 是光滑截面, 而非全纯截面.)</p>
+<p>设
+$$
+g = g_{i \bar j} dz^i \otimes d\bar z^j,
+$$
+其实部
+$$
+\operatorname{Re}g= \frac{1}{2} g_{i\bar j} (dz^i\otimes d\bar z^j + d \bar z^i\otimes d z^j)
+$$
+为 Riemann 度量, 虚部
+$$
+\gamma = \operatorname{Im}g=\frac{\sqrt{-1}}{2}g_{i\bar j}(dz^i\otimes d\bar z^j - d \bar z^i\otimes d z^j)=\frac{\sqrt{-1}}{2}g_{i\bar j}\, dz^i\wedge d\bar z^j
+$$
+(的 $2$ 倍) 称为<strong>基本 $2$-形式</strong>. 见<span class="link local"><a href="/基本形式.html" title="“基本形式” [基本形式]">基本形式</a></span>.</p>
+<p>满足 <strong>Kähler 条件</strong> $d\gamma=0$ 的度量称为 Kähler 度量, 此时 $\gamma$ 称为 <strong>Kähler 形式</strong>.</p>
+<blockquote>
+<p>很自然地会产生退化度量.</p>
+</blockquote>
+<h2>性质</h2>
+<h3>Kähler 度量的拉回</h3>
+<p><strong>命题</strong>. 设 $f\colon N\to (M,g)$ 是 Kähler 流形的子流形, 则 $(N,f^* g)$ 是 Kähler 流形.</p>
+<p><strong>证明</strong>. 对 $(M,g)$ 的基本形式 $\gamma$ 有 $d(f^*\gamma)=f^*(d\gamma)=0$.</p>
+<h3>代数簇</h3>
+<p><strong>命题</strong>. 若 $M$ 为紧 Kähler 流形, $H^2(M,\mathcal O_M) = 0$, 则 $M$ 是<span class="link local"><a href="/代数簇.html" title="“代数簇” [代数簇]">代数簇</a></span>.</p>
+<p><strong>证明</strong>. $H^2(M,\mathbb C) \simeq H^{2,0} \oplus H^{1,1} \oplus H^{0,2}$, …</p>
+<p><strong>推论</strong>. 紧 <span class="link local"><a href="/Riemann面.html" title="“Riemann 面” [Riemann面]">Riemann 面</a></span>是代数簇.</p>
+<h2>例</h2>
+<p>$\mathbb{C}P^n$ 在 <span class="link local"><a href="/Fubini--Study度量.html" title="“Fubini–Study 度量” [Fubini--Study度量]">Fubini–Study 度量</a></span>下构成 Kähler 流形. 进而 $\mathbb{C}P^n$ 的子流形构成 Kähler 流形.</p>
+<h2>联络与曲率</h2>
+<p><strong>定理</strong>. Kähler 流形 $M$ 的全纯切丛上的<span class="link local"><a href="/陈联络.html" title="“陈联络” [陈联络]">陈联络</a></span>等同于 Levi-Civita 联络; 事实上这个条件与 Kähler 条件等价.</p>
+<p><strong>证明</strong>. 设 $g$ 为 Hermite 度量, $\nabla$ 为<span class="link local"><a href="/陈联络.html" title="“陈联络” [陈联络]">陈联络</a></span>. 我们证明 $\nabla$ 无<span class="link local"><a href="/挠.html" title=" [挠]">挠率</a></span>等价于 $d\gamma = 0$.</p>
+<p>考虑联络形式
+$$
+\omega = g^{-1}dg = \sum_k g^{i \bar k} \partial g_{i \bar k},
+$$
+则有
+$$
+\nabla_{\frac{\partial}{\partial z^i}} \frac{\partial}{\partial z^j}=g^{\ell \bar k} \Big(\frac{\partial}{\partial z^i} g_{j\bar k}\Big) \frac{\partial}{\partial z^\ell}
+$$
+故 $\nabla$ 无挠等价于 $\displaystyle \frac{\partial g_{j\bar k}}{\partial z^i}$ 关于 $i,j$ 对称. 另一方面,
+$$
+d\gamma = \partial\gamma+\bar\partial\gamma = 0
+$$
+等价于
+$$
+\partial\gamma =0
+$$
+(因为 $\gamma$ 是实形式)</p>
+<p>$\square$</p>
+<p><strong>定理</strong>. Kähler 条件等价于 <span class="link local"><a href="/Laplace算子.html" title="“Laplace 算子” [Laplace算子]">Laplace 算子</a></span>与微分形式到 $(p,q)$-形式的投影算子交换.</p>
+<blockquote>
+<p>上面这个结论是丘先生 2023 年 3 月 16 日在院长讨论班讲的. 同时他说, 假若和 Laplace 算子交换的微分算子的环比标准的 ($\triangle,d,d^*$ 等等) 要更大, 那么流形的几何会有有趣的性质. 这种用算子完全代替几何的想法与<span class="link local"><a href="/非交换几何.html" title=" [非交换几何]">非交换几何</a></span>有关系.</p>
+</blockquote>
+<p><span class="link local"><a href="/曲率.html" title="“曲率” [曲率]">曲率</a></span>张量与<span class="link local"><a href="/近复结构.html" title="近复结构 [近复结构]">近复结构</a></span>相容:
+$$
+R(X,Y)\circ J=J\circ R(X,Y).
+$$</p>
+<p>定义 Ricci 形式
+$$
+\rho(X,Y)=\operatorname{Ric}(X,JY).
+$$
+有
+$$
+\rho = -2i K_{\alpha\bar{\beta}} dz^\alpha\wedge d\bar z^{\beta},
+$$
+其中
+$$
+K_{\alpha\bar\beta} = -\frac{\partial^2 \log G}{\partial z^\alpha \partial\bar z^\beta},\quad G= \det(g_{\alpha\bar\beta}).
+$$</p>
+<h3>曲率 $2$-形式</h3>
+<p>$(1,1)$-形式
+$$
+\Omega_i^j = d\omega_i^j-\omega_i^k\wedge _k^j = R_{ik\bar\ell}^{j} dz^k d\wedge \bar{z}^\ell
+$$
+考虑</p>
+<p>$$
+R_{i\bar j}=- \frac{\partial ^4}{\partial z^i \partial z^j}\log\det(g,r).
+$$</p>
+<h2>适配坐标</h2>
+<p>类似于 Riemann 几何的正则坐标 (normal coordinates), 我们定义复流形上 $p$ 处的适配坐标 (adapted coordinates at $p$) 为满足如下条件的全纯坐标:</p>
+<ul>
+<li>$z^i (p)=0$;</li>
+<li>$g_{i\bar j}(p) =\delta_{ij}$;</li>
+<li>$\Gamma_{jk}^i (p) = 0$.</li>
+</ul>
+<p><strong>定理</strong>. $(M,g)$ 为 Kähler 流形当且仅当每一点处存在适配坐标.</p>
+<p><strong>证明</strong>. 必要性. 对于适配坐标, $\nabla$ 无挠, 故 $\nabla$ 与 Levi-Civita 联络相等, $g$ 是 Kähler 的.</p>
+<p>充分性. 先取 $z^i$ 满足前两条, 然后取常数 $c_{ik}^j$ (关于 $i,k$ 对称), 作坐标变换
+$$
+z^j = w^j + \frac{1}{2} \sum c_{ik}^j w^i w^k,
+$$
+试图满足第三个条件.</p>
+<h2>Kähler 势</h2>
+<p><strong>命题</strong>. 基本形式 $\gamma$ 可写成
+$$
+\gamma = \sqrt{-1} \partial \bar\partial f,
+$$
+$f$ 称为 Kähler 势.</p>
+<p><strong>证明</strong>. 因为 $\gamma$ 是闭形式, 局部上有 $1$-形式 $\psi$ 使得 $\gamma = d \psi$.</p>
+<p>由 $\gamma$ 是实的, 有 $\psi = \varphi + \overline{\varphi}$, 其中 $\varphi$ 是 $(1,0)$-形式.</p>
+<p>由
+$$
+\gamma
+ = \partial \varphi + \partial \bar\varphi + \bar\partial \varphi + \bar\partial \bar\varphi
+$$
+是 $(1,1)$-形式, 知 $\bar\partial \bar\varphi = 0$.</p>
+<p>由 $\bar\partial$-<span class="link local"><a href="/Poincaré引理.html" title="Poincaré 引理 [Poincaré引理]">Poincaré 引理</a></span>, 局部上存在光滑函数 $\tau$ 使得 $\bar\varphi = \bar\partial \bar\tau$, 也即 $\varphi = \partial \tau$. 因此
+$$
+\gamma = \bar\partial \partial  \tau + \partial \bar\partial \bar\tau = \partial \bar\partial (\bar\tau - \tau),
+$$
+令 $\bar\tau - \tau = \sqrt{-1} f$ 即可. $\square$</p>
+<p>因此
+$$
+g_{i \bar j} = \frac{\partial ^2 f }{\partial z^i \partial \overline{z^j}}.
+$$</p>
+<h2>Hodge 恒等式</h2>
+<ul>
+<li>$[L,\partial] = 0$, $[L,\bar\partial] = 0$, $[\Lambda,\bar\partial^*] = 0$, $[\Lambda,\partial^*] = 0$;</li>
+<li>$[L,\partial^*] = \sqrt{-1}\bar\partial$, $[L,\bar\partial^*] = - \sqrt{-1}\partial$;</li>
+<li>$[\Lambda,\partial]=\sqrt{-1}\bar\partial^*$, $[\Lambda,\bar\partial] = - \sqrt{-1}\partial^*$.</li>
+</ul>
+<p>定义 $\triangle_\partial = \partial^* \partial + \partial \partial ^*$, 等等.</p>
+<p><strong>命题</strong>.
+$$
+\triangle_d = 2 \triangle_{\partial} = 2 \triangle_{\bar\partial}.
+$$
+<strong>证明</strong>.
+$$
+\begin{aligned}
+	\triangle_d &amp;= (\partial + \bar\partial)^*(\partial + \bar\partial) + (\partial + \bar\partial)(\partial + \bar\partial)^*\\
+	&amp;= \triangle_{\partial} + \triangle_{\bar\partial}+ (\partial \bar\partial ^* + \bar\partial ^*\partial) +(\bar\partial  \partial ^* + \partial ^* \bar \partial).
+\end{aligned}
+$$
+由 Hodge 恒等式,
+$$
+\triangle_\partial = \partial ^* \partial + \partial \partial ^* = \sqrt{-1} [\Lambda,\bar\partial]\partial + \sqrt{-1} \partial [\Lambda,\bar\partial] = \triangle_{\bar\partial},
+$$
+$$
+\partial \bar\partial ^* + \bar\partial ^*\partial = -\sqrt{-1} \partial [\Lambda, \partial] -\sqrt{-1} [\Lambda, \partial] \partial = 0.
+$$
+$\square$</p>
+<p>由此及 <span class="link local"><a href="/Hodge分解定理.html" title=" [Hodge分解定理]">Hodge 理论</a></span>
+$$
+\mathcal H^{p,q}_{\bar\partial}(M) \simeq \ker \triangle_{\bar\partial}
+$$
+可知
+$$
+\mathcal H_d^r(M) \otimes \mathbb{C} \simeq \sum_{p+q=r} \mathcal H^{p,q}_{\bar\partial}(M).
+$$</p>
+<p><strong>推论</strong>. 对于紧流形 $M$,
+$$
+H^r(M;\mathbb{C}) \simeq \bigoplus_{p+q=r} H^q(M,\Omega^p(M)).
+$$</p>
+<p><strong>命题</strong>. $\triangle_d$ 是实算子, 即若 $\alpha$ 是实形式, 则 $\triangle\alpha$ 也是实形式.</p>
+<p>由此, $\ker\triangle_{\bar\partial}$ 在共轭下不变;</p>
+<p><strong>定理</strong>. 对紧 Kähler 流形 $M$,
+$$
+H^q(M,\Omega^p(M)) \simeq H^p(M,\Omega^q(M)).
+$$
+<strong>推论</strong>. $b^2 = \dim_\mathbb{C} H^2(M;\mathbb{C}) = 2 \dim H^{1,0}$ 是偶数.</p>
+</details></section><section class="block" data-taxon=""><details ><summary id="Riemann面"><header><h1><span class="taxon"></span>“Riemann 面” <a class="slug" href="/Riemann面.html">[Riemann面]</a><a class="edit" href="vscode://file/E:/Simplopedia_source/trees/Riemann%E9%9D%A2.md">[edit]</a></h1><div class="metadata"><ul><li class="meta-item">百科</li><li class="meta-item"><span class="link local"><a href="/SimplicialCat.html" title="单纯猫 [SimplicialCat]">SimplicialCat</a></span></li></ul></div></header></summary>
+<p>Riemann 面最初的动机是<strong>单复变解析函数的自然定义域</strong>.</p>
+<h2>定义</h2>
+<p><strong>Riemann 面</strong>是指一维<span class="link local"><a href="/复流形.html" title="“复流形” [复流形]">复流形</a></span>, 又称复<span class="link local"><a href="/曲线.html" title="“曲线” [曲线]">曲线</a></span>.</p>
+<h2>例</h2>
+<p>常见的 Riemann 面有开圆盘 $D^2$, 复射影平面 $\mathbb CP^1$ (也记作 $\mathbb P^1$), 环面 $\mathbb C / \Gamma = T^2$ ($\Gamma$ 为格点).</p>
+<p>$T^2$ 上有不可数无穷多种复流形结构.</p>
+<h2>全纯映射的性质</h2>
+<p>在 Riemann 面上,</p>
+<ul>
+<li>两个全纯映射只要在一个有极限点的子集上相等, 就在整个曲面上相等.</li>
+<li>全纯映射局部上形如 $z\mapsto z^k$.</li>
+<li>亚纯函数即是到 $\mathbb P^1$ 的全纯映射.</li>
+<li>非常值全纯映射是开映射.</li>
+</ul>
+<h2>Riemann 面来自代数几何</h2>
+<p><strong>命题</strong>. 设 $C$ 为连通紧 Riemann 面, 则存在 $\mathbb{C}$ 上的光滑紧合<span class="link local"><a href="/曲线.html" title="“曲线” [曲线]">曲线</a></span> $X$, 使得 $C$ 同构于 $X$ 的<span class="link local"><a href="/解析化.html" title=" [解析化]">GAGA</a></span> $X^{\text{an}}$, 即 Riemann 面 $C$ “来自代数几何”.</p>
+<p>Abel 和 Jacobi 研究了此时由 $C$ 构造的<span class="link local"><a href="/复环面.html" title=" [复环面]">复环面</a></span>. 他们的研究开辟了 <span class="link local"><a href="/Abel簇.html" title="“Abel 簇” [Abel簇]">Abel 簇</a></span>的概念.</p>
+</details></section><section class="block" data-taxon=""><details ><summary id="主除子"><header><h1><span class="taxon"></span>“主除子” <a class="slug" href="/主除子.html">[主除子]</a><a class="edit" href="vscode://file/E:/Simplopedia_source/trees/%E4%B8%BB%E9%99%A4%E5%AD%90.md">[edit]</a></h1><div class="metadata"><ul><li class="meta-item">百科</li><li class="meta-item"><span class="link local"><a href="/SimplicialCat.html" title="单纯猫 [SimplicialCat]">SimplicialCat</a></span></li></ul></div></header></summary>
+<h2>定义</h2>
+<p>设 $f$ 是<span class="link local"><a href="/复流形.html" title="“复流形” [复流形]">复流形</a></span> $M$ 上的亚纯函数, 除子 $(f)$ 称为主除子 (principal divisor).</p>
+<h2>性质</h2>
+<p>主除子在除子与<span class="link local"><a href="/线丛.html" title="线丛 [线丛]">线丛</a></span>的对应中对应平凡线丛.</p>
+</details></section><section class="block" data-taxon=""><details ><summary id="代数簇"><header><h1><span class="taxon"></span>“代数簇” <a class="slug" href="/代数簇.html">[代数簇]</a><a class="edit" href="vscode://file/E:/Simplopedia_source/trees/%E4%BB%A3%E6%95%B0%E7%B0%87.md">[edit]</a></h1><div class="metadata"><ul><li class="meta-item">百科</li><li class="meta-item"><span class="link local"><a href="/SimplicialCat.html" title="单纯猫 [SimplicialCat]">SimplicialCat</a></span></li></ul></div></header></summary>
+<h2>定义</h2>
+<p>代数簇是 $\mathbb{C} P^n$ 上齐次多项式的公共零点集.</p>
+<h3>抽象 (内蕴) 定义</h3>
+<p>Grothendieck 将抽象的代数簇定义为代数闭域上整, 可分, 有限型的<span class="link local"><a href="/概形.html" title="概形 [概形]">概形</a></span>. 经典的代数簇还要加上<span class="link local"><a href="/拟射影簇.html" title="“拟射影簇” [拟射影簇]">拟射影簇</a></span>的条件.</p>
+<h2>性质</h2>
+<h3>复流形</h3>
+<p>对于<span class="link local"><a href="/复流形.html" title="“复流形” [复流形]">复流形</a></span> $M$, 若存在足够大的 $n$, 使得 $M$ 可嵌入 $\mathbb{C}P^n$, 则称其为 (非奇异) 代数簇. 这个定义是由于著名的<span class="link local"><a href="/周炜良定理.html" title="“周炜良定理” [周炜良定理]">周炜良定理</a></span>.</p>
+<p><strong>命题</strong>. 若 $M$ 是代数簇, 则 $M$ 是 <span class="link local"><a href="/Kähler流形.html" title="Kähler 流形 [Kähler流形]">Kähler 流形</a></span>; 特别地, $H^2(M;\mathbb{R})\neq 0$.</p>
+<h2>例</h2>
+<h3>仿射代数簇</h3>
+<h3>反例: 不是代数簇的复流形</h3>
+<p>$S^3\times S^3$ 上有复结构 (由 $T^2$ 作用 $T^2\to S^3\times S^3 \to S^2\times S^2$ 给出), 但它不是代数簇.</p>
+<p><strong>Hopf 曲面</strong> $S^1\times S^3$ 的复结构由 $\mathbb{C}^2\setminus\{0\}\big/ \mathbb{Z}$ 定义, 其中 $n\in\mathbb{Z}$ 的作用是乘以 $2^n$. 它不是代数簇.</p>
+</details></section><section class="block" data-taxon=""><details ><summary id="全纯向量丛"><header><h1><span class="taxon"></span>“全纯向量丛” <a class="slug" href="/全纯向量丛.html">[全纯向量丛]</a><a class="edit" href="vscode://file/E:/Simplopedia_source/trees/%E5%85%A8%E7%BA%AF%E5%90%91%E9%87%8F%E4%B8%9B.md">[edit]</a></h1><div class="metadata"><ul><li class="meta-item">百科</li><li class="meta-item"><span class="link local"><a href="/SimplicialCat.html" title="单纯猫 [SimplicialCat]">SimplicialCat</a></span></li></ul></div></header></summary>
+<p>$n$ 维<strong>全纯向量丛</strong> (holomorphic vector bundle) 是<span class="link local"><a href="/复流形.html" title="“复流形” [复流形]">复流形</a></span>上以<strong>全纯映射</strong> $U_{ij}\to GL(n,\mathbb{C})$ 为转移函数的<span class="link local"><a href="/复向量丛.html" title="“复向量丛” [复向量丛]">复向量丛</a></span>. 全纯向量丛也可等价地定义为投影映射 $E\to X$ 是复流形全纯映射的复向量丛.</p>
+<p><strong>注</strong>. 复向量丛可在一般的空间上定义, 而全纯向量丛依赖于底流形的复结构, 即全纯向量丛只能在<strong>复流形</strong>上定义.</p>
+<h2>度数</h2>
+<p><span class="link local"><a href="/全纯线丛.html" title="“全纯线丛” [全纯线丛]">全纯线丛</a></span>的度数是除子的 “系数之和”, 与第一<span class="link local"><a href="/陈类.html" title="“陈类” [陈类]">陈类</a></span>有关.</p>
+<p>全纯向量丛 $E$ 的<strong>度数</strong> (degree) 定义为其行列式丛 $\wedge^r E$ 的度数.</p>
+<p><strong>命题</strong>. 对两个全纯向量丛 $E_1,E_2$,
+$$
+\deg (E_1\otimes E_2) = \deg(E_1)\operatorname{rank}(E_2) + \operatorname{rank}(E_1)\deg(E_2).
+$$</p>
+<h2>全纯截面</h2>
+<p>全纯向量丛 $E$ 上的<strong>全纯截面</strong> (holomorphic section) 是指局部 (在某个平凡化中) 全纯的截面. 全纯截面构成一个<span class="link local"><a href="/层.html" title="拓扑空间上的层 [层]">层</a></span> $\mathcal O(E)$. 有时人们不区分全纯向量丛与其对应的层.</p>
+<h2>$\bar\partial$ 算子</h2>
+<p>全纯向量丛上的<strong>光滑截面</strong>上可定义算子
+$$\bar\partial_E \colon
+C^\infty(M,E)\to C^\infty(M,E\otimes {T^*}''M).
+$$
+具体地, 给定局部的全纯截面 $\sigma_i$, 对光滑截面 $s= f^i \sigma_i$ 有 $\bar\partial_E s = (\bar\partial f^i) \sigma_i.$ 由于转移函数是全纯的, 这个表达式不依赖于 $\sigma_i$ 的选取.</p>
+<p>例如复流形上的微分形式有算子
+$$
+\bar\partial \colon C^\infty (\wedge^{p,q}M)\to C^\infty(\wedge^{p,q+1}M).
+$$</p>
+<h2>等价定义</h2>
+<p>(待补充)</p>
+<h2>联络</h2>
+<p>见<span class="link local"><a href="/陈联络.html" title="“陈联络” [陈联络]">陈联络</a></span>.</p>
+<h2>分类</h2>
+<p><strong>定理</strong> 设 $X$ 是 $\mathbb P^1$ 或 <span class="link local"><a href="/椭圆曲线.html" title="“椭圆曲线” [椭圆曲线]">椭圆曲线</a></span>, 则 $X$ 上的全纯向量丛等同于代数向量丛, 也即局部自由层. 参见 <span class="link local"><a href="/GAGA.html" title="“GAGA” [GAGA]">GAGA</a></span>.</p>
+<p><strong>定理</strong> (Grothendieck) $\mathbb P^1$ 上的全纯向量丛都可写成
+$$
+\mathcal O(d_1)^{n_1}\oplus \cdots \oplus \mathcal O(d_k)^{n_k}.
+$$</p>
+<p><strong>定理</strong>. <span class="link local"><a href="/椭圆曲线.html" title="“椭圆曲线” [椭圆曲线]">椭圆曲线</a></span> $X$ 的 <span class="link local"><a href="/Picard群.html" title="Picard 群 [Picard群]">Picard 群</a></span>同构于 $X$ 本身.</p>
+<h2>例</h2>
+<p>复流形的切丛是全纯向量丛.</p>
+<p>另见 <span class="link local"><a href="/Hermite向量丛.html" title="“Hermite 向量丛” [Hermite向量丛]">Hermite 向量丛</a></span>, <span class="link local"><a href="/线丛.html" title="线丛 [线丛]">线丛</a></span>.</p>
+</details></section><section class="block" data-taxon=""><details ><summary id="周炜良定理"><header><h1><span class="taxon"></span>“周炜良定理” <a class="slug" href="/周炜良定理.html">[周炜良定理]</a><a class="edit" href="vscode://file/E:/Simplopedia_source/trees/%E5%91%A8%E7%82%9C%E8%89%AF%E5%AE%9A%E7%90%86.md">[edit]</a></h1><div class="metadata"><ul><li class="meta-item">百科</li><li class="meta-item"><span class="link local"><a href="/SimplicialCat.html" title="单纯猫 [SimplicialCat]">SimplicialCat</a></span></li></ul></div></header></summary>
+<p>$\mathbb P^n$ 的紧复子流形是若干齐次多项式的公共零点集.</p>
+<p>见<span class="link local"><a href="/复流形.html" title="“复流形” [复流形]">复流形</a></span>, <span class="link local"><a href="/代数簇.html" title="“代数簇” [代数簇]">代数簇</a></span>.</p>
+</details></section><section class="block" data-taxon=""><details ><summary id="极化流形"><header><h1><span class="taxon"></span>“极化流形” <a class="slug" href="/极化流形.html">[极化流形]</a><a class="edit" href="vscode://file/E:/Simplopedia_source/trees/%E6%9E%81%E5%8C%96%E6%B5%81%E5%BD%A2.md">[edit]</a></h1><div class="metadata"><ul><li class="meta-item">百科</li><li class="meta-item"><span class="link local"><a href="/SimplicialCat.html" title="单纯猫 [SimplicialCat]">SimplicialCat</a></span></li></ul></div></header></summary>
+<h2>定义</h2>
+<p>极化流形 (polarized manifold) 是紧<span class="link local"><a href="/复流形.html" title="“复流形” [复流形]">复流形</a></span> $M$ 配备<span class="link local"><a href="/正线丛.html" title="“正线丛” [正线丛]">正线丛</a></span> $L$.</p>
+<h2>性质</h2>
+<p><strong>命题</strong>. <span class="link local"><a href="/代数簇.html" title="“代数簇” [代数簇]">代数簇</a></span>是极化流形, 因为 $\mathbb P^n(\mathbb{C})$ 上的线丛 $\mathcal O(1)$ 的拉回是一个正线丛.</p>
+<p><span class="link local"><a href="/小平嵌入定理.html" title="“小平嵌入定理” [小平嵌入定理]">小平嵌入定理</a></span>是上述命题的逆.</p>
+</details></section><section class="block" data-taxon=""><details ><summary id="正形式"><header><h1><span class="taxon"></span>“正形式” <a class="slug" href="/正形式.html">[正形式]</a><a class="edit" href="vscode://file/E:/Simplopedia_source/trees/%E6%AD%A3%E5%BD%A2%E5%BC%8F.md">[edit]</a></h1><div class="metadata"><ul><li class="meta-item">百科</li><li class="meta-item"><span class="link local"><a href="/SimplicialCat.html" title="单纯猫 [SimplicialCat]">SimplicialCat</a></span></li></ul></div></header></summary>
+<h2>$(1,1)$-形式</h2>
+<p><span class="link local"><a href="/复流形.html" title="“复流形” [复流形]">复流形</a></span> $M$ 上的实 $(1,1)$-形式 $\omega \in \mathcal A^{1,1}(M) \cap \mathcal A^2(M,\mathbb{R})$ 称为正的是指对任意非零的实切向量 $v\in TM$, 都有 $\omega(v,Jv) &gt;0$.</p>
+</details></section><section class="block" data-taxon=""><details ><summary id="解析子集"><header><h1><span class="taxon"></span>“解析子集” <a class="slug" href="/解析子集.html">[解析子集]</a><a class="edit" href="vscode://file/E:/Simplopedia_source/trees/%E8%A7%A3%E6%9E%90%E5%AD%90%E9%9B%86.md">[edit]</a></h1><div class="metadata"><ul><li class="meta-item">百科</li><li class="meta-item"><span class="link local"><a href="/SimplicialCat.html" title="单纯猫 [SimplicialCat]">SimplicialCat</a></span></li></ul></div></header></summary>
+<h2>定义</h2>
+<p>设 $M$ 为<span class="link local"><a href="/复流形.html" title="“复流形” [复流形]">复流形</a></span>. 对于子集 $A \subset M$, 称 $A$ 为解析子集, 是指 $A$ 在局部上可以写成 (不恒为零的) 全纯函数的零点集.</p>
+<p>称 $A$ 为超曲面 (余维数 $1$ 的解析子集), 是指 $A$ 在局部上可以写成一个全纯函数的零点集.</p>
+</details></section><section class="block" data-taxon=""><details ><summary id="近复结构"><header><h1><span class="taxon"></span>近复结构 <a class="slug" href="/近复结构.html">[近复结构]</a><a class="edit" href="vscode://file/E:/Simplopedia_source/trees/%E8%BF%91%E5%A4%8D%E7%BB%93%E6%9E%84.md">[edit]</a></h1><div class="metadata"><ul><li class="meta-item">百科</li><li class="meta-item"><span class="link local"><a href="/SimplicialCat.html" title="单纯猫 [SimplicialCat]">SimplicialCat</a></span></li></ul></div></header></summary>
+<p>关于向量空间上的近复结构, 见<span class="link local"><a href="/复向量空间.html" title="“复向量空间” [复向量空间]">复向量空间</a></span>.</p>
+<h2>定义</h2>
+<p>实流形 $M$ 上的<strong>近复结构</strong> (almost complex structure) 是切丛 $TM$ 的自同构 $J$, 满足
+$$
+J^2 = -1.
+$$
+此时称 $(M,J)$ 为<strong>近复流形</strong>.</p>
+<p>实 $2n$ 维流形 $M$ 的切丛对应映射 $M \to BGL(2n,\mathbb{R})$, 而近复结构 $J$ 等同于提升 $M\to BGL(n,\mathbb{C}) \to BGL(2n,\mathbb{R})$.</p>
+<h3>可积性</h3>
+<p>近复结构 $J$ 可积是指它来自一个复结构. 见<span class="link local"><a href="/复流形.html" title="“复流形” [复流形]">复流形</a></span>.</p>
+<p>可积条件与如下条件等价.</p>
+<ul>
+<li>$[T^{0,1}M,T^{0,1}M]\subset T^{0,1}M$;</li>
+<li>$d C^\infty (\wedge^{1,0}M) \subset C^\infty (\wedge^{2,0}M\oplus \wedge^{1,1}M)$.</li>
+</ul>
+<h3>全纯映射</h3>
+<p>近复流形的映射 $f\colon (M,J)\to (M',J')$ 称为 $(J,J')$-全纯映射是指, 对任意 $x\in M$ 有如下交换图:
+$$
+\begin{array}
+	{ccc}
+	T_xM&amp;\overset{df}{\to}&amp; T_{f(x)M'}\\
+	\hspace{-1em}J \downarrow&amp;&amp;\downarrow J\hspace{-1em}\\
+	T_xM&amp;\underset{df}{\to}&amp; T_{f(x)}M'
+\end{array}
+$$
+近复结构 $J$ 可积等价于存在 $(J,i)$-全纯的坐标卡.</p>
+<p>当 $(M,J)$ 不可积时, 通常没有 $(M,J)$ 到 $\mathbb{C}$ 的全纯映射.</p>
+<p><span class="link local"><a href="/Riemann面.html" title="“Riemann 面” [Riemann面]">Riemann 面</a></span>到近复流形的全纯映射称为 <span class="link local"><a href="/J-全纯曲线.html" title="“J-全纯曲线” [J-全纯曲线]">J-全纯曲线</a></span>.</p>
+<h2>性质</h2>
+<p>近复流形的实维数是偶数, 这是因为 $\det J^2 = (-1)^{\dim_{\mathbb{R}} M}$, 而 $\det J\in\mathbb{R}$.</p>
+<p>近复流形有<span class="link local"><a href="/结构群的约化.html" title="“结构群的约化” [结构群的约化]">结构群的约化</a></span> $GL(n,\mathbb{C})\to GL(2n,\mathbb{R})$, 其中 $2n=\dim_{\mathbb{R}} M$.</p>
+<h3>与 Riemann 流形的关系</h3>
+<p>…</p>
+<p>$$
+g(JX,JY)=g(X,Y)
+$$</p>
+<p>对于 <span class="link local"><a href="/Levi-Civita联络.html" title="“Levi-Civita 联络” [Levi-Civita联络]">Levi-Civita 联络</a></span> $\nabla$ 若有 $\nabla J = 0$ 则 $(M,g,J)$ 为 <span class="link local"><a href="/Kähler流形.html" title="Kähler 流形 [Kähler流形]">Kähler 流形</a></span>.</p>
+<h3>相容三元组</h3>
+<p>相容三元组是指 $M$ 上的 Riemann 度量 $g$, 近复结构 $J$ 与辛形式 $\omega$, 满足以下条件 (即三个结构中的任意一个可由另外两个表示):</p>
+<ul>
+<li>$g(X,Y)=\omega(X,JY)$;</li>
+<li>$\omega(X,Y)=g(JX,Y)$;</li>
+<li>$JX=g^{-1}(\omega(X,-))$.</li>
+</ul>
+<p>这与<span class="link local"><a href="/酉群的三选二性质.html" title="“酉群的三选二性质” [酉群的三选二性质]">酉群的三选二性质</a></span>有关.</p>
+<h3>实 2 维的情形</h3>
+<p>$2$ 维实流形上的任意近复结构都可积, 这是因为可积性等价于 $\bar\partial^2=0$, 而这在实 $2$ 维情形自动成立.</p>
+</details></section></details></section></footer></article></div></body></html>

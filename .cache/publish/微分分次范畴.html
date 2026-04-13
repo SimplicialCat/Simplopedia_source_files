@@ -1,0 +1,1166 @@
+<!DOCTYPE html>
+<html lang="en-US"><head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<meta name="viewport" content="width=device-width"><title>微分分次范畴</title><link rel="icon" href="/assets/favicon.ico" /><style>
+  @font-face {
+    font-family: 'NewCM10';
+    src: url(assets/NewCM10-Book.otf) format('opentype');
+    font-weight: 400;
+    font-style: normal;
+  }
+
+  @font-face {
+    font-family: 'NewCM10';
+    src: url(assets/NewCM10-Italic.otf) format('opentype');
+    font-weight: 400;
+    font-style: italic;
+  }
+
+  @font-face {
+    font-family: 'NewCM10';
+    src: url(assets/NewCM10-Bold.otf) format('opentype');
+    font-weight: 700;
+    font-style: normal;
+  }
+
+  body {
+    --text-font-family: "NewCM10", serif !important;
+  }
+</style><template id="inline-section">
+  <section class="inline block" data-taxon="">
+    <details open="">
+      <summary>
+        <header>
+          <h1>
+            <span class="taxon"></span>
+            <div id="title"></div>
+          </h1>
+        </header>
+      </summary>
+      <div id="content"></div>
+    </details>
+  </section>
+</template>
+
+<script>
+  function inlineSection(template, section, taxon, title) {
+    taxon = taxon || section.getAttribute("taxon") || null;
+    title = title || section.getAttribute("title") || "";
+
+    const clone = template.content.cloneNode(true);
+    clone.querySelector("section").dataset.taxon = taxon;
+    clone.querySelector(".taxon").textContent = taxon ? `${taxon}. ` : "";
+    clone.querySelector("#title").replaceWith(title);
+    clone.querySelector("#content").replaceWith(...section.childNodes);
+
+    if (section.hasAttribute("close")) {
+      clone.querySelector("details").removeAttribute("open");
+    }
+    
+    section.replaceWith(clone);
+  }
+
+  const tagTaxonTable = {
+    "exegesis": "Exegesis",
+    "definition": "Definition",
+    "proposition": "Proposition",
+    "remark": "Remark",
+    "conjecture": "Conjecture",
+    "postulate": "Postulate",
+    "claim": "Claim",
+    "observation": "Observation",
+    "fact": "Fact",
+    "hypothesis": "Hypothesis",
+    "axiom": "Axiom",
+    "lemma": "Lemma",
+    "theorem": "Theorem",
+    "corollary": "Corollary",
+    "example": "Example", 
+    "proof": "Proof",
+  };
+
+  document.addEventListener("DOMContentLoaded", () => {
+    const template = document.getElementById("inline-section");
+
+    [...document.getElementsByTagName("block")].forEach(section => inlineSection(template, section));
+
+    Object.entries(tagTaxonTable).forEach(([tag, taxon]) => {
+      [...document.getElementsByTagName(tag)].forEach(section => inlineSection(template, section, taxon));
+    });
+  });
+</script><script>
+  function toggleDetailsOpen() {
+    const details = document.querySelector("#toc>div>details");
+    if (!details) return;
+
+    if (window.matchMedia("(max-width: 1000px)").matches) {
+      details.removeAttribute("open");
+    } else {
+      details.setAttribute("open", "");
+    }
+  }
+
+  document.addEventListener("DOMContentLoaded", toggleDetailsOpen);
+  window.addEventListener("resize", toggleDetailsOpen);
+</script><style>
+  theme-option {
+    display: inline-block;
+  }
+
+  theme-option>input {
+    display: none;
+  }
+
+  theme-option>label {
+    color: var(--slug-color);
+  }
+
+  theme-option>label:hover {
+    background-color: var(--hover-color-link);
+  }
+
+  theme-option:has(input:checked)>label {
+    color: var(--link-color);
+  }
+
+  theme-option>label::before {
+    content: "[";
+    color: rgba(0, 0, 0, 0);
+  }
+
+  theme-option>label::after {
+    content: "]";
+    color: rgba(0, 0, 0, 0);
+  }
+
+  theme-option:has(input:checked)>label::before {
+    color: var(--link-color);
+  }
+
+  theme-option:has(input:checked)>label::after {
+    color: var(--link-color);
+  }
+</style>
+
+<template id="theme-option-template">
+  <input type="radio" name="theme" />
+  <label></label>
+</template>
+
+<script>
+  const THEME_KEY = `kodama-theme`;
+
+  function storeSelectedTheme(name) {
+    localStorage.setItem(THEME_KEY, name);
+  }
+
+  function getCurrentTheme() {
+    return localStorage.getItem(THEME_KEY) || window.primaryTheme;
+  }
+
+  function selectTheme(themeName) {
+    storeSelectedTheme(themeName);
+    requestAnimationFrame(applyDynamicColorInvert);
+  }
+
+  function applyFavorTheme() {
+    const favoredTheme = getCurrentTheme();
+    if (favoredTheme) {
+      const selector = `input[type='radio'][id='${favoredTheme}']`;
+      const favoredOption = window.themeOptions.querySelector(selector);
+
+      if (favoredOption) {
+        favoredOption.checked = true;
+      } else if (window.primaryOption) {
+        // Fallback to primary theme, if the favored theme is not found
+        // e.g., when the theme options have changed, and the stored theme is no longer available.
+        window.primaryOption.checked = true;
+      }
+    }
+    applyDynamicColorInvert();
+  }
+
+  document.addEventListener("DOMContentLoaded", function () {
+    window.themeOptions = document.getElementById("theme-options");
+    const templateContent = document.getElementById("theme-option-template").content;
+
+    customElements.define(
+      "theme-option",
+      class extends HTMLElement {
+        constructor() {
+          super();
+
+          const node = templateContent.cloneNode(true);
+          const themeName = this.getAttribute("name");
+
+          const input = node.querySelector("input");
+          input.setAttribute("id", themeName);
+          input.setAttribute("value", themeName);
+
+          const label = node.querySelector("label");
+          label.setAttribute("for", themeName);
+          label.addEventListener("click", () => selectTheme(themeName));
+
+          while (this.firstChild) {
+            label.appendChild(this.firstChild);
+          }
+          this.appendChild(node);
+        }
+      },
+    );
+
+    window.primaryOption = window.themeOptions.querySelector("input[type='radio']");
+    window.primaryTheme = primaryOption?.value;
+
+    applyFavorTheme();
+  });
+</script>
+
+<script>
+  const clamp = (value) => Math.max(0, Math.min(255, value));
+
+  const multiply = ([r, g, b], matrix) => {
+    const nr = clamp(r * matrix[0] + g * matrix[1] + b * matrix[2]);
+    const ng = clamp(r * matrix[3] + g * matrix[4] + b * matrix[5]);
+    const nb = clamp(r * matrix[6] + g * matrix[7] + b * matrix[8]);
+    return [nr, ng, nb];
+  };
+
+  const hueRotate = ([r, g, b], angle = 0) => {
+    const rad = (angle / 180) * Math.PI;
+    const sin = Math.sin(rad);
+    const cos = Math.cos(rad);
+    const matrix = [
+      0.213 + cos * 0.787 - sin * 0.213,
+      0.715 - cos * 0.715 - sin * 0.715,
+      0.072 - cos * 0.072 + sin * 0.928,
+      0.213 - cos * 0.213 + sin * 0.143,
+      0.715 + cos * 0.285 + sin * 0.140,
+      0.072 - cos * 0.072 - sin * 0.283,
+      0.213 - cos * 0.213 - sin * 0.787,
+      0.715 - cos * 0.715 + sin * 0.715,
+      0.072 + cos * 0.928 + sin * 0.072,
+    ];
+    return multiply([r, g, b], matrix);
+  };
+
+  const grayscale = ([r, g, b], value = 1) => {
+    const matrix = [
+      0.2126 + 0.7874 * (1 - value),
+      0.7152 - 0.7152 * (1 - value),
+      0.0722 - 0.0722 * (1 - value),
+      0.2126 - 0.2126 * (1 - value),
+      0.7152 + 0.2848 * (1 - value),
+      0.0722 - 0.0722 * (1 - value),
+      0.2126 - 0.2126 * (1 - value),
+      0.7152 - 0.7152 * (1 - value),
+      0.0722 + 0.9278 * (1 - value),
+    ];
+    return multiply([r, g, b], matrix);
+  };
+
+  const sepia = ([r, g, b], value = 1) => {
+    const matrix = [
+      0.393 + 0.607 * (1 - value),
+      0.769 - 0.769 * (1 - value),
+      0.189 - 0.189 * (1 - value),
+      0.349 - 0.349 * (1 - value),
+      0.686 + 0.314 * (1 - value),
+      0.168 - 0.168 * (1 - value),
+      0.272 - 0.272 * (1 - value),
+      0.534 - 0.534 * (1 - value),
+      0.131 + 0.869 * (1 - value),
+    ];
+    return multiply([r, g, b], matrix);
+  };
+
+  const saturate = ([r, g, b], value = 1) => {
+    const matrix = [
+      0.213 + 0.787 * value,
+      0.715 - 0.715 * value,
+      0.072 - 0.072 * value,
+      0.213 - 0.213 * value,
+      0.715 + 0.285 * value,
+      0.072 - 0.072 * value,
+      0.213 - 0.213 * value,
+      0.715 - 0.715 * value,
+      0.072 + 0.928 * value,
+    ];
+    return multiply([r, g, b], matrix);
+  };
+
+  const linear = ([r, g, b], slope = 1, intercept = 0) => {
+    const scale = 255;
+    return [
+      clamp(r * slope + intercept * scale),
+      clamp(g * slope + intercept * scale),
+      clamp(b * slope + intercept * scale),
+    ];
+  };
+
+  const brightness = (rgb, value = 1) => linear(rgb, value);
+  const contrast = (rgb, value = 1) => linear(rgb, value, -0.5 * value + 0.5);
+
+  const invert = ([r, g, b], value = 1) => {
+    const nr = (value + r / 255 * (1 - 2 * value)) * 255;
+    const ng = (value + g / 255 * (1 - 2 * value)) * 255;
+    const nb = (value + b / 255 * (1 - 2 * value)) * 255;
+    return [clamp(nr), clamp(ng), clamp(nb)];
+  };
+
+  // Code taken from https://stackoverflow.com/a/9493060/2688027, licensed under CC BY-SA.
+  const rgbToHsl = (r, g, b) => {
+    r /= 255; g /= 255; b /= 255;
+    const max = Math.max(r, g, b);
+    const min = Math.min(r, g, b);
+    let h, s, l = (max + min) / 2;
+    if (max === min) {
+      h = s = 0;
+    } else {
+      const d = max - min;
+      s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
+      switch (max) {
+        case r: h = (g - b) / d + (g < b ? 6 : 0); break;
+        case g: h = (b - r) / d + 2; break;
+        case b: h = (r - g) / d + 4; break;
+      }
+      h /= 6;
+    }
+    return { h: h * 100, s: s * 100, l: l * 100 };
+  };
+
+  const applyFilters = (rgb, [inv, sep, sat, hue, bri, con]) => {
+    let color = [...rgb];
+    color = invert(color, inv / 100);
+    color = sepia(color, sep / 100);
+    color = saturate(color, sat / 100);
+    color = hueRotate(color, hue * 3.6);
+    color = brightness(color, bri / 100);
+    color = contrast(color, con / 100);
+    return color;
+  };
+
+  const lossFn = (targetRgb, filters) => {
+    const resultRgb = applyFilters([0, 0, 0], filters);
+    const targetHsl = rgbToHsl(...targetRgb);
+    const resultHsl = rgbToHsl(...resultRgb);
+    return (
+      Math.abs(resultRgb[0] - targetRgb[0]) +
+      Math.abs(resultRgb[1] - targetRgb[1]) +
+      Math.abs(resultRgb[2] - targetRgb[2]) +
+      Math.abs(resultHsl.h - targetHsl.h) +
+      Math.abs(resultHsl.s - targetHsl.s) +
+      Math.abs(resultHsl.l - targetHsl.l)
+    );
+  };
+
+  const fix = (value, idx) => {
+    let max = 100;
+    if (idx === 2) max = 7500;                  // saturate
+    else if (idx === 4 || idx === 5) max = 200; // brightness, contrast
+    if (idx === 3) { // hue-rotate
+      if (value > max) return value % max;
+      if (value < 0) return max + (value % max);
+      return value;
+    }
+    return Math.max(0, Math.min(max, value));
+  };
+
+  const spsa = (targetRgb, A, a, c, initial, iters) => {
+    const alpha = 1;
+    const gamma = 1 / 6;
+    let values = [...initial];
+    let best = [...values];
+    let bestLoss = Infinity;
+
+    for (let k = 0; k < iters; k++) {
+      const ck = c / Math.pow(k + 1, gamma);
+      const deltas = Array(6).fill().map(() => (Math.random() > 0.5 ? 1 : -1));
+      const highArgs = values.map((v, i) => v + ck * deltas[i]);
+      const lowArgs = values.map((v, i) => v - ck * deltas[i]);
+      const lossDiff = lossFn(targetRgb, highArgs) - lossFn(targetRgb, lowArgs);
+
+      values = values.map((v, i) => {
+        const g = (lossDiff / (2 * ck)) * deltas[i];
+        const ak = a[i] / Math.pow(A + k + 1, alpha);
+        return fix(v - ak * g, i);
+      });
+
+      const loss = lossFn(targetRgb, values);
+      if (loss < bestLoss) {
+        best = [...values];
+        bestLoss = loss;
+      }
+    }
+    return { values: best, loss: bestLoss };
+  };
+
+  // Threshold for acceptable color loss. This value determines when the SPSA algorithm stops early.
+  // A loss below this value is considered visually indistinguishable for most use cases.
+  // The value 25 was determined empirically to balance performance and color accuracy.
+  const ACCEPTABLE_COLOR_LOSS = 25;
+
+  const solveWide = (targetRgb) => {
+    const A = 5;
+    const c = 15;
+    const a = [60, 180, 18000, 600, 1.2, 1.2];
+    let best = { loss: Infinity, values: null };
+    for (let i = 0; best.loss > ACCEPTABLE_COLOR_LOSS && i < 3; i++) {
+      const initial = [50, 20, 3750, 50, 100, 100];
+      const result = spsa(targetRgb, A, a, c, initial, 1000);
+      if (result.loss < best.loss) best = result;
+    }
+    return best;
+  };
+
+  const solveNarrow = (targetRgb, wideResult) => {
+    const A = wideResult.loss;
+    const c = 2;
+    const A1 = A + 1;
+    const a = [0.25 * A1, 0.25 * A1, A1, 0.25 * A1, 0.2 * A1, 0.2 * A1];
+    return spsa(targetRgb, A, a, c, wideResult.values, 500);
+  };
+
+  const cssFilterString = (filters) => {
+    const [inv, sep, sat, hue, bri, con] = filters.map(Math.round);
+    const hueDeg = Math.round(hue * 3.6);
+    return `filter: invert(${inv}%) sepia(${sep}%) saturate(${sat}%) hue-rotate(${hueDeg}deg) brightness(${bri}%) contrast(${con}%);`;
+  };
+
+  const solveColor = (targetRgb) => {
+    const wide = solveWide(targetRgb);
+    const narrow = solveNarrow(targetRgb, wide);
+    return {
+      values: narrow.values,
+      loss: narrow.loss,
+      filter: cssFilterString(narrow.values),
+    };
+  };
+
+  // Reuse a single canvas / context to avoid memory leaks
+  const colorParseCanvas = document.createElement('canvas');
+  colorParseCanvas.width = 1;
+  colorParseCanvas.height = 1;
+  const colorParseContext = colorParseCanvas.getContext('2d');
+
+  const toRGBArray = (cssColor) => {
+    colorParseContext.fillStyle = cssColor;
+    colorParseContext.fillRect(0, 0, 1, 1);
+
+    // The `getImageData().data` returns a Uint8ClampedArray with 4 values per pixel (RGBA). 
+    // also see: https://developer.mozilla.org/zh-CN/docs/Web/API/ImageData/data
+    const rgba = colorParseContext.getImageData(0, 0, 1, 1).data;
+    return Array.from(rgba.slice(0, 3));
+  };
+
+  const DYNAMIC_STYLE_ID = 'dynamic-color-invert-style';
+  const SOLVED_COLOR_KEY = "solved-";
+
+  function memorizedSolvedFilter(color) {
+    const colorKey = SOLVED_COLOR_KEY + color;
+    const storedFilterOption = localStorage.getItem(colorKey);
+    if (storedFilterOption) {
+      return storedFilterOption;
+    } else {
+      const filter = solveColor(color).filter;
+      localStorage.setItem(colorKey, filter);
+      return filter;
+    }
+  }
+
+  function applyDynamicColorInvert() {
+    const textColor = getComputedStyle(document.body).getPropertyValue('--text-color');
+    if (textColor && textColor.length > 0) {
+      const rgb = toRGBArray(textColor);
+      const filter = memorizedSolvedFilter(rgb);
+
+      const existingStyle = document.getElementById(DYNAMIC_STYLE_ID);
+      if (existingStyle) {
+        existingStyle.textContent = `.color-invert {${filter}}`;
+      } else {
+        const style = document.createElement('style');
+        style.id = DYNAMIC_STYLE_ID;
+        style.textContent = `.color-invert {${filter}}`;
+        document.head.appendChild(style);
+      }
+    }
+  }
+</script><script>
+  (() => {
+    const url = "/kodama.json";
+    const interval = 1000; // 1 second
+
+    let lastModified = null;
+
+    async function check() {
+      try {
+        const res = await fetch(url + "?t=" + Date.now(), {
+          method: "HEAD",
+          cache: "no-store",
+        });
+
+        const lm = res.headers.get("last-modified");
+
+        if (lastModified && lm && lm !== lastModified) {
+          location.reload();
+          return;
+        }
+
+        lastModified = lm || lastModified;
+      } catch (e) {
+        // Ignore
+        console.warn("Reload check failed:", e);
+      }
+
+      setTimeout(check, interval);
+    }
+
+    check();
+  })();
+</script><!-- Also see: https://katex.org/docs/autorender -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.25/dist/katex.min.css" integrity="sha384-WcoG4HRXMzYzfCgiyfrySxx90XSl2rxY5mnVY5TwtWE6KLrArNKn0T/mOgNL0Mmi" crossorigin="anonymous">
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.25/dist/katex.min.js" integrity="sha384-J+9dG2KMoiR9hqcFao0IBLwxt6zpcyN68IgwzsCSkbreXUjmNVRhPFTssqdSGjwQ" crossorigin="anonymous"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.25/dist/contrib/auto-render.min.js" integrity="sha384-hCXGrW6PitJEwbkoStFjeJxv+fSOOQKOPbJxSfM6G5sWZjAyWhXiTIIAmQqnlLlh" crossorigin="anonymous"></script>
+<!-- Also see: https://github.com/KaTeX/KaTeX/tree/main/contrib/copy-tex -->
+<script src="https://cdn.jsdelivr.net/npm/katex@0.16.25/dist/contrib/copy-tex.min.js" integrity="sha384-HORx6nWi8j5/mYA+y57/9/CZc5z8HnEw4WUZWy5yOn9ToKBv1l58vJaufFAn9Zzi" crossorigin="anonymous"></script>
+
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    renderMathInElement(document.body, {
+      delimiters: [
+        { left: "$$", right: "$$", display: true },
+        { left: "$", right: "$", display: false },
+        { left: "\\(", right: "\\)", display: false },
+        { left: "\\[", right: "\\]", display: true },
+      ],
+      trust: true,
+      strict: false,
+      throwOnError: false,
+      minRuleThickness: 0.05,
+    });
+  });
+</script>
+<link rel="stylesheet" href="/main.css"><style>
+@media only screen and (min-width: 1000px) {
+  #grid-wrapper { grid-template-columns: var(--article-max-width) var(--toc-max-width); }
+  nav#toc { max-width: max-content; }
+}
+</style></head><body><header class="header"><nav class="nav"><div class="logo"><span class="cursor-pointer" onclick="window.location.href='/index.html'" title="单纯百科 Simplopedia">« 单纯百科 Simplopedia</span></div></nav></header><div id="grid-wrapper" style="grid-template-areas: 'article toc';" data-base-url="./"><nav id="toc" class="sticky-nav mobile-sticky-nav"><div id="theme-options"><style>
+  body:has(input[value="furina"]:checked) {
+    --article-max-width: 110ex; /* default: 90ex */
+
+    --color-Furina-deep-navy: #253085;
+    --color-Furina-royal-blue: #465BCF;
+    --color-Furina-aqua-cyan: #6AC6E8;
+    --color-Furina-frost-white: #FAFBFC;
+    --color-Furina-misty-blue: #C4D7ED;
+    --color-Furina-vivid-sapphire: #5670E9;
+    --color-Furina-luminous-hydro: #70DBFF;
+    --color-Furina-bright-periwinkle: #8DA4F1;
+    --color-Furina-vintage-gold: #BD9368;
+    --color-Furina-vintage-gold-light: #DDB368;
+    --color-Furina-vintage-gold-ultra-light: #FDF388;
+
+    --background-color: var(--color-Furina-frost-white);
+    --link-color: var(--color-Furina-vivid-sapphire);
+    --slug-color: var(--color-Furina-aqua-cyan);
+    --logo-color: var(--color-Furina-deep-navy);
+
+    --block-background-color: #FFFFFF;
+    --shadow-color: rgba(27, 63, 143, 0.06);
+    --radius: 5px;
+    --margin-left: 14px;
+
+    --hover-color-block: var(--block-background-color);
+    --logo-hover-color: #88d;
+    --span-tag-color: #88d;
+    --article-tag-color: #88d;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    body:has(input[value="furina"]:checked) {
+      --color-Furina-deep-navy: #B5C0F5;
+      --color-Furina-royal-blue: #D6EBFF;
+
+      --background-color: #2f2f2f;
+      --block-background-color: #3a3a3a;
+    }
+  }
+
+  .block {
+    /*2026-3-16 21:10 新增*/
+    padding: 15px;
+    margin-top: 6px;
+    margin-bottom: 6px;
+
+    border-radius: var(--radius);
+    background-color: var(--block-background-color);
+    box-shadow: 0 2px 12px var(--shadow-color);
+  }
+
+  .footnote-definition {
+    margin-left: var(--margin-left);
+  }
+
+  h5,
+  h6,
+  p {
+    margin: 5px;
+  }
+
+  tr {
+    border-bottom: 1px solid var(--color-Furina-bright-periwinkle);
+  }
+
+  /* 可选：去除表头下方的重复横线（如果表头需要特殊样式） */
+  thead tr {
+    border-bottom: 2px solid var(--color-Furina-deep-navy);
+  }
+
+  /* 去除最后一行的边框 */
+  tbody tr:last-child {
+    border-bottom: none;
+  }
+
+  .footnote-definition>p {
+    display: inline;
+    margin-left: 0;
+    color: var(--color-Furina-bright-periwinkle);
+    font-size: small;
+  }
+
+  article > section > details > summary > header > h1 {
+    font-weight: 600;
+    font-size: 1.75rem !important;
+  }
+
+  h2 {
+    font-weight: 500;
+    font-size: 1.5rem !important;
+    color: var(--color-Furina-deep-navy);
+    margin-bottom: 10px;
+    border-bottom: 1px solid #88d;
+    padding-bottom: 1px;
+    /* 增加底部内边距让横线和文字有间距 */
+  }
+
+  h2::before {
+    content: "\2726";
+    /* ✦ 的Unicode转义码 */
+    display: inline-block;
+    margin-right: 0.3em;
+    /*color: var(--color-Furina-vintage-gold-light);*/
+    /* 替换 color 属性，改为以下背景和裁剪属性 */
+    background: linear-gradient(150deg,
+        var(--color-Furina-vintage-gold-ultra-light) 30%,
+        var(--color-Furina-vintage-gold-light) 60%,
+        var(--color-Furina-vintage-gold) 90%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    /* 将文字颜色设为透明以显示背景 */
+    /* 组合径向渐变（中心高光）和线性渐变（基础色调） */
+    /*background: radial-gradient(
+      ellipse at center,
+      var(--color-Furina-vintage-gold-ultra-light) 20%,
+      transparent 70%
+    ),
+    linear-gradient(
+      to bottom,
+      var(--color-Furina-vintage-gold-light),
+      var(--color-Furina-vintage-gold)
+    );
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent; */
+    filter: drop-shadow(0px 1px 1px rgba(184, 150, 131, 0.5));
+    /* 可选：增加与主色呼应的柔和投影 */
+    font-weight: normal;
+  }
+
+
+  h3 {
+    font-weight: 700;
+    color: var(--color-Furina-royal-blue);
+    margin-bottom: 5px;
+  }
+
+  h3::before {
+    content: "\2726";
+    /* ✦ 的Unicode转义码 */
+    display: inline-block;
+    margin-left: 0.06em;
+    margin-right: 0.36em;
+    /*color: var(--color-Furina-vintage-gold-ultra-light);*/
+    background: linear-gradient(150deg,
+        var(--color-Furina-vintage-gold-ultra-light) 20%,
+        var(--color-Furina-vintage-gold-light) 90%,
+        var(--color-Furina-vintage-gold) 95%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    font-weight: normal;
+  }
+
+  h4 {
+    text-indent: var(--marginleft);
+    font-weight: 700;
+    color: #696cd9;
+    margin-bottom: 0;
+  }
+
+  h5 {
+    text-indent: var(--marginleft);
+    font-weight: 700;
+    color: #8a8ff4;
+    margin-bottom: 0;
+  }
+
+  h6 {
+    text-indent: var(--marginleft);
+    font-weight: 700;
+    color: #aaaff4;
+    margin-bottom: 0;
+  }
+
+  code, pre, .mono {
+    font-family: "Liberation Mono", "Courier New", monospace;
+    font-size: 0.9em; /* 可选微调尺寸 */
+  }
+
+  @media only screen and (max-width: 1000px) {
+    #grid-wrapper>nav {
+      display: none !important;
+    }
+  }
+
+  #toc,
+  #toc .block {
+    background: none !important;
+    box-shadow: none !important;
+  }
+
+  ul {
+    margin: 5px;
+    margin-left: calc(5px + 2em);
+    padding-left: 0;
+    list-style-type: none;
+  }
+
+  ul li {
+    margin-bottom: 5px;
+    position: relative;
+    padding-left: 0;
+    /*color: var(--text-secondary);*/
+  }
+
+  ul li::before {
+    content: '✦';
+    position: absolute;
+    left : -1em;
+    /*color: var(--color-Furina-vintage-gold-ultra-light);*/
+    font-size: 0.9em;
+  }
+
+  .metadata {
+    color: var(--article-tag-color);
+  }
+
+  .metadata ul {
+    margin : 0;
+  }
+
+  .metadata li::before {
+    content: none;
+  }
+
+  .music-player button {
+    text-decoration: none;
+  }
+
+  .music-player button:hover {
+    text-decoration: underline;
+    text-decoration-color: var(--color-Furina-vintage-gold-light);
+    /* 金色 */
+    text-underline-offset: 6px;
+    /* 调整下划线与文字距离 */
+    text-decoration-thickness: 1px;
+    /* 线条粗细 */
+  }
+</style>
+
+<theme-option name="furina" style="display: none;">furina</theme-option></div></nav>
+
+<article><section class="block" data-taxon=""><details open><summary id="微分分次范畴"><header><h1><span class="taxon"></span>微分分次范畴 <a class="slug" href="/微分分次范畴.html">[微分分次范畴]</a><a class="edit" href="vscode://file/E:/Simplopedia_source/trees/%E5%BE%AE%E5%88%86%E5%88%86%E6%AC%A1%E8%8C%83%E7%95%B4.md">[edit]</a></h1><div class="metadata"><ul><li class="meta-item">百科</li><li class="meta-item"><span class="link local"><a href="/SimplicialCat.html" title="单纯猫 [SimplicialCat]">SimplicialCat</a></span></li></ul></div></header></summary>
+<h2>观念</h2>
+<p>交换环 $k$ 上的微分分次范畴 (differential graded category, “dg category”) 是 “$k$-线性<span class="link local"><a href="/稳定无穷范畴.html" title="稳定范畴 [稳定无穷范畴]">稳定无穷范畴</a></span>” 的一种模型, 也等同于充实于 <span class="link local"><a href="/Eilenberg–MacLane谱.html" title="Eilenberg–MacLane 谱 [Eilenberg–MacLane谱]">Eilenberg–MacLane 谱</a></span> $Hk$ 上的模范畴 $\mathsf{Mod}(Hk)$ 的范畴, 或 $\mathsf{Mod}(Hk)$-<span class="link local"><a href="/高阶模.html" title="高阶模 [高阶模]">模</a></span>;
+$$
+\mathsf{DGCat} = \mathsf{Mod}(\mathsf{Mod}(Hk)).
+$$</p>
+<p>微分分次范畴构成<span class="link local"><a href="/对称幺半∞-范畴.html" title="对称幺半 ∞-范畴 [对称幺半∞-范畴]">对称幺半 $2$-范畴</a></span> $\mathsf{DGCat}$, 其中的乘法称为 <span class="link local"><a href="/Lurie张量积.html" title="Lurie 张量积 [Lurie张量积]">Lurie 张量积</a></span>. <span class="link local"><a href="/紧生成范畴.html" title="紧生成范畴 [紧生成范畴]">紧生成</a></span>的微分分次范畴是 $\mathsf{DGCat}$ 中的<span class="link local"><a href="/可对偶对象.html" title="对偶 [可对偶对象]">可对偶对象</a></span>.</p>
+<p>单对象的微分分次范畴等同于<span class="link local"><a href="/微分分次代数.html" title="微分分次代数 [微分分次代数]">微分分次代数</a></span>.</p>
+<h2>定义</h2>
+<h3>作为充实 $1$-范畴</h3>
+<p>定义交换环 $k$ 上的微分分次范畴为 $k$-<span class="link local"><a href="/链复形.html" title="链复形 [链复形]">链复形</a></span>的 $1$-范畴 $\mathsf{Ch}(k)$ 上的<span class="link local"><a href="/充实范畴.html" title="充实范畴 [充实范畴]">充实范畴</a></span>.</p>
+</details></section><footer><section class="block link-list" id="backlinks"><details open><summary><header><h1>关联页面</h1></header></summary><section class="block" data-taxon=""><details ><summary id="Hopf代数"><header><h1><span class="taxon"></span>Hopf 代数 <a class="slug" href="/Hopf代数.html">[Hopf代数]</a><a class="edit" href="vscode://file/E:/Simplopedia_source/trees/Hopf%E4%BB%A3%E6%95%B0.md">[edit]</a></h1><div class="metadata"><ul><li class="meta-item">百科</li><li class="meta-item"><span class="link local"><a href="/SimplicialCat.html" title="单纯猫 [SimplicialCat]">SimplicialCat</a></span></li></ul></div></header></summary>
+<h2>观念</h2>
+<p>Hopf 代数可视为群的推广; 它具有<span class="link local"><a href="/双代数.html" title="双代数 [双代数]">双代数</a></span>结构与一个对径映射, 对径映射可视为群中取逆运算的推广.</p>
+<p>Hopf 代数上的模范畴是群表示范畴的推广.</p>
+<p>另见<span class="link local"><a href="/量子群.html" title="量子群 [量子群]">量子群</a></span>.</p>
+<p>另见<span class="link local"><a href="/交换Hopf代数.html" title="交换 Hopf 代数 [交换Hopf代数]">交换 Hopf 代数</a></span>.</p>
+<h2>定义</h2>
+<h3>传统定义</h3>
+<p><span class="link local"><a href="/对称幺半范畴.html" title="对称幺半范畴 [对称幺半范畴]">对称幺半 $1$-范畴</a></span>中的 Hopf 代数是<span class="link local"><a href="/双代数.html" title="双代数 [双代数]">双代数</a></span> $(A,m,\eta,\epsilon,\Delta)$ 带有对径映射 $S\colon A\to A$, 满足
+$$
+m (\mathrm{id} \otimes S) \Delta = m (S \otimes \mathrm{id}) \Delta = \eta\epsilon,
+$$</p>
+<p>若 Hopf 代数满足 $S^2=\mathrm{id}$, 则称之为<strong>对合 Hopf 代数</strong> (involutive Hopf algebra). 有时我们默认这个条件成立.</p>
+<h2>性质</h2>
+<p>Hopf 代数的对偶也是 Hopf 代数.</p>
+<h2>例</h2>
+<h3>群代数</h3>
+<p>对于交换环 $k$ 与群 $G$, 群代数 $k[G]$ 是 Hopf 代数; 其对偶为群 $G$ 上的 $k$-值函数空间 $\operatorname{Hom}(k[G],k)$ 在卷积下构成的代数.</p>
+<p>类似地, 对于有限型代数群 $G$, 其上 <span class="link local"><a href="/D-模.html" title="D-模 [D-模]">D-模</a></span>的范畴 $D\text{-}\mathsf{Mod}(G)$ 是 <span class="link local"><a href="/微分分次范畴.html" title="微分分次范畴 [微分分次范畴]">$\mathsf{DGCat}$</a></span> 中的 Hopf 代数.</p>
+<h3>泛包络代数</h3>
+<p>Lie 代数 $\mathfrak g$ 的<span class="link local"><a href="/泛包络代数.html" title="泛包络代数 (Lie 代数) [泛包络代数]">泛包络代数</a></span> $\mathcal U\mathfrak g$ 是 Hopf 代数:</p>
+<ul>
+<li>余乘法 $\Delta\colon \mathcal U\mathfrak g\to\mathcal U\mathfrak g\otimes\mathcal U\mathfrak g\simeq\mathcal U(\mathfrak g\times\mathfrak g)$ 由对角映射 $\mathfrak g\to\mathfrak g\times\mathfrak g$ 诱导, 其在 $X\in\mathfrak g$ 上的作用为 $\Delta(X)= X\otimes 1+1\otimes X$.</li>
+<li>对极映射 $S\colon \mathcal U\mathfrak g\to\mathcal U\mathfrak g$ 由 $-\mathrm{id}\colon \mathfrak g\to\mathfrak g$ 诱导.</li>
+</ul>
+<p><span class="link local"><a href="/仿射代数群.html" title="“仿射代数群” [仿射代数群]">仿射代数群</a></span></p>
+<h2>相关概念</h2>
+<p><span class="link local"><a href="/Cartier对偶.html" title="“Cartier 对偶” [Cartier对偶]">Cartier 对偶</a></span></p>
+<p><span class="link local"><a href="/拟三角Hopf代数.html" title="拟三角 Hopf 代数 [拟三角Hopf代数]">拟三角 Hopf 代数</a></span></p>
+<p><span class="link local"><a href="/交换Hopf代数.html" title="交换 Hopf 代数 [交换Hopf代数]">交换 Hopf 代数</a></span></p>
+</details></section><section class="block" data-taxon=""><details ><summary id="Morita范畴"><header><h1><span class="taxon"></span>Morita 范畴 <a class="slug" href="/Morita范畴.html">[Morita范畴]</a><a class="edit" href="vscode://file/E:/Simplopedia_source/trees/Morita%E8%8C%83%E7%95%B4.md">[edit]</a></h1><div class="metadata"><ul><li class="meta-item">百科</li><li class="meta-item"><span class="link local"><a href="/SimplicialCat.html" title="单纯猫 [SimplicialCat]">SimplicialCat</a></span></li></ul></div></header></summary>
+<p>一般而言, 以某种<span class="link local"><a href="/结合代数.html" title="结合代数 [结合代数]">结合代数</a></span> $A$ 代表其上的模范畴 $\operatorname{Mod}(A)$, 代数之间的态射 $A\to B$ 是模范畴之间的 (加性, 余连续) 函子 $\mathsf{Mod}(A)\to\mathsf{Mod}(B)$, 也等同于 $(A,B)$-双模 (即<span class="link local"><a href="/充实范畴.html" title="充实范畴 [充实范畴]">充实</a></span>的单对象范畴之间的<span class="link local"><a href="/代函子.html" title="代函子 [代函子]">代函子</a></span>), 所得的 $2$-范畴称为 Morita 范畴, 该范畴中的等价为 <span class="link local"><a href="/Morita等价.html" title="Morita 等价 [Morita等价]">Morita 等价</a></span>.</p>
+<p>更一般地, <span class="link local"><a href="/En-代数.html" title="En-代数 [En-代数]">$\mathbb E_n$-代数</a></span>构成<span class="link local"><a href="/高阶Morita范畴.html" title="高阶 Morita 范畴 [高阶Morita范畴]">高阶 Morita 范畴</a></span>.</p>
+<h2>性质</h2>
+<h3>与线性范畴的关系</h3>
+<p><strong>定理</strong> (Eilenberg–Watts). 设 $F\colon \mathsf{RMod}(R) \to \mathsf{RMod}(S)$ 为加性余连续函子, 则存在 $(R,S)$-双模 $N$ 使得
+$$
+F \simeq (-)\otimes_R N.
+$$</p>
+<h2>例</h2>
+<p>幺半 <span class="link local"><a href="/微分分次范畴.html" title="微分分次范畴 [微分分次范畴]">DG 范畴</a></span>的 Morita 范畴是一个 $3$-范畴, 其对象为 $\mathcal A\text{-}\mathrm{Mod}(\mathsf{DGCat})$, 态射 $\mathcal A\text{-}\mathrm{Mod}(\mathsf{DGCat}) \to \mathcal B\text{-}\mathrm{Mod}(\mathsf{DGCat})$ 构成的 $2$-范畴为双模范畴
+$$
+(\mathcal A^{\text{rev}}\otimes\mathcal B)\text{-}\mathrm{Mod}(\mathsf{DGCat}),
+$$
+其中 $\mathcal A^{\text{rev}}$ 表示将 $\mathcal A$ 的乘法 (幺半结构) 反转.</p>
+</details></section><section class="block" data-taxon=""><details ><summary id="充实范畴"><header><h1><span class="taxon"></span>充实范畴 <a class="slug" href="/充实范畴.html">[充实范畴]</a><a class="edit" href="vscode://file/E:/Simplopedia_source/trees/%E5%85%85%E5%AE%9E%E8%8C%83%E7%95%B4.md">[edit]</a></h1><div class="metadata"><ul><li class="meta-item">百科</li><li class="meta-item"><span class="link local"><a href="/SimplicialCat.html" title="单纯猫 [SimplicialCat]">SimplicialCat</a></span></li></ul></div></header></summary>
+<h2>观念</h2>
+<p><strong>充实范畴</strong>是范畴的推广, 其对象之间的 “态射集” 不是集合, 而是更一般的幺半范畴的对象.</p>
+<ul>
+<li>$n$-范畴可视为充实于 $(n-1)$-范畴的范畴. 这里, $n$-范畴指的是 $(\infty,n)$-范畴.</li>
+<li>充实于 <span class="link local"><a href="/生象.html" title="生象, ∞-群胚 [生象]">$\mathsf{Ani}$</a></span> 的范畴就是 $(\infty ,1)$-范畴.</li>
+<li>充实于 $k$-模谱范畴 $\mathsf{Vect}_k$ 的范畴即是 <span class="link local"><a href="/微分分次范畴.html" title="微分分次范畴 [微分分次范畴]">DG 范畴</a></span>.</li>
+</ul>
+<h2>定义</h2>
+<h3>传统</h3>
+<p>设 $\mathcal{V}$ 为<span class="link local"><a href="/幺半范畴.html" title="幺半范畴 [幺半范畴]">幺半范畴</a></span>, 定义 $\mathcal{V}$-充实范畴 $\mathcal C$ 为如下结构: 一族对象 $\operatorname{ob}(\mathcal C)$, 每两个对象之间有一个态射对象 $\operatorname{Hom}(x,y)\in\operatorname{ob}(\mathcal{V})$, 每三个对象之间有一个复合态射
+$$
+\circ\colon \operatorname{Hom}(y,z)\otimes \operatorname{Hom}(x,y) \to \operatorname{Hom}(x,z).
+$$</p>
+<h3>使用代数胚</h3>
+<p>充实范畴是<span class="link local"><a href="/结合代数.html" title="结合代数 [结合代数]">结合代数</a></span>的推广, 是一种<span class="link local"><a href="/代数胚.html" title="代数胚 [代数胚]">代数胚</a></span>.</p>
+<p>…</p>
+<p>参考 <span class="link local"><a href="/GepnerHaugsengEnrichedCategories.html" title="Enriched ∞-categories via non-symmetric ∞-operads [GepnerHaugsengEnrichedCategories]">Gepner–Haugseng</a></span>, <span class="link local"><a href="/HinichYonedaEnriched.html" title="Yoneda lemma for enriched infinity categories [HinichYonedaEnriched]">Hinich</a></span>, <span class="link local"><a href="/StefanichHigherQCoh.html" title="Higher Quasicoherent Sheaves [StefanichHigherQCoh]">Stefanich</a></span>.</p>
+<h2>性质</h2>
+<h3>充实用范畴的更换</h3>
+<p>设 $F \colon \mathcal V \to \mathcal V'$ 为<span class="link local"><a href="/松幺半函子.html" title="松幺半函子 [松幺半函子]">松幺半函子</a></span>, 则由 $\mathcal V$-充实范畴 $\mathcal C$ 可得 $\mathcal V'$-充实范畴 $\mathcal C'$, 其中
+$$
+\operatorname{Hom}_{\mathcal C'}(X,Y) = F(\operatorname{Hom}_{\mathcal C}(X,Y)).
+$$
+特别地, 松幺半函子 $F\colon \mathcal V\to\mathcal V'$ 将 $\mathcal V$ 中的<span class="link local"><a href="/结合代数.html" title="结合代数 [结合代数]">结合代数</a></span>变为 $\mathcal V'$ 中的结合代数.</p>
+<p>假设函子 $\operatorname{Hom}_{\mathcal V}(1_{\mathcal V},-) \colon \mathcal V \to \mathsf{Set}$ 是松幺半的, 那么 $\mathcal V$-充实范畴可变为普通范畴, 这个普通范畴有时称为其底层范畴.</p>
+<h3>充实范畴的张量积</h3>
+<p>设 $\mathcal V$ 为<span class="link local"><a href="/幺半范畴.html" title="幺半范畴 [幺半范畴]">幺半范畴</a></span>, 则对于 $\mathcal V$-充实范畴 $\mathcal A,\mathcal B$, 可定义 $\mathcal V$-充实范畴 $\mathcal A\otimes\mathcal B$, 其对象为 $(a,b)$, $a\in\mathcal A$, $b\in\mathcal B$; 态射为
+$$
+\operatorname{Hom}_{\mathcal A\otimes \mathcal B}((a,b),(a',b')) := \operatorname{Hom}_{\mathcal A}(a,a')\otimes\operatorname{Hom}_{\mathcal B}(b,b').
+$$</p>
+<h3>充实范畴上的模</h3>
+<p>当 $\mathcal V$ 为余完备<span class="link local"><a href="/闭范畴.html" title="闭范畴 [闭范畴]">闭</a></span><span class="link local"><a href="/对称幺半范畴.html" title="对称幺半范畴 [对称幺半范畴]">对称幺半范畴</a></span>时, $\mathcal V$-充实范畴上可定义左模, 右模, 双模, <span class="link local"><a href="/Morita等价.html" title="Morita 等价 [Morita等价]">Morita 等价</a></span>等等概念; 见<span class="link local"><a href="/充实范畴上的模.html" title="充实范畴上的模 [充实范畴上的模]">充实范畴上的模</a></span>.</p>
+<h3>与模的关系</h3>
+<p>参考 <span class="link local"><a href="/StefanichHigherQCoh.html" title="Higher Quasicoherent Sheaves [StefanichHigherQCoh]">Stefanich</a></span> 第 4 章.</p>
+<p>设 $\mathcal V$ 为<span class="link local"><a href="/可表现范畴.html" title="可表现范畴 [可表现范畴]">可表现</a></span><span class="link local"><a href="/对称幺半范畴.html" title="对称幺半范畴 [对称幺半范畴]">对称幺半范畴</a></span>, 则 $\mathsf{Pr}$ 中的 $\mathcal V$-模 $\mathcal A$ 可视为 $\mathcal V$-充实范畴, 满足
+$$
+\operatorname{Hom}_{\mathcal A}(v\otimes a,a')\simeq\operatorname{Hom}_{\mathcal V}(v,\operatorname{Hom}(a,a')).
+$$</p>
+<p>另一方面, $\mathcal V$-充实范畴也可自由地生成 $\mathcal V$-模: 对于 $\mathcal V$-充实范畴 $\mathcal A$, 其上的<span class="link local"><a href="/预层.html" title="预层 [预层]">预层</a></span>的范畴, 也即 $\mathcal A$-<span class="link local"><a href="/充实范畴上的模.html" title="充实范畴上的模 [充实范畴上的模]">右模</a></span>的范畴 $\mathsf{Fun}(\mathcal A^{\mathrm{op}},\mathcal V)$ 是其自由生成的 $\mathcal V$-模.</p>
+<h2>相关概念</h2>
+</details></section><section class="block" data-taxon=""><details ><summary id="几何Langlands对应"><header><h1><span class="taxon"></span>几何 Langlands 对应 <a class="slug" href="/几何Langlands对应.html">[几何Langlands对应]</a><a class="edit" href="vscode://file/E:/Simplopedia_source/trees/%E5%87%A0%E4%BD%95Langlands%E5%AF%B9%E5%BA%94.md">[edit]</a></h1><div class="metadata"><ul><li class="meta-item">百科</li><li class="meta-item"><span class="link local"><a href="/SimplicialCat.html" title="单纯猫 [SimplicialCat]">SimplicialCat</a></span></li></ul></div></header></summary>
+<h2>陈述</h2>
+<h3>经典对应</h3>
+<p>几何 Langlands 对应是<span class="link local"><a href="/Langlands对应.html" title="经典 Langlands 对应 [Langlands对应]">经典 Langlands 对应</a></span>的<span class="link local"><a href="/函数域类比.html" title="函数域类比 [函数域类比]">函数域类比</a></span>, 以及其在复代数曲线 (<span class="link local"><a href="/Riemann面.html" title="“Riemann 面” [Riemann面]">Riemann 面</a></span>) 上的进一步类比.</p>
+<p>todo: 重写</p>
+<p><span class="link local"><a href="/Galois表示.html" title=" [Galois表示]">Galois 表示</a></span>理解为 <span class="link local"><a href="/l-进局部系统.html" title=" [l-进局部系统]">$\ell$-进层</a></span>.</p>
+<p>非分歧<span class="link local"><a href="/自守表示.html" title="“自守表示” [自守表示]">自守表示</a></span>给出 $\mathrm{GL}_n(F) \backslash \mathrm{GL}_n(\mathbb A) / \mathrm{GL}_n(\mathcal O)$ 上的函数 $f_\pi$ (差一个常数), 它是 <span class="link local"><a href="/Hecke代数.html" title="Hecke 代数 [Hecke代数]">Hecke 代数</a></span> $\mathcal H_x, x\in X$ 的特征函数. 使用 <span class="link local"><a href="/Grothendieck函数–层字典.html" title="“Grothendieck 函数–层字典” [Grothendieck函数–层字典]">Grothendieck 函数–层字典</a></span>, 该函数对应于 $X$ 上的 $G$-丛模空间上的 Hecke 特征层.</p>
+<h3>范畴层面的对应</h3>
+<p>“范畴式” (categorical) 几何 Langlands 对应的主旨是两个 <span class="link local"><a href="/微分分次范畴.html" title="微分分次范畴 [微分分次范畴]">DG 范畴</a></span>的比较:</p>
+<ul>
+<li>几何 (“自守”) 侧, 即 $X$ 上 $G$-丛的<span class="link local"><a href="/模叠.html" title=" [模叠]">模空间</a></span>上的 <span class="link local"><a href="/D-模.html" title="D-模 [D-模]">D-模</a></span>;</li>
+<li>谱 (“Galois”) 侧, 即 $X$ 上 $\check G$-<span class="link local"><a href="/局部系统.html" title="局部系统 [局部系统]">局部系统</a></span>的叠上的<span class="link local"><a href="/拟凝聚层.html" title="拟凝聚层 [拟凝聚层]">拟凝聚层</a></span>.</li>
+</ul>
+<h3>物理视角: Kapustin–Witten</h3>
+<p>2006 年, <span class="link local"><a href="/KapustinWittenGL.html" title="Electric-Magnetic Duality And The Geometric Langlands Program [KapustinWittenGL]">Kapustin 与 Witten</a></span> 指出 4D 超对称规范场论的 S 对偶能够推出几何 Langlands 对应.</p>
+<p>对于 Langlands 对偶群 $G,G^L$, 分别考虑代数曲线 $X$ 上对应的 Higgs 丛的 <span class="link local"><a href="/Hitchin模叠.html" title="“Hitchin 模叠” [Hitchin模叠]">Hitchin 模叠</a></span>, 人们认识到几何 Langlands 纲领与该几何对象的<span class="link local"><a href="/同调镜像对称.html" title="同调镜像对称 [同调镜像对称]">同调镜像对称</a></span>有关.</p>
+<h2>相关概念</h2>
+<p><span class="link local"><a href="/量子几何Langlands纲领.html" title="量子几何 Langlands 纲领 [量子几何Langlands纲领]">量子几何 Langlands 纲领</a></span></p>
+</details></section><section class="block" data-taxon=""><details ><summary id="对称序列"><header><h1><span class="taxon"></span>对称序列 <a class="slug" href="/对称序列.html">[对称序列]</a><a class="edit" href="vscode://file/E:/Simplopedia_source/trees/%E5%AF%B9%E7%A7%B0%E5%BA%8F%E5%88%97.md">[edit]</a></h1><div class="metadata"><ul><li class="meta-item">百科</li><li class="meta-item"><span class="link local"><a href="/SimplicialCat.html" title="单纯猫 [SimplicialCat]">SimplicialCat</a></span></li></ul></div></header></summary>
+<h2>观念</h2>
+<p>对称序列是一种可用于定义<span class="link local"><a href="/算畴.html" title="算畴 [算畴]">算畴</a></span>的结构.</p>
+<p>对称序列可视为<span class="link local"><a href="/解析函子.html" title="解析函子 (算畴理论) [解析函子]">多项式函子</a></span>的 “系数”, 对称序列上有一个幺半结构和一个对称幺半结构, 分别对应多项式函子的复合与乘积.</p>
+<h2>定义</h2>
+<p>考虑有限集合与双射构成的范畴 $\mathsf{Fin}^{\simeq}$, 配备无交并构成对称幺半范畴. 它是由一个对象生成的<span class="link local"><a href="/自由-遗忘伴随.html" title="自由–遗忘伴随 [自由-遗忘伴随]">自由</a></span>对称幺半范畴. 它也是所有有限<span class="link local"><a href="/对称群.html" title="对称群 [对称群]">对称群</a></span>的<span class="link local"><a href="/逆环路空间.html" title="逆环路空间 [逆环路空间]">逆环路空间</a></span>的无交并:
+$$
+\mathsf{Fin}^{\simeq} \simeq \bigsqcup_{n\geq 0} \mathbf{B}S_n.
+$$</p>
+<p><span class="link local"><a href="/对称幺半∞-范畴.html" title="对称幺半 ∞-范畴 [对称幺半∞-范畴]">对称幺半范畴</a></span> $\mathcal C$ 中的对称序列是函子
+$$
+\mathsf{Fin}^{\simeq} \to \mathcal C.
+$$</p>
+<p>给出一个对称序列就是对每个 $n$ 给出对称群 $S_n$ 的一个<span class="link local"><a href="/群作用.html" title="群作用 [群作用]">表示</a></span>.</p>
+<h2>性质</h2>
+<h3>与自函子的关系</h3>
+<p>设对称幺半范畴 $\mathcal C$ 有合适的余极限. 那么对称序列 $F\colon \mathsf{Fin}^{\simeq} \to \mathcal C$ 给出 $\mathcal C$ 的自函子
+$$
+X\mapsto \bigsqcup_{n\geq 0} F(n)\otimes_{S_n}X^{\otimes n} = \int_{\mathsf{Fin}^{\simeq}}F(n)\otimes X^{\otimes n},
+$$
+且该函子为<span class="link local"><a href="/解析函子.html" title="解析函子 (算畴理论) [解析函子]">解析函子</a></span>.
+这个函子可以如下理解. 由于 $\mathsf{Fin}^{\simeq}$ 是一个对象生成的<span class="link local"><a href="/自由-遗忘伴随.html" title="自由–遗忘伴随 [自由-遗忘伴随]">自由</a></span>对称幺半范畴, 对象 $X$ 给出一个对称幺半函子 $\mathsf{Fin}^{\simeq}\to\mathcal C, n\mapsto X^{\otimes n}$.</p>
+<p>设 $F,G$ 是两个对称序列, 我们计算它们对应的自函子的复合:
+$$
+\begin{aligned}
+X&amp;\mapsto
+\bigsqcup_{n\ge 0} F(n) \otimes_{S_n}
+\Big(
+\bigsqcup_{m\ge 0} G(m) \otimes_{S_m}
+X^{\otimes m}
+\Big)
+^{\otimes n}\\
+&amp;\simeq\bigsqcup_{n\geq 0} F(n) \otimes_{S_n}
+\bigsqcup_{(m_i)_{i=1}^n}
+\bigotimes_{i=1}^n(G(m_i)\otimes_{S_{m_i}}X^{\otimes m_i})\\
+&amp;\simeq
+\bigsqcup_{\ell\geq 0}\bigsqcup_{n,m_1+\cdots + m_n = \ell}\big(F(n)\otimes\bigotimes_{i=1}^n G(m_i)\big)\otimes
+\end{aligned}
+$$</p>
+<h3>对称幺半结构</h3>
+<p>设对称幺半范畴 $\mathcal C$ 具有<span class="link local"><a href="/和(范畴论).html" title="和 (范畴论) [和(范畴论)]">余积</a></span>, 且 $X\otimes -$ 保持余积. 那么对称序列上还有一个由 <span class="link local"><a href="/Day卷积.html" title="Day 卷积 [Day卷积]">Day 卷积</a></span>给出的对称幺半结构; 具体地,
+$$
+(X\otimes Y)_n = \bigsqcup_{p+q=n} \operatorname{Ind}_{\Sigma_p\times\Sigma_q}^{\Sigma_n} (X_p\otimes Y_q).
+$$
+其中 $\operatorname{Ind}$ 是沿 $\Sigma_p\times \Sigma_q\hookrightarrow\Sigma_n$ 的 <span class="link local"><a href="/诱导表示.html" title="诱导表示 [诱导表示]">诱导表示</a></span>, 即限制表示的左伴随.</p>
+<h3>泛性质</h3>
+<p>对称序列的范畴 $\mathsf{Seq}:=\mathsf{Fun}(\mathsf{Fin}^{\simeq},\mathcal C)$ 是由一个对象生成的<span class="link local"><a href="/自由-遗忘伴随.html" title="自由–遗忘伴随 [自由-遗忘伴随]">自由</a></span> $\mathcal C$-<span class="link local"><a href="/充实范畴.html" title="充实范畴 [充实范畴]">充实</a></span><span class="link local"><a href="/对称幺半∞-范畴.html" title="对称幺半 ∞-范畴 [对称幺半∞-范畴]">对称幺半范畴</a></span>. 换言之, 它是遗忘函子 $U\colon \mathcal C\text{-}\mathsf{Cat}^{\text{SymMon}} \to \mathsf{Cat}$ 的表示对象. 因此由 $(\infty,2)$-范畴版本的<span class="link local"><a href="/米田引理.html" title="米田引理 [米田引理]">米田引理</a></span>,
+$$
+\begin{aligned}
+\mathsf{Seq} &amp;\simeq \mathsf{Fun}^{\text{SymMon}}(\mathsf{Seq},\mathsf{Seq}) \\&amp;\simeq \operatorname{End}(U).
+\end{aligned}
+$$
+这给出其上的复合幺半结构. 这是<span class="link local"><a href="/自由-遗忘伴随.html" title="自由–遗忘伴随 [自由-遗忘伴随]">自由–遗忘伴随</a></span>的一般现象.</p>
+<p><strong>例</strong>. 固定一个域 $k$, 记 $\mathsf{Vect}$ 为 $k$-线性空间范畴的<span class="link local"><a href="/导出范畴.html" title="导出范畴 [导出范畴]">导出范畴</a></span>. $\mathsf{Vect}$ 中的对称序列构成的范畴
+$$
+\mathsf{Vect}^\Sigma:= \mathsf{Fun}(\mathsf{Fin}^{\simeq},\mathsf{Vect}) \simeq \prod_{n\geq 1} \mathsf{Rep}(\Sigma_n)
+$$
+是一个对象生成的<span class="link local"><a href="/自由-遗忘伴随.html" title="自由–遗忘伴随 [自由-遗忘伴随]">自由</a></span> <span class="link local"><a href="/微分分次范畴.html" title="微分分次范畴 [微分分次范畴]">DG 范畴</a></span>. 见 <span class="link local"><a href="/Gaitsgory–RozenblyumDAG.html" title="A Study in Derived Algebraic Geometry [Gaitsgory–RozenblyumDAG]">Gaitsgory–Rozenblyum 导出代数几何讲义</a></span> (关于 Lie 代数与 Koszul 对偶的一节).</p>
+</details></section><section class="block" data-taxon=""><details ><summary id="微分分次脉"><header><h1><span class="taxon"></span>“微分分次脉” <a class="slug" href="/微分分次脉.html">[微分分次脉]</a><a class="edit" href="vscode://file/E:/Simplopedia_source/trees/%E5%BE%AE%E5%88%86%E5%88%86%E6%AC%A1%E8%84%89.md">[edit]</a></h1><div class="metadata"><ul><li class="meta-item">百科</li><li class="meta-item"><span class="link local"><a href="/SimplicialCat.html" title="单纯猫 [SimplicialCat]">SimplicialCat</a></span></li></ul></div></header></summary>
+<p>微分分次脉 (dg-nerve) 是<span class="link local"><a href="/微分分次范畴.html" title="微分分次范畴 [微分分次范畴]">微分分次范畴</a></span>的 “底层<span class="link local"><a href="/无穷范畴.html" title="无穷范畴 [无穷范畴]">无穷范畴</a></span>” (以<span class="link local"><a href="/拟范畴.html" title="“拟范畴” [拟范畴]">拟范畴</a></span>表示).</p>
+<p>微分分次脉中的映射空间的同伦群是原来的微分分次范畴的映射链复形的同调群 (<span class="link local"><a href="/Dold–Kan对应.html" title="Dold–Kan 对应 [Dold–Kan对应]">Dold–Kan 对应</a></span>).</p>
+</details></section><section class="block" data-taxon=""><details ><summary id="算畴"><header><h1><span class="taxon"></span>算畴 <a class="slug" href="/算畴.html">[算畴]</a><a class="edit" href="vscode://file/E:/Simplopedia_source/trees/%E7%AE%97%E7%95%B4.md">[edit]</a></h1><div class="metadata"><ul><li class="meta-item">百科</li><li class="meta-item"><span class="link local"><a href="/SimplicialCat.html" title="单纯猫 [SimplicialCat]">SimplicialCat</a></span></li></ul></div></header></summary>
+<h2>观念</h2>
+<p>一个算畴表达了<span class="link local"><a href="/对称幺半范畴.html" title="对称幺半范畴 [对称幺半范畴]">对称幺半范畴</a></span>的对象上可能具有的一族多元运算, 以及运算之间的关系. 算畴又叫<strong>多重范畴</strong> (multicategory), 是范畴的推广, 由<strong>颜色</strong> (多重范畴的对象) 与<strong>运算</strong> (多个对象到一个对象的态射) 构成.</p>
+<p>将一个算畴中记录的颜色与运算按照规定的关系实现到某个具体范畴中的方法称为<span class="link local"><a href="/算畴上的代数.html" title="算畴上的代数 [算畴上的代数]">算畴上的代数</a></span>.</p>
+<h2>定义</h2>
+<h3>作为多重范畴</h3>
+<p><strong>有色算畴</strong> (colored operad) 等同于<strong>多重范畴</strong> (multicategory). 所谓多重范畴就是一族对象之间带有 “多个对象到一个对象的态射”
+$$
+\operatorname{Hom}(X_1,X_2,\cdots,X_n ; Y).
+$$</p>
+<p>算畴种的 “颜色” 即是多重范畴中的对象. 当多重范畴仅有一个对象时, 称之为<strong>单色算畴</strong>. 不同文献中对算畴是否默认为单色有不同的约定.</p>
+<p><strong>对称算畴</strong> (symmetric operad) 是指多重范畴中的 $\operatorname{Hom}$ 带有对称群的作用, 即对 $\sigma\in S_n$ 有相容的同构 $\operatorname{Hom}(X_1,\cdots,X_n ; Y) \simeq \operatorname{Hom}(X_{\sigma(1),\cdots,\sigma(n)};Y)$.</p>
+<p>上面定义的是 <span class="link local"><a href="/生象.html" title="生象, ∞-群胚 [生象]">$\mathsf{Ani}$</a></span> 上的算畴. 对于一般<span class="link local"><a href="/对称幺半∞-范畴.html" title="对称幺半 ∞-范畴 [对称幺半∞-范畴]">对称幺半范畴</a></span> $\mathcal C$, 也可定义相应的 “<span class="link local"><a href="/充实范畴.html" title="充实范畴 [充实范畴]">充实</a></span>多重范畴” 作为 $\mathcal C$ 上的算畴的概念.</p>
+<h3>作为对称序列</h3>
+<p>一个单色对称算畴的 “$n$ 元运算的空间” 给出一个带对称群作用的序列, 称为<span class="link local"><a href="/对称序列.html" title="对称序列 [对称序列]">对称序列</a></span> (symmetric sequence). 事实上, 单色对称算畴是对称序列的范畴中的<span class="link local"><a href="/结合代数.html" title="结合代数 [结合代数]">结合代数</a></span>.</p>
+<p>具体地, 给定<span class="link local"><a href="/对称幺半∞-范畴.html" title="对称幺半 ∞-范畴 [对称幺半∞-范畴]">对称幺半范畴</a></span> $(\mathcal V,\otimes,1)$, 一个 $\mathcal V$-值的对称算畴 $C$ 为如下资料:</p>
+<ul>
+<li>“$n$ 元运算的参数空间”, 对象 $C(n) \in \mathcal V$,</li>
+<li>“恒等运算”, 态射 $1\to C(1)$,</li>
+<li>“运算的复合”, 即态射 $C(k)\otimes C(j_1)\otimes\cdots\otimes  C(j_k)\to  C(j_1+\cdots+j_k)$,</li>
+<li>$C(n)$ 上对称群 $\Sigma_n$ 的作用,</li>
+</ul>
+<p>满足</p>
+<ul>
+<li>结合律, 幺元律,</li>
+<li>与对称群作用相容.</li>
+</ul>
+<p>给定对称算畴 $C$, 一个 $C$-<span class="link local"><a href="/算畴上的代数.html" title="算畴上的代数 [算畴上的代数]">代数</a></span>是指一个 (带 $\mathcal{V}$-模结构的范畴中的) 对象 $A$, 以及 $\Sigma_j$-等变的态射 $C(j)\otimes A^{\otimes j}\to A$, 满足适当的结合律, 幺元律.</p>
+<h4>线性空间的对称序列</h4>
+<p>$k$-线性空间的对称序列构成的范畴是
+$$
+\mathsf{Vect}^\Sigma:= \mathsf{Fun}(\mathsf{Fin}^{\simeq},\mathsf{Vect}) \simeq \prod_{n\geq 1} \mathsf{Rep}(\Sigma_n).
+$$
+它也是由一个对象生成的自由<span class="link local"><a href="/对称幺半∞-范畴.html" title="对称幺半 ∞-范畴 [对称幺半∞-范畴]">对称幺半</a></span> <span class="link local"><a href="/微分分次范畴.html" title="微分分次范畴 [微分分次范畴]">DG 范畴</a></span>. 见 <span class="link local"><a href="/Gaitsgory–RozenblyumDAG.html" title="A Study in Derived Algebraic Geometry [Gaitsgory–RozenblyumDAG]">Gaitsgory–Rozenblyum 导出代数几何讲义</a></span> (关于 Lie 代数与 Koszul 对偶的一节). 换言之, 它是遗忘函子 $U\colon \mathsf{DGCat}^{\text{SymMon}} \to \mathsf{Cat}$ 的表示对象. 因此由 $(\infty,2)$-范畴版本的<span class="link local"><a href="/米田引理.html" title="米田引理 [米田引理]">米田引理</a></span>,
+$$
+\mathsf{Vect}^\Sigma \simeq \mathsf{Fun}^{\text{SymMon}}(\mathsf{Vect}^\Sigma,\mathsf{Vect}^\Sigma) \simeq \operatorname{End}(U).
+$$</p>
+<h3>作为算子范畴</h3>
+<p>算畴 $\mathcal C$ 也可定义为其<strong>算子范畴</strong> (category of operators) $\mathcal C^\otimes$. 它的对象为颜色的序列, 态射为 “算子”, 该算畴中的一个 $k$ 元运算给出 $k$ 个颜色的序列到一个颜色的态射. 这个范畴类似于 (一阶理论的) <span class="link local"><a href="/语法–语义对偶.html" title="语法–语义对偶 [语法–语义对偶]">语法范畴</a></span>, 具有万有 $\mathcal C$-代数.</p>
+<p>记 $\mathsf{Fin}_{*}$
+为有限带基点集合
+$\langle n \rangle := \{*,1,\cdots,n\}$
+和保基点映射构成的范畴.
+设 $\mathcal C$ 为算畴,
+定义 $\mathsf{Fin}_*$ 上的一个范畴 $\mathcal C^{\otimes}$,</p>
+<ul>
+<li>$\mathcal C^{\otimes}$ 在 $\langle n \rangle$ 上的对象为颜色的 $n$ 元组 $(X_1,\cdots,X_n)$;</li>
+<li>态射 $(X_1,\cdots,X_n) \to (Y_1,\cdots,Y_m)$ 是一个保基点映射 $\phi\colon \langle n \rangle \to \langle m\rangle$, 以及多重范畴 $\mathcal C$ 中的多重映射
+$$
+f_i \in \operatorname{Hom}((X_j)_{j\in\phi^{-1}(i)}; Y_i)\,(1\leq i\leq m).
+$$</li>
+</ul>
+<p>如下条件刻画了一个 $\mathsf{Fin}_*$ 上的范畴 $p \colon \mathcal O^\otimes\to\mathsf{Fin}_*$ 何时来自一个算畴. 记 $\mathcal O^\otimes_{\langle n\rangle}$ 为 $p$ 在 $\langle n\rangle\in\mathsf{Fin}_*$ 上的纤维, 即想象中的 “颜色 $n$ 元组”.</p>
+<ol>
+<li>$\mathsf{Fin}_*$ 中的<strong>惰性映射</strong> $f \colon \langle n\rangle \to\langle m\rangle$ (惰性是指除 $*$ 以外, 每个点的原像均为单点) 总能提升为<span class="link local"><a href="/推前.html" title="推前, 拉回 (纤维范畴) [推前]">推前</a></span>, 给出函子 $f_!\colon \mathcal O^\otimes_{\langle n\rangle} \to \mathcal O^\otimes_{\langle m\rangle}$.</li>
+<li>对任意 $f\colon \langle n\rangle \to \langle m\rangle$, 如下映射为等价:
+$$
+     \mathcal O^\otimes_{f}(X,Y)\to\prod_{k=1}^m \mathcal O^\otimes_{\rho_i f}(X,(\rho_i)_! Y),
+ $$
+其中 $\rho_i\colon \langle m\rangle\to\langle 1\rangle$ 将 $i$ 映射到 $1$, 其它元素映射到 $*$.</li>
+<li>$(\rho_i)_!\colon \mathcal O^\otimes_{\langle n\rangle} \to \mathcal O^\otimes_{\langle 1\rangle}$ 给出的映射 $\mathcal O^\otimes_{\langle n\rangle} \to  \big(\mathcal O^\otimes_{\langle 1\rangle}\big)^n$ 为等价.</li>
+</ol>
+<h2>性质</h2>
+<h3>代数范畴作为算畴</h3>
+<p>算畴之间的态射也称为一个算畴 $\mathcal O$ 在另一个算畴 $\mathcal P$ 中的<span class="link local"><a href="/算畴上的代数.html" title="算畴上的代数 [算畴上的代数]">代数</a></span>, 其构成的范畴记为 $\mathsf{Alg}_{\mathcal O}(\mathcal P)$. 如同范畴之间的态射空间可升级为范畴一样, 算畴之间的态射空间也可升级为算畴: 多重映射 $(A_i) \to B$ 是对每个对象 $X \in \mathcal O$ 指定 $\mathcal P$ 中一个多重映射 $(A_i(X)) \to B(X)$, 且对 $\mathcal O$ 中任意多重映射 $(X_i) \to Y$ 有如下交换图.
+$$
+\begin{array}
+    {ccc}
+    (A_i(X_j)) &amp; \to &amp; (A_i(Y)) \\
+    \downarrow &amp; &amp; \downarrow \\
+    (B(X_j)) &amp; \to &amp; B(Y).
+\end{array}
+$$</p>
+<h3>Boardman–Vogt 张量积</h3>
+<p>$\mathsf{Alg}_{\mathcal P}(-)$ 的左伴随是 <strong>Boardman–Vogt 张量积</strong> $(-)\otimes \mathcal P$.</p>
+<h3>算畴 Kan 扩张</h3>
+<p><span class="link local"><a href="/Kan扩张.html" title="Kan 扩张 [Kan扩张]">Kan 扩张</a></span> 是函子范畴之间拉回的左右伴随. 类似地, 对于余完备<span class="link local"><a href="/对称幺半范畴.html" title="对称幺半范畴 [对称幺半范畴]">对称幺半范畴</a></span> $\mathcal C$ 以及算畴的态射 $f\colon \mathcal O\to\mathcal P$, 在代数范畴之间也有拉回 $f^*\colon \mathsf{Alg}_{\mathcal P}(\mathcal C)\to\mathsf{Alg}_{\mathcal O}(\mathcal C)$ 的左伴随
+$$
+    f_! \colon \mathsf{Alg}_{\mathcal O}(\mathcal C)\to\mathsf{Alg}_{\mathcal P}(\mathcal C),
+$$
+称为<span class="link local"><a href="/oLKE.html" title="算畴左 Kan 扩张 [oLKE]">算畴左 Kan 扩张</a></span> (operadic left Kan extension). 对于 $A\in\mathsf{Alg}_{\mathcal O}(\mathcal C)$, $P\in\mathcal P$,
+$$
+    (f_!A)(P) = \operatorname{colim}_{\alpha\colon f(O)\to P\text{活性}} \pi(\alpha)_! A(O),
+$$
+其中 $O\in\mathcal O^\otimes$, $\pi\colon \mathcal P^\otimes\to\mathsf{Fin}_*$.</p>
+<p>代数范畴之间的拉回可视为遗忘函子, 而算畴左 Kan 扩张给出<strong>自由代数</strong>.</p>
+<h3>与单子的关系</h3>
+<p>单色算畴的<span class="link local"><a href="/自由-遗忘伴随.html" title="自由–遗忘伴随 [自由-遗忘伴随]">自由–遗忘伴随</a></span>给出<span class="link local"><a href="/单子.html" title="单子 [单子]">单子</a></span>. 设 $\mathcal O$ 为单色对称算畴, $\mathcal C$ 为余完备对称幺半范畴, 那么 $\mathcal C$ 上的自由 $\mathcal O$-代数单子为
+$$
+X \mapsto \coprod_{n\geq 0} \mathcal O(n)\otimes_{S_n}X^{\otimes n}.
+$$
+详见<span class="link local"><a href="/算畴给出单子.html" title="算畴给出单子 [算畴给出单子]">算畴给出单子</a></span>.</p>
+<h2>例</h2>
+<h3>二次算畴</h3>
+<p><span class="link local"><a href="/二次算畴.html" title="二次算畴 [二次算畴]">二次算畴</a></span>是一类有特殊性质的算畴, 包括交换算畴, 结合算畴, Lie 算畴.</p>
+<h3>交换算畴</h3>
+<p>交换算畴 $\mathsf{Comm}$ 作为多重范畴仅有一个对象 $*$, 且 $\operatorname{Hom}(*^n,*) = 1$. 交换性意味着任何 $n$ 个元素有唯一的结合方式.</p>
+<p>交换算畴的算子范畴 $\mathsf{Comm}^\otimes \to \mathsf{Fin}_*$ 就是 $\mathsf{Fin}_*$ 到自身的恒等.</p>
+<p>交换算畴又称 <span class="link local"><a href="/E∞-算畴.html" title="E∞-算畴 [E∞-算畴]">E∞-算畴</a></span>.</p>
+<h3>$\mathbb{E}_n$-算畴</h3>
+<p>算畴 $\mathbb {E}_n$ 是 $\mathbb {E}_1$ 的 $n$ 次 Boardman–Vogt 张量积.</p>
+<p>算畴 $\mathbb {E}_n$ 的一种<span class="link local"><a href="/数学对象的表现.html" title="数学对象的表现 [数学对象的表现]">表现</a></span>为<span class="link local"><a href="/小n-方块算畴.html" title="小方块算畴 [小n-方块算畴]">小 $n$-方块算畴</a></span>.</p>
+<h3>$\mathbb E_M$-算畴</h3>
+<p>算畴 $\mathbb {E}_n$ 的一种类比是任意 $n$ 维流形 $M$ 给出的算畴 $\mathbb E_M$. 见 <span class="link local"><a href="/E_M-算畴.html" title="E_M-算畴 [E_M-算畴]">$\mathbb E_M$-算畴</a></span>.</p>
+<h3>结合算畴</h3>
+<p><span class="link local"><a href="/A∞-算畴.html" title="结合算畴 [A∞-算畴]">结合算畴</a></span> $\mathsf{Assoc}$ 作为多重范畴仅有一个对象, 且
+$$
+    \operatorname{Hom}_{\mathsf{Assoc}}(*^n,*) = S_n,
+$$
+带有 $S_n$ 的自由作用. 结合性意味着 $n$ 个元素的结合由一个排列完全确定.</p>
+<h3>自同态算畴</h3>
+<p>任何一个对象 $X$ 上都有一个自同态算畴 $\mathcal {E}_X$, 且 $X$ 是 $\mathcal {E}_X$-代数.</p>
+<p>对于算畴 $\mathcal P$, 一个对象 $X$ 上的 $\mathcal P$-代数结构等同于算畴的态射 $\mathcal P\to\mathcal {E}_X$.</p>
+<h3>模算畴</h3>
+<p>模算畴是表达 (交换, 结合等) 代数上的模的算畴.</p>
+<p>“交换代数上的模” 算畴 $\mathsf{CM}$ 作为多重范畴有两个对象 $a,m$, 且有</p>
+<ul>
+<li>$\operatorname{Hom}_{\mathsf{CM}}(a^n,a) = 1$,</li>
+<li>$\operatorname{Hom}_{\mathsf{CM}}(a^{n}m,m) = 1$ (包括 $a^n m$ 的所有排列),</li>
+<li>其它 $\operatorname{Hom}$ 为空.</li>
+</ul>
+<p>“两个结合代数上的双模” 算畴 $\mathsf{BM}$ 作为多重范畴有三个对象 $l,m,r$, 且有</p>
+<ul>
+<li>$\operatorname{Hom}_{\mathsf{BM}}(l^n,l) = 1$,</li>
+<li>$\operatorname{Hom}_{\mathsf{BM}}(r^n,r) = 1$,</li>
+<li>$\operatorname{Hom}_{\mathsf{BM}}(l^p m r^q,m) = 1$ (包括 $l^p m r^q$ 的所有排列),</li>
+<li>其它 $\operatorname{Hom}$ 为空.</li>
+</ul>
+<h3>对称幺半范畴</h3>
+<p>设 $(\mathcal C,\otimes)$ 为<span class="link local"><a href="/对称幺半范畴.html" title="对称幺半范畴 [对称幺半范畴]">对称幺半范畴</a></span>, 则其给出一个算畴, 不妨仍记为 $\mathcal C$. 作为多重范畴,
+$$
+\operatorname{Hom}_{\mathcal C}(X_1,\cdots,X_n; Y) := \operatorname{Hom}_{\mathcal C}(X_1\otimes\cdots\otimes X_n, Y).
+$$</p>
+<p>将对称幺半范畴视为算畴的这种观点可以方便地定义<span class="link local"><a href="/算畴上的代数.html" title="算畴上的代数 [算畴上的代数]">算畴上的代数</a></span>.</p>
+<p>另外, 若将对称幺半范畴视为多重范畴, 那么它们之间的函子就是<span class="link local"><a href="/松幺半函子.html" title="松幺半函子 [松幺半函子]">松对称幺半函子</a></span>.</p>
+<h3>模拟余积幺半范畴</h3>
+<p>设 $\mathcal C$ 为任意范畴, 定义多重范畴 $\mathcal C^{\sqcup}$,
+$$
+\operatorname{Hom}_{\mathcal C^{\sqcup}}(X_1,\cdots,X_n;Y) := \prod_{i=1}^{n}\operatorname{Hom}_{\mathcal C}(X_i,Y).
+$$
+当 $\mathcal C$ 具有余积时, 这就是 $\mathcal C$ 上的余积给出的对称幺半范畴; 但它作为多重范畴的存在不需要 $\mathcal C$ 具有余积.</p>
+<h2>算畴作用 (算畴对)</h2>
+<p>设所考虑的对称幺半范畴是不带基点的空间范畴.</p>
+<p>设有一对算畴 $(\mathcal C,\mathcal G)$, 记 $\mathcal C(0)=\{0\}$, $\mathcal G(0)=\{1\}$. 算畴 $\mathcal G$ 在算畴 $\mathcal C$ 上的作用是指映射
+$$
+\xi\colon \mathcal G(k)\times \mathcal C(j_1)\times\cdots\times \mathcal C(j_k) \to\mathcal C(j_1\cdot\cdots\cdot j_k),
+$$
+满足分配律, 幺元律, 以及等变条件. 注意右边括号内是 $k$ 个数的乘积. 这样两个算畴叫做算畴对 (operad pair).</p>
+<p>直观: $\mathcal C$ 参数化加法, $\mathcal G$ 参数化乘法, 映射 $\xi$ 是分配律.</p>
+<p>设空间 $X$ 带两个基点 $0,1$. 算畴对 $(\mathcal C,\mathcal G)$ 在 $X$ 上的作用包含 $\mathcal C$ 在 $(X,0)$ 上的作用与 $\mathcal G$ 在 $(X,1)$ 上的作用, 使得由 $\xi$ 给出的 “分配” 映射
+$$
+\xi_k\colon \mathcal G(k)\times \mathcal C(j_1)\times X^{j_1}\times\cdots\to \mathcal C(j_1\cdots j_k)\times X^{j_1\cdots j_k}
+$$
+满足分配律.</p>
+<p>等价地, $(\mathcal C,\mathcal G)$-空间是 $\mathcal C$-空间范畴中的 $\mathcal G$-代数.</p>
+</details></section><section class="block" data-taxon=""><details ><summary id="自函子的迹"><header><h1><span class="taxon"></span>自函子的迹 <a class="slug" href="/自函子的迹.html">[自函子的迹]</a><a class="edit" href="vscode://file/E:/Simplopedia_source/trees/%E8%87%AA%E5%87%BD%E5%AD%90%E7%9A%84%E8%BF%B9.md">[edit]</a></h1><div class="metadata"><ul><li class="meta-item">百科</li><li class="meta-item"><span class="link local"><a href="/SimplicialCat.html" title="单纯猫 [SimplicialCat]">SimplicialCat</a></span></li></ul></div></header></summary>
+<p>设 $\mathcal{C}$ 是<span class="link local"><a href="/可对偶对象.html" title="对偶 [可对偶对象]">可对偶</a></span> <span class="link local"><a href="/微分分次范畴.html" title="微分分次范畴 [微分分次范畴]">DG 范畴</a></span>, 则可定义 $\mathcal C$ 的自函子 $F\colon \mathcal C\to\mathcal C$ 的<span class="link local"><a href="/迹.html" title="迹 [迹]">迹</a></span> $\operatorname{Tr}(F) \in \mathsf{Vect}$.</p>
+<h2>例</h2>
+</details></section><section class="block" data-taxon=""><details ><summary id="链复形无穷范畴"><header><h1><span class="taxon"></span>链复形无穷范畴 <a class="slug" href="/链复形无穷范畴.html">[链复形无穷范畴]</a><a class="edit" href="vscode://file/E:/Simplopedia_source/trees/%E9%93%BE%E5%A4%8D%E5%BD%A2%E6%97%A0%E7%A9%B7%E8%8C%83%E7%95%B4.md">[edit]</a></h1><div class="metadata"><ul><li class="meta-item">百科</li><li class="meta-item"><span class="link local"><a href="/SimplicialCat.html" title="单纯猫 [SimplicialCat]">SimplicialCat</a></span></li></ul></div></header></summary>
+<h2>定义</h2>
+<p>设 $\mathcal A$ 为<span class="link local"><a href="/加性范畴.html" title="加性范畴 [加性范畴]">加性范畴</a></span>, 记 $\mathsf {Ch}(\mathcal A)$ 为其中<span class="link local"><a href="/链复形.html" title="链复形 [链复形]">链复形</a></span>的范畴 ($1$-范畴).</p>
+<p>记 $S$ 为 $\mathcal A$ 中<span class="link local"><a href="/链同伦等价.html" title="链同伦等价 [链同伦等价]">链同伦等价</a></span>的全体, 定义<strong>链复形 ∞-范畴</strong>为<span class="link local"><a href="/局部化(范畴论).html" title="局部化 (范畴论) [局部化(范畴论)]">局部化</a></span>
+$$
+\mathsf K(\mathcal A) := \mathsf {Ch}(\mathcal A)[S^{-1}].
+$$
+它是一个<span class="link local"><a href="/稳定∞-范畴.html" title=" [稳定∞-范畴]">稳定无穷范畴</a></span>. (它也是 $\mathsf {Ch}(\mathcal A)$ 作为<span class="link local"><a href="/微分分次范畴.html" title="微分分次范畴 [微分分次范畴]">微分分次范畴</a></span>的<span class="link local"><a href="/微分分次脉.html" title="“微分分次脉” [微分分次脉]">微分分次脉</a></span>.)</p>
+<p>注意与<span class="link local"><a href="/导出范畴.html" title="导出范畴 [导出范畴]">导出范畴</a></span>的区别.</p>
+<h2>性质</h2>
+<p><strong>例</strong>. 拓扑空间映射的同伦诱导奇异链复形态射的同伦, 链同伦的两个态射诱导相同的同调群同态; 这就是说同调群 $H_*\colon \mathsf{Top} \to \mathsf{Ab}^{\mathbb{Z}}$ 有如下分解:
+$$
+\mathsf{Top} \overset{\operatorname{Sing}}{\to} \mathsf{K}(\mathsf{Ab}) \overset{H_*}{\to} \mathsf{Ab}^{\mathbb{Z}}.
+$$</p>
+<p><strong>命题</strong>. $\mathsf {Ch}(\mathcal A)$ 上存在一个<span class="link local"><a href="/模型范畴.html" title="“模型范畴” [模型范畴]">模型范畴</a></span>结构使得</p>
+<ul>
+<li>弱等价恰为拟同构;</li>
+<li>余纤维化恰为逐项的单射.</li>
+</ul>
+<p>在这种模型结构中, 纤维性对象与内射对象有关. (k-injectivity?)</p>
+<p><strong>命题</strong>. 存在正合的伴随函子
+$$
+\mathsf K(\mathcal A) \rightleftarrows \mathsf D(\mathcal A),
+$$
+其中右伴随 $\mathsf D(\mathcal A)\to\mathsf K(\mathcal A)$ 全忠实, 左伴随 $\mathsf K(\mathcal A)\to\mathsf D(\mathcal A)$ 是一种纤维性替换, 其核为 $\mathsf K(\mathcal A)$ 中的零调复形.</p>
+<h2>t-结构</h2>
+<p>$\mathsf D(\mathcal A)$ 上有明显的 <span class="link local"><a href="/t-结构.html" title="t-结构 [t-结构]">t-结构</a></span> $(\mathsf D(\mathcal A)^{\leq 0},\mathsf D(\mathcal A)^{\geq 0})$, 且 $H^0$ 诱导等价 $\mathsf D(\mathcal A)^\heartsuit \to \mathcal A$.</p>
+<h3>有界导出范畴</h3>
+<p>设 Abel 范畴 $\mathcal A$ 具有足够多内射对象. 定义 $\mathsf D^+(\mathcal A) = N_{\text{dg}}(\mathsf {Ch}^+(\mathcal A_{\text{inj}}))$.</p>
+<p>设 Abel 范畴 $\mathcal A$ 具有足够多投射对象. 定义 $\mathsf D^-(\mathcal A) = N_{\text{dg}}(\mathsf {Ch}^-(\mathcal A_{\text{proj}}))\simeq\mathsf D^{+}(\mathcal A^{\text{op}})^{\text{op}}$.</p>
+<p>$\mathsf D^-(\mathcal A)$ 具有如下泛性质. 对任意带有左完备 t-结构的<span class="link local"><a href="/稳定无穷范畴.html" title="稳定范畴 [稳定无穷范畴]">稳定无穷范畴</a></span> $\mathcal C$, 如下资料等价:</p>
+<ul>
+<li>t-右正合函子 $\mathsf D^-(\mathcal A)\to\mathcal C$, 将 $\mathcal A_{\text{proj}}$ 映射到 $\mathcal C^\heartsuit$;</li>
+<li>右正合函子 $\mathcal A\to\mathcal C^\heartsuit$.</li>
+</ul>
+<p>对于右正合函子 $\mathcal A\to\mathcal C^\heartsuit$, 称对应的函子 $\mathsf D^-(\mathcal A)\to\mathcal C$ 为其<span class="link local"><a href="/导出函子.html" title="导出函子 [导出函子]">导出函子</a></span>.</p>
+<h2>相关概念</h2>
+<p><span class="link local"><a href="/微分分次范畴.html" title="微分分次范畴 [微分分次范畴]">微分分次范畴</a></span>: 充实于 $1$-范畴 $\mathsf {Ch}(\mathsf {Ab})$ 的范畴.</p>
+</details></section></details></section></footer></article></div></body></html>

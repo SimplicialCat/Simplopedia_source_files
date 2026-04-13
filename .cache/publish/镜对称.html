@@ -1,0 +1,946 @@
+<!DOCTYPE html>
+<html lang="en-US"><head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<meta name="viewport" content="width=device-width"><title>“镜对称”</title><link rel="icon" href="/assets/favicon.ico" /><style>
+  @font-face {
+    font-family: 'NewCM10';
+    src: url(assets/NewCM10-Book.otf) format('opentype');
+    font-weight: 400;
+    font-style: normal;
+  }
+
+  @font-face {
+    font-family: 'NewCM10';
+    src: url(assets/NewCM10-Italic.otf) format('opentype');
+    font-weight: 400;
+    font-style: italic;
+  }
+
+  @font-face {
+    font-family: 'NewCM10';
+    src: url(assets/NewCM10-Bold.otf) format('opentype');
+    font-weight: 700;
+    font-style: normal;
+  }
+
+  body {
+    --text-font-family: "NewCM10", serif !important;
+  }
+</style><template id="inline-section">
+  <section class="inline block" data-taxon="">
+    <details open="">
+      <summary>
+        <header>
+          <h1>
+            <span class="taxon"></span>
+            <div id="title"></div>
+          </h1>
+        </header>
+      </summary>
+      <div id="content"></div>
+    </details>
+  </section>
+</template>
+
+<script>
+  function inlineSection(template, section, taxon, title) {
+    taxon = taxon || section.getAttribute("taxon") || null;
+    title = title || section.getAttribute("title") || "";
+
+    const clone = template.content.cloneNode(true);
+    clone.querySelector("section").dataset.taxon = taxon;
+    clone.querySelector(".taxon").textContent = taxon ? `${taxon}. ` : "";
+    clone.querySelector("#title").replaceWith(title);
+    clone.querySelector("#content").replaceWith(...section.childNodes);
+
+    if (section.hasAttribute("close")) {
+      clone.querySelector("details").removeAttribute("open");
+    }
+    
+    section.replaceWith(clone);
+  }
+
+  const tagTaxonTable = {
+    "exegesis": "Exegesis",
+    "definition": "Definition",
+    "proposition": "Proposition",
+    "remark": "Remark",
+    "conjecture": "Conjecture",
+    "postulate": "Postulate",
+    "claim": "Claim",
+    "observation": "Observation",
+    "fact": "Fact",
+    "hypothesis": "Hypothesis",
+    "axiom": "Axiom",
+    "lemma": "Lemma",
+    "theorem": "Theorem",
+    "corollary": "Corollary",
+    "example": "Example", 
+    "proof": "Proof",
+  };
+
+  document.addEventListener("DOMContentLoaded", () => {
+    const template = document.getElementById("inline-section");
+
+    [...document.getElementsByTagName("block")].forEach(section => inlineSection(template, section));
+
+    Object.entries(tagTaxonTable).forEach(([tag, taxon]) => {
+      [...document.getElementsByTagName(tag)].forEach(section => inlineSection(template, section, taxon));
+    });
+  });
+</script><script>
+  function toggleDetailsOpen() {
+    const details = document.querySelector("#toc>div>details");
+    if (!details) return;
+
+    if (window.matchMedia("(max-width: 1000px)").matches) {
+      details.removeAttribute("open");
+    } else {
+      details.setAttribute("open", "");
+    }
+  }
+
+  document.addEventListener("DOMContentLoaded", toggleDetailsOpen);
+  window.addEventListener("resize", toggleDetailsOpen);
+</script><style>
+  theme-option {
+    display: inline-block;
+  }
+
+  theme-option>input {
+    display: none;
+  }
+
+  theme-option>label {
+    color: var(--slug-color);
+  }
+
+  theme-option>label:hover {
+    background-color: var(--hover-color-link);
+  }
+
+  theme-option:has(input:checked)>label {
+    color: var(--link-color);
+  }
+
+  theme-option>label::before {
+    content: "[";
+    color: rgba(0, 0, 0, 0);
+  }
+
+  theme-option>label::after {
+    content: "]";
+    color: rgba(0, 0, 0, 0);
+  }
+
+  theme-option:has(input:checked)>label::before {
+    color: var(--link-color);
+  }
+
+  theme-option:has(input:checked)>label::after {
+    color: var(--link-color);
+  }
+</style>
+
+<template id="theme-option-template">
+  <input type="radio" name="theme" />
+  <label></label>
+</template>
+
+<script>
+  const THEME_KEY = `kodama-theme`;
+
+  function storeSelectedTheme(name) {
+    localStorage.setItem(THEME_KEY, name);
+  }
+
+  function getCurrentTheme() {
+    return localStorage.getItem(THEME_KEY) || window.primaryTheme;
+  }
+
+  function selectTheme(themeName) {
+    storeSelectedTheme(themeName);
+    requestAnimationFrame(applyDynamicColorInvert);
+  }
+
+  function applyFavorTheme() {
+    const favoredTheme = getCurrentTheme();
+    if (favoredTheme) {
+      const selector = `input[type='radio'][id='${favoredTheme}']`;
+      const favoredOption = window.themeOptions.querySelector(selector);
+
+      if (favoredOption) {
+        favoredOption.checked = true;
+      } else if (window.primaryOption) {
+        // Fallback to primary theme, if the favored theme is not found
+        // e.g., when the theme options have changed, and the stored theme is no longer available.
+        window.primaryOption.checked = true;
+      }
+    }
+    applyDynamicColorInvert();
+  }
+
+  document.addEventListener("DOMContentLoaded", function () {
+    window.themeOptions = document.getElementById("theme-options");
+    const templateContent = document.getElementById("theme-option-template").content;
+
+    customElements.define(
+      "theme-option",
+      class extends HTMLElement {
+        constructor() {
+          super();
+
+          const node = templateContent.cloneNode(true);
+          const themeName = this.getAttribute("name");
+
+          const input = node.querySelector("input");
+          input.setAttribute("id", themeName);
+          input.setAttribute("value", themeName);
+
+          const label = node.querySelector("label");
+          label.setAttribute("for", themeName);
+          label.addEventListener("click", () => selectTheme(themeName));
+
+          while (this.firstChild) {
+            label.appendChild(this.firstChild);
+          }
+          this.appendChild(node);
+        }
+      },
+    );
+
+    window.primaryOption = window.themeOptions.querySelector("input[type='radio']");
+    window.primaryTheme = primaryOption?.value;
+
+    applyFavorTheme();
+  });
+</script>
+
+<script>
+  const clamp = (value) => Math.max(0, Math.min(255, value));
+
+  const multiply = ([r, g, b], matrix) => {
+    const nr = clamp(r * matrix[0] + g * matrix[1] + b * matrix[2]);
+    const ng = clamp(r * matrix[3] + g * matrix[4] + b * matrix[5]);
+    const nb = clamp(r * matrix[6] + g * matrix[7] + b * matrix[8]);
+    return [nr, ng, nb];
+  };
+
+  const hueRotate = ([r, g, b], angle = 0) => {
+    const rad = (angle / 180) * Math.PI;
+    const sin = Math.sin(rad);
+    const cos = Math.cos(rad);
+    const matrix = [
+      0.213 + cos * 0.787 - sin * 0.213,
+      0.715 - cos * 0.715 - sin * 0.715,
+      0.072 - cos * 0.072 + sin * 0.928,
+      0.213 - cos * 0.213 + sin * 0.143,
+      0.715 + cos * 0.285 + sin * 0.140,
+      0.072 - cos * 0.072 - sin * 0.283,
+      0.213 - cos * 0.213 - sin * 0.787,
+      0.715 - cos * 0.715 + sin * 0.715,
+      0.072 + cos * 0.928 + sin * 0.072,
+    ];
+    return multiply([r, g, b], matrix);
+  };
+
+  const grayscale = ([r, g, b], value = 1) => {
+    const matrix = [
+      0.2126 + 0.7874 * (1 - value),
+      0.7152 - 0.7152 * (1 - value),
+      0.0722 - 0.0722 * (1 - value),
+      0.2126 - 0.2126 * (1 - value),
+      0.7152 + 0.2848 * (1 - value),
+      0.0722 - 0.0722 * (1 - value),
+      0.2126 - 0.2126 * (1 - value),
+      0.7152 - 0.7152 * (1 - value),
+      0.0722 + 0.9278 * (1 - value),
+    ];
+    return multiply([r, g, b], matrix);
+  };
+
+  const sepia = ([r, g, b], value = 1) => {
+    const matrix = [
+      0.393 + 0.607 * (1 - value),
+      0.769 - 0.769 * (1 - value),
+      0.189 - 0.189 * (1 - value),
+      0.349 - 0.349 * (1 - value),
+      0.686 + 0.314 * (1 - value),
+      0.168 - 0.168 * (1 - value),
+      0.272 - 0.272 * (1 - value),
+      0.534 - 0.534 * (1 - value),
+      0.131 + 0.869 * (1 - value),
+    ];
+    return multiply([r, g, b], matrix);
+  };
+
+  const saturate = ([r, g, b], value = 1) => {
+    const matrix = [
+      0.213 + 0.787 * value,
+      0.715 - 0.715 * value,
+      0.072 - 0.072 * value,
+      0.213 - 0.213 * value,
+      0.715 + 0.285 * value,
+      0.072 - 0.072 * value,
+      0.213 - 0.213 * value,
+      0.715 - 0.715 * value,
+      0.072 + 0.928 * value,
+    ];
+    return multiply([r, g, b], matrix);
+  };
+
+  const linear = ([r, g, b], slope = 1, intercept = 0) => {
+    const scale = 255;
+    return [
+      clamp(r * slope + intercept * scale),
+      clamp(g * slope + intercept * scale),
+      clamp(b * slope + intercept * scale),
+    ];
+  };
+
+  const brightness = (rgb, value = 1) => linear(rgb, value);
+  const contrast = (rgb, value = 1) => linear(rgb, value, -0.5 * value + 0.5);
+
+  const invert = ([r, g, b], value = 1) => {
+    const nr = (value + r / 255 * (1 - 2 * value)) * 255;
+    const ng = (value + g / 255 * (1 - 2 * value)) * 255;
+    const nb = (value + b / 255 * (1 - 2 * value)) * 255;
+    return [clamp(nr), clamp(ng), clamp(nb)];
+  };
+
+  // Code taken from https://stackoverflow.com/a/9493060/2688027, licensed under CC BY-SA.
+  const rgbToHsl = (r, g, b) => {
+    r /= 255; g /= 255; b /= 255;
+    const max = Math.max(r, g, b);
+    const min = Math.min(r, g, b);
+    let h, s, l = (max + min) / 2;
+    if (max === min) {
+      h = s = 0;
+    } else {
+      const d = max - min;
+      s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
+      switch (max) {
+        case r: h = (g - b) / d + (g < b ? 6 : 0); break;
+        case g: h = (b - r) / d + 2; break;
+        case b: h = (r - g) / d + 4; break;
+      }
+      h /= 6;
+    }
+    return { h: h * 100, s: s * 100, l: l * 100 };
+  };
+
+  const applyFilters = (rgb, [inv, sep, sat, hue, bri, con]) => {
+    let color = [...rgb];
+    color = invert(color, inv / 100);
+    color = sepia(color, sep / 100);
+    color = saturate(color, sat / 100);
+    color = hueRotate(color, hue * 3.6);
+    color = brightness(color, bri / 100);
+    color = contrast(color, con / 100);
+    return color;
+  };
+
+  const lossFn = (targetRgb, filters) => {
+    const resultRgb = applyFilters([0, 0, 0], filters);
+    const targetHsl = rgbToHsl(...targetRgb);
+    const resultHsl = rgbToHsl(...resultRgb);
+    return (
+      Math.abs(resultRgb[0] - targetRgb[0]) +
+      Math.abs(resultRgb[1] - targetRgb[1]) +
+      Math.abs(resultRgb[2] - targetRgb[2]) +
+      Math.abs(resultHsl.h - targetHsl.h) +
+      Math.abs(resultHsl.s - targetHsl.s) +
+      Math.abs(resultHsl.l - targetHsl.l)
+    );
+  };
+
+  const fix = (value, idx) => {
+    let max = 100;
+    if (idx === 2) max = 7500;                  // saturate
+    else if (idx === 4 || idx === 5) max = 200; // brightness, contrast
+    if (idx === 3) { // hue-rotate
+      if (value > max) return value % max;
+      if (value < 0) return max + (value % max);
+      return value;
+    }
+    return Math.max(0, Math.min(max, value));
+  };
+
+  const spsa = (targetRgb, A, a, c, initial, iters) => {
+    const alpha = 1;
+    const gamma = 1 / 6;
+    let values = [...initial];
+    let best = [...values];
+    let bestLoss = Infinity;
+
+    for (let k = 0; k < iters; k++) {
+      const ck = c / Math.pow(k + 1, gamma);
+      const deltas = Array(6).fill().map(() => (Math.random() > 0.5 ? 1 : -1));
+      const highArgs = values.map((v, i) => v + ck * deltas[i]);
+      const lowArgs = values.map((v, i) => v - ck * deltas[i]);
+      const lossDiff = lossFn(targetRgb, highArgs) - lossFn(targetRgb, lowArgs);
+
+      values = values.map((v, i) => {
+        const g = (lossDiff / (2 * ck)) * deltas[i];
+        const ak = a[i] / Math.pow(A + k + 1, alpha);
+        return fix(v - ak * g, i);
+      });
+
+      const loss = lossFn(targetRgb, values);
+      if (loss < bestLoss) {
+        best = [...values];
+        bestLoss = loss;
+      }
+    }
+    return { values: best, loss: bestLoss };
+  };
+
+  // Threshold for acceptable color loss. This value determines when the SPSA algorithm stops early.
+  // A loss below this value is considered visually indistinguishable for most use cases.
+  // The value 25 was determined empirically to balance performance and color accuracy.
+  const ACCEPTABLE_COLOR_LOSS = 25;
+
+  const solveWide = (targetRgb) => {
+    const A = 5;
+    const c = 15;
+    const a = [60, 180, 18000, 600, 1.2, 1.2];
+    let best = { loss: Infinity, values: null };
+    for (let i = 0; best.loss > ACCEPTABLE_COLOR_LOSS && i < 3; i++) {
+      const initial = [50, 20, 3750, 50, 100, 100];
+      const result = spsa(targetRgb, A, a, c, initial, 1000);
+      if (result.loss < best.loss) best = result;
+    }
+    return best;
+  };
+
+  const solveNarrow = (targetRgb, wideResult) => {
+    const A = wideResult.loss;
+    const c = 2;
+    const A1 = A + 1;
+    const a = [0.25 * A1, 0.25 * A1, A1, 0.25 * A1, 0.2 * A1, 0.2 * A1];
+    return spsa(targetRgb, A, a, c, wideResult.values, 500);
+  };
+
+  const cssFilterString = (filters) => {
+    const [inv, sep, sat, hue, bri, con] = filters.map(Math.round);
+    const hueDeg = Math.round(hue * 3.6);
+    return `filter: invert(${inv}%) sepia(${sep}%) saturate(${sat}%) hue-rotate(${hueDeg}deg) brightness(${bri}%) contrast(${con}%);`;
+  };
+
+  const solveColor = (targetRgb) => {
+    const wide = solveWide(targetRgb);
+    const narrow = solveNarrow(targetRgb, wide);
+    return {
+      values: narrow.values,
+      loss: narrow.loss,
+      filter: cssFilterString(narrow.values),
+    };
+  };
+
+  // Reuse a single canvas / context to avoid memory leaks
+  const colorParseCanvas = document.createElement('canvas');
+  colorParseCanvas.width = 1;
+  colorParseCanvas.height = 1;
+  const colorParseContext = colorParseCanvas.getContext('2d');
+
+  const toRGBArray = (cssColor) => {
+    colorParseContext.fillStyle = cssColor;
+    colorParseContext.fillRect(0, 0, 1, 1);
+
+    // The `getImageData().data` returns a Uint8ClampedArray with 4 values per pixel (RGBA). 
+    // also see: https://developer.mozilla.org/zh-CN/docs/Web/API/ImageData/data
+    const rgba = colorParseContext.getImageData(0, 0, 1, 1).data;
+    return Array.from(rgba.slice(0, 3));
+  };
+
+  const DYNAMIC_STYLE_ID = 'dynamic-color-invert-style';
+  const SOLVED_COLOR_KEY = "solved-";
+
+  function memorizedSolvedFilter(color) {
+    const colorKey = SOLVED_COLOR_KEY + color;
+    const storedFilterOption = localStorage.getItem(colorKey);
+    if (storedFilterOption) {
+      return storedFilterOption;
+    } else {
+      const filter = solveColor(color).filter;
+      localStorage.setItem(colorKey, filter);
+      return filter;
+    }
+  }
+
+  function applyDynamicColorInvert() {
+    const textColor = getComputedStyle(document.body).getPropertyValue('--text-color');
+    if (textColor && textColor.length > 0) {
+      const rgb = toRGBArray(textColor);
+      const filter = memorizedSolvedFilter(rgb);
+
+      const existingStyle = document.getElementById(DYNAMIC_STYLE_ID);
+      if (existingStyle) {
+        existingStyle.textContent = `.color-invert {${filter}}`;
+      } else {
+        const style = document.createElement('style');
+        style.id = DYNAMIC_STYLE_ID;
+        style.textContent = `.color-invert {${filter}}`;
+        document.head.appendChild(style);
+      }
+    }
+  }
+</script><script>
+  (() => {
+    const url = "/kodama.json";
+    const interval = 1000; // 1 second
+
+    let lastModified = null;
+
+    async function check() {
+      try {
+        const res = await fetch(url + "?t=" + Date.now(), {
+          method: "HEAD",
+          cache: "no-store",
+        });
+
+        const lm = res.headers.get("last-modified");
+
+        if (lastModified && lm && lm !== lastModified) {
+          location.reload();
+          return;
+        }
+
+        lastModified = lm || lastModified;
+      } catch (e) {
+        // Ignore
+        console.warn("Reload check failed:", e);
+      }
+
+      setTimeout(check, interval);
+    }
+
+    check();
+  })();
+</script><!-- Also see: https://katex.org/docs/autorender -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.25/dist/katex.min.css" integrity="sha384-WcoG4HRXMzYzfCgiyfrySxx90XSl2rxY5mnVY5TwtWE6KLrArNKn0T/mOgNL0Mmi" crossorigin="anonymous">
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.25/dist/katex.min.js" integrity="sha384-J+9dG2KMoiR9hqcFao0IBLwxt6zpcyN68IgwzsCSkbreXUjmNVRhPFTssqdSGjwQ" crossorigin="anonymous"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.25/dist/contrib/auto-render.min.js" integrity="sha384-hCXGrW6PitJEwbkoStFjeJxv+fSOOQKOPbJxSfM6G5sWZjAyWhXiTIIAmQqnlLlh" crossorigin="anonymous"></script>
+<!-- Also see: https://github.com/KaTeX/KaTeX/tree/main/contrib/copy-tex -->
+<script src="https://cdn.jsdelivr.net/npm/katex@0.16.25/dist/contrib/copy-tex.min.js" integrity="sha384-HORx6nWi8j5/mYA+y57/9/CZc5z8HnEw4WUZWy5yOn9ToKBv1l58vJaufFAn9Zzi" crossorigin="anonymous"></script>
+
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    renderMathInElement(document.body, {
+      delimiters: [
+        { left: "$$", right: "$$", display: true },
+        { left: "$", right: "$", display: false },
+        { left: "\\(", right: "\\)", display: false },
+        { left: "\\[", right: "\\]", display: true },
+      ],
+      trust: true,
+      strict: false,
+      throwOnError: false,
+      minRuleThickness: 0.05,
+    });
+  });
+</script>
+<link rel="stylesheet" href="/main.css"><style>
+@media only screen and (min-width: 1000px) {
+  #grid-wrapper { grid-template-columns: var(--article-max-width) var(--toc-max-width); }
+  nav#toc { max-width: max-content; }
+}
+</style></head><body><header class="header"><nav class="nav"><div class="logo"><span class="cursor-pointer" onclick="window.location.href='/index.html'" title="单纯百科 Simplopedia">« 单纯百科 Simplopedia</span></div></nav></header><div id="grid-wrapper" style="grid-template-areas: 'article toc';" data-base-url="./"><nav id="toc" class="sticky-nav mobile-sticky-nav"><div id="theme-options"><style>
+  body:has(input[value="furina"]:checked) {
+    --article-max-width: 110ex; /* default: 90ex */
+
+    --color-Furina-deep-navy: #253085;
+    --color-Furina-royal-blue: #465BCF;
+    --color-Furina-aqua-cyan: #6AC6E8;
+    --color-Furina-frost-white: #FAFBFC;
+    --color-Furina-misty-blue: #C4D7ED;
+    --color-Furina-vivid-sapphire: #5670E9;
+    --color-Furina-luminous-hydro: #70DBFF;
+    --color-Furina-bright-periwinkle: #8DA4F1;
+    --color-Furina-vintage-gold: #BD9368;
+    --color-Furina-vintage-gold-light: #DDB368;
+    --color-Furina-vintage-gold-ultra-light: #FDF388;
+
+    --background-color: var(--color-Furina-frost-white);
+    --link-color: var(--color-Furina-vivid-sapphire);
+    --slug-color: var(--color-Furina-aqua-cyan);
+    --logo-color: var(--color-Furina-deep-navy);
+
+    --block-background-color: #FFFFFF;
+    --shadow-color: rgba(27, 63, 143, 0.06);
+    --radius: 5px;
+    --margin-left: 14px;
+
+    --hover-color-block: var(--block-background-color);
+    --logo-hover-color: #88d;
+    --span-tag-color: #88d;
+    --article-tag-color: #88d;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    body:has(input[value="furina"]:checked) {
+      --color-Furina-deep-navy: #B5C0F5;
+      --color-Furina-royal-blue: #D6EBFF;
+
+      --background-color: #2f2f2f;
+      --block-background-color: #3a3a3a;
+    }
+  }
+
+  .block {
+    /*2026-3-16 21:10 新增*/
+    padding: 15px;
+    margin-top: 6px;
+    margin-bottom: 6px;
+
+    border-radius: var(--radius);
+    background-color: var(--block-background-color);
+    box-shadow: 0 2px 12px var(--shadow-color);
+  }
+
+  .footnote-definition {
+    margin-left: var(--margin-left);
+  }
+
+  h5,
+  h6,
+  p {
+    margin: 5px;
+  }
+
+  tr {
+    border-bottom: 1px solid var(--color-Furina-bright-periwinkle);
+  }
+
+  /* 可选：去除表头下方的重复横线（如果表头需要特殊样式） */
+  thead tr {
+    border-bottom: 2px solid var(--color-Furina-deep-navy);
+  }
+
+  /* 去除最后一行的边框 */
+  tbody tr:last-child {
+    border-bottom: none;
+  }
+
+  .footnote-definition>p {
+    display: inline;
+    margin-left: 0;
+    color: var(--color-Furina-bright-periwinkle);
+    font-size: small;
+  }
+
+  article > section > details > summary > header > h1 {
+    font-weight: 600;
+    font-size: 1.75rem !important;
+  }
+
+  h2 {
+    font-weight: 500;
+    font-size: 1.5rem !important;
+    color: var(--color-Furina-deep-navy);
+    margin-bottom: 10px;
+    border-bottom: 1px solid #88d;
+    padding-bottom: 1px;
+    /* 增加底部内边距让横线和文字有间距 */
+  }
+
+  h2::before {
+    content: "\2726";
+    /* ✦ 的Unicode转义码 */
+    display: inline-block;
+    margin-right: 0.3em;
+    /*color: var(--color-Furina-vintage-gold-light);*/
+    /* 替换 color 属性，改为以下背景和裁剪属性 */
+    background: linear-gradient(150deg,
+        var(--color-Furina-vintage-gold-ultra-light) 30%,
+        var(--color-Furina-vintage-gold-light) 60%,
+        var(--color-Furina-vintage-gold) 90%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    /* 将文字颜色设为透明以显示背景 */
+    /* 组合径向渐变（中心高光）和线性渐变（基础色调） */
+    /*background: radial-gradient(
+      ellipse at center,
+      var(--color-Furina-vintage-gold-ultra-light) 20%,
+      transparent 70%
+    ),
+    linear-gradient(
+      to bottom,
+      var(--color-Furina-vintage-gold-light),
+      var(--color-Furina-vintage-gold)
+    );
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent; */
+    filter: drop-shadow(0px 1px 1px rgba(184, 150, 131, 0.5));
+    /* 可选：增加与主色呼应的柔和投影 */
+    font-weight: normal;
+  }
+
+
+  h3 {
+    font-weight: 700;
+    color: var(--color-Furina-royal-blue);
+    margin-bottom: 5px;
+  }
+
+  h3::before {
+    content: "\2726";
+    /* ✦ 的Unicode转义码 */
+    display: inline-block;
+    margin-left: 0.06em;
+    margin-right: 0.36em;
+    /*color: var(--color-Furina-vintage-gold-ultra-light);*/
+    background: linear-gradient(150deg,
+        var(--color-Furina-vintage-gold-ultra-light) 20%,
+        var(--color-Furina-vintage-gold-light) 90%,
+        var(--color-Furina-vintage-gold) 95%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    font-weight: normal;
+  }
+
+  h4 {
+    text-indent: var(--marginleft);
+    font-weight: 700;
+    color: #696cd9;
+    margin-bottom: 0;
+  }
+
+  h5 {
+    text-indent: var(--marginleft);
+    font-weight: 700;
+    color: #8a8ff4;
+    margin-bottom: 0;
+  }
+
+  h6 {
+    text-indent: var(--marginleft);
+    font-weight: 700;
+    color: #aaaff4;
+    margin-bottom: 0;
+  }
+
+  code, pre, .mono {
+    font-family: "Liberation Mono", "Courier New", monospace;
+    font-size: 0.9em; /* 可选微调尺寸 */
+  }
+
+  @media only screen and (max-width: 1000px) {
+    #grid-wrapper>nav {
+      display: none !important;
+    }
+  }
+
+  #toc,
+  #toc .block {
+    background: none !important;
+    box-shadow: none !important;
+  }
+
+  ul {
+    margin: 5px;
+    margin-left: calc(5px + 2em);
+    padding-left: 0;
+    list-style-type: none;
+  }
+
+  ul li {
+    margin-bottom: 5px;
+    position: relative;
+    padding-left: 0;
+    /*color: var(--text-secondary);*/
+  }
+
+  ul li::before {
+    content: '✦';
+    position: absolute;
+    left : -1em;
+    /*color: var(--color-Furina-vintage-gold-ultra-light);*/
+    font-size: 0.9em;
+  }
+
+  .metadata {
+    color: var(--article-tag-color);
+  }
+
+  .metadata ul {
+    margin : 0;
+  }
+
+  .metadata li::before {
+    content: none;
+  }
+
+  .music-player button {
+    text-decoration: none;
+  }
+
+  .music-player button:hover {
+    text-decoration: underline;
+    text-decoration-color: var(--color-Furina-vintage-gold-light);
+    /* 金色 */
+    text-underline-offset: 6px;
+    /* 调整下划线与文字距离 */
+    text-decoration-thickness: 1px;
+    /* 线条粗细 */
+  }
+</style>
+
+<theme-option name="furina" style="display: none;">furina</theme-option></div></nav>
+
+<article><section class="block" data-taxon=""><details open><summary id="镜对称"><header><h1><span class="taxon"></span>“镜对称” <a class="slug" href="/镜对称.html">[镜对称]</a><a class="edit" href="vscode://file/E:/Simplopedia_source/trees/%E9%95%9C%E5%AF%B9%E7%A7%B0.md">[edit]</a></h1><div class="metadata"><ul><li class="meta-item">百科</li><li class="meta-item"><span class="link local"><a href="/SimplicialCat.html" title="单纯猫 [SimplicialCat]">SimplicialCat</a></span></li></ul></div></header></summary>
+<p>复代数簇 (<span class="link local"><a href="/Calabi--丘流形.html" title="“Calabi–丘流形” [Calabi--丘流形]">Calabi–丘流形</a></span>) 与<span class="link local"><a href="/辛流形.html" title="辛流形 [辛流形]">辛流形</a></span>之间的一种关系.</p>
+<blockquote>
+<p>When it emerged in the early 1990s, mirror symmetry was an aspect of theoretical physics, and specifically a duality between quantum field theories. Since then, many people have tried to place it on a mathematical foundation. Their labors have built up a fascinating but somewhat unruly subject. It describes some sort of relation between pairs of Calabi-Yau spaces, but there are several quite different formulations of this relation, with no strong links between them. Notable among these are the <strong>toric approach of Batyrev-Borisov</strong>, leading to a very large class of examples whose Hodge numbers behave as desired, and the <strong>symplectic approach of Strominger-Yau-Zaslow</strong>, hereinafter SYZ. The latter is inspired by the original physics, and holds out the remarkable promise of connecting mirror symmetry to the theory of <strong>integrable systems</strong>. But it is extremely difficult to find examples.</p>
+</blockquote>
+<blockquote>
+<p>Mirror symmetry is supposed to relate two such Calabi-Yau manifolds $M$ and $\widehat{M}$, interchanging the <strong>deformation spaces of the Kahler and complex structures</strong>.</p>
+</blockquote>
+<h2>例</h2>
+<p>复射影直线上一个线丛的全空间 $\operatorname{Tot}\mathcal O_{\mathbb P^1}(-2)$ 大约与余切丛 $T^*S^2$ 对称. 两者的实维数都是 $4$.</p>
+<h2>相关概念</h2>
+<p><span class="link local"><a href="/Langlands对偶.html" title="Langlands 对偶群 [Langlands对偶]">Langlands 对偶</a></span></p>
+<p><span class="link local"><a href="/B-场.html" title="“B-场” [B-场]">B-场</a></span></p>
+</details></section><footer><section class="block link-list" id="backlinks"><details open><summary><header><h1>关联页面</h1></header></summary><section class="block" data-taxon=""><details ><summary id="Langlands纲领"><header><h1><span class="taxon"></span>Langlands 纲领 <a class="slug" href="/Langlands纲领.html">[Langlands纲领]</a><a class="edit" href="vscode://file/E:/Simplopedia_source/trees/Langlands%E7%BA%B2%E9%A2%86.md">[edit]</a></h1><div class="metadata"><ul><li class="meta-item">百科</li><li class="meta-item"><span class="link local"><a href="/SimplicialCat.html" title="单纯猫 [SimplicialCat]">SimplicialCat</a></span></li></ul></div></header></summary>
+<h2>观念</h2>
+<p>Langlands 纲领是<span class="link local"><a href="/调和分析.html" title="调和分析 [调和分析]">调和分析</a></span> (<span class="link local"><a href="/Fourier变换.html" title="Fourier 变换 [Fourier变换]">Fourier 变换</a></span>) 的 “非 Abel” 类比.</p>
+<table><thead><tr><th></th><th></th><th></th><th></th><th></th></tr></thead><tbody>
+<tr><td><span class="link local"><a href="/椭圆曲线.html" title="“椭圆曲线” [椭圆曲线]">椭圆曲线</a></span></td><td>←</td><td>Ramanujan</td><td>→</td><td><span class="link local"><a href="/自守形式.html" title="“自守形式” [自守形式]">自守形式</a></span></td></tr>
+<tr><td>↓</td><td></td><td></td><td></td><td>↓</td></tr>
+<tr><td>$\operatorname{Gal}(\overline{F}/F) \to {^LG}$, Frobenius</td><td>←</td><td>原始 <span class="link local"><a href="/Langlands对应.html" title="经典 Langlands 对应 [Langlands对应]">Langlands 对应</a></span></td><td>→</td><td>$\mathbb G(\mathbb A_F)$ 的<span class="link local"><a href="/自守表示.html" title="“自守表示” [自守表示]">自守表示</a></span>, Hecke</td></tr>
+<tr><td>↓</td><td></td><td></td><td></td><td>↓</td></tr>
+<tr><td>曲线上的平坦 ${^LG}$-丛</td><td>←</td><td><span class="link local"><a href="/几何Langlands对应.html" title="几何 Langlands 对应 [几何Langlands对应]">几何 Langlands 对应</a></span></td><td>→</td><td><span class="link local"><a href="/主丛的模空间.html" title="“主丛的模空间” [主丛的模空间]">主丛的模空间</a></span> $\mathrm {Bun}_G$ 上的 Hecke 特征层</td></tr>
+<tr><td>↓</td><td></td><td></td><td></td><td>↓</td></tr>
+<tr><td>$\mathrm {Loc}_{^LG}$ 上的导出范畴</td><td>←</td><td>范畴 Langlands 对应</td><td>→</td><td>$\mathrm {Bun}_G$ 上的 <span class="link local"><a href="/D-模.html" title="D-模 [D-模]">D-模</a></span>导出范畴</td></tr>
+</tbody></table>
+<h2>相关概念</h2>
+<p><span class="link local"><a href="/Weil罗塞塔石碑.html" title="“Weil 罗塞塔石碑” [Weil罗塞塔石碑]">Weil 罗塞塔石碑</a></span>, <span class="link local"><a href="/函数域类比.html" title="函数域类比 [函数域类比]">函数域类比</a></span></p>
+<p><span class="link local"><a href="/局部几何Langlands对应.html" title="“局部几何 Langlands 对应” [局部几何Langlands对应]">局部几何 Langlands 对应</a></span></p>
+<p><span class="link local"><a href="/镜对称.html" title="“镜对称” [镜对称]">镜对称</a></span></p>
+</details></section><section class="block" data-taxon=""><details ><summary id="love-and-math"><header><h1><span class="taxon"></span>爱与数学 <a class="slug" href="/love-and-math.html">[love-and-math]</a><a class="edit" href="vscode://file/E:/Simplopedia_source/trees/love-and-math.md">[edit]</a></h1><div class="metadata"><ul><li class="meta-item">笔记</li><li class="meta-item"><span class="link local"><a href="/SimplicialCat.html" title="单纯猫 [SimplicialCat]">SimplicialCat</a></span></li></ul></div></header></summary>
+<p>本文是 Frenkel 的科普书 <span class="link local"><a href="/FrenkelLoveMath.html" title="Love and Math - The Heart of Hidden Reality [FrenkelLoveMath]">Love and Math</a></span> 的阅读笔记. 此处只摘录了读者 (也就是我) 关心的内容. 有一些文字较长的, 和数学无关的段落使用了 AI 总结, 目的是节省阅读的时间.</p>
+<h2>15</h2>
+<p>1990 年, 作者 Edward Frenkel 来到哈佛大学, 与 Drinfeld 讨论了 Langlands 纲领.</p>
+<blockquote>
+<p>Drinfeld: Shimura–Taniyama–Weil 猜想联系了三次方程与模形式; Langlands 由此迈了一大步, 用 Lie 群的自守表示代替了模形式.</p>
+<p>Edward: 什么是自守表示?</p>
+<p>Drinfeld: 具体定义暂不重要. 重要的是它是某个 Lie 群的表示.</p>
+<p>Edward: 这些自守表示与什么有关?</p>
+<p>Drinfeld: 有趣的来了. Langlands 预测它应当对应 Galois 群在另一个 Lie 群中的表示. … 称为 Langlands 对偶群 $^L G$.</p>
+<p>Edward: $L$ 是 Langlands 的意思吗?</p>
+<p>Drinfeld: (笑) Langlands 最初的目的是理解所谓 $L$-函数, 所以它给这个群命名为 $L$-群.</p>
+<p>Edward: 让我看看我有没有理解. 对每个 Lie 群 $G$, 都有一个对应的 Lie 群 $^LG$, 对吗?</p>
+<p>Drinfeld: 是的, 而且 Langlands 对应使用到了这个对应. Langlands 对应大致是这样的:</p>
+<p>Galois 群在 $^LG$ 中的表示, 对应于 $G$ 的自守表示</p>
+<p>Edward: 不懂. 我能先问些简单的问题吗, $\mathrm{SO}(3)$ 的 Langlands 对偶群是什么?</p>
+<p>Drinfeld: 它是 $\mathrm{SO}(3)$ 的二重覆叠. 你知道茶杯游戏吗?</p>
+<p>右手伸出, 手掌朝上, 拿一只茶杯; 旋转手掌及手臂, 保持茶杯朝上; 当茶杯旋转过一周时, 手臂就扭曲了; 继续旋转, 转过两周之后, 手臂与茶杯神奇地同时回到了未扭曲的状态.</p>
+<p>这个游戏说明 $\mathrm{SO}(3)$ 上存在着一条不平凡的闭路径, 但沿此路径走两遍又会得到平凡的路径.</p>
+<p>Edward: 我懂了, 走两遍不会让手臂更扭曲, 反而会取消扭曲. … 这与 Langlands 对偶群有什么关系?</p>
+<p>Drinfeld: $\mathrm{SO}(3)$ 的 Langlands 对偶是其二重覆叠, 所以…</p>
+<p>Edward: 所以对于 $\mathrm{SO}(3)$ 的每个元素, 有其对偶群的两个元素.</p>
+<p>Drinfeld: 因此新的群将没有任何非平凡的闭路径.</p>
+<p>Edward: 就是说取 Langlands 对偶群可以消除这些奇怪的扭曲?</p>
+<p>Drinfeld: 是的. 这件事看似不起眼, 却有很重要的作用. 比如物质的基本组成单元, 电子, 夸克, 光子, 它们的行为的差异就在于此.</p>
+<p>对于一般的 Lie 群, 其与 Langlands 对偶的关系要更费解, 两个群之间没有明显的联系.</p>
+<p>Edward: 对偶群在 Langlands 对应中到底是怎么出现的? 感觉就像魔法一样.</p>
+<p>Drinfeld: 其实, 我们不知道.</p>
+</blockquote>
+<p>人们通过许多手段描述了对偶群出现的方式, 但始终不能理解其本质原因.</p>
+<p>因此我们通过 Weil 的 Rosetta 石碑将 Langlands 纲领扩展到数学的其它领域, 甚至量子力学; 期望找到更多出现 Langlands 对偶群的案例, 帮助我们理解对偶群的含义.</p>
+<p>现在来看 Rosetta 石碑的 Riemann 面一栏. 它的 Langlands 对应的双方是</p>
+<ul>
+<li>$X$ 上的 $G$-丛模空间上扮演自守函数的 “自守层”;</li>
+<li>$X$ 的基本群在 $^L G$ 中的表示.</li>
+</ul>
+<p>这是所谓几何 Langlands 对应.</p>
+<p>Deinfeld 对此有一条崭新的思路.</p>
+<blockquote>
+<p>Drinfeld: 我认为 Kac–Moody 代数的表示可用来构造自守层.</p>
+<p>Edward: 那是什么?</p>
+<p>Drinfeld: 考虑一个 Riemann 面, 它以若干圆圈为边界, 而这些圈联系到环路群, 从而联系到 Kac–Moody 代数. 这样, 我们可将 Kac–Moody 代数的表示转化为这个 Riemann 面上的 $G$-丛模空间上的层. 总体方略如下:</p>
+<p>基本群在 $^LG$ 中的表示 $\to$ $G$ 的 Kac–Moody 代数的表示 $\to$ $G$-丛模空间上的自守层</p>
+<p>现在问题在于如何构造第一步. Feigin 向我介绍了你在 Kac–Moody 代数表示方面的工作, 我认为可应用于此.</p>
+<p>Edward: 为什么 $G$ 的 Kac–Moody 代数的表示能够承载 Langlands 对偶群 $^LG$ 的信息?</p>
+<p>Drinfeld: 这就是留给你的问题了.</p>
+</blockquote>
+<p>一种构造 Riemann 面基本群的表示的方法是微分方程. 闭路径的<span class="link local"><a href="/单值.html" title="单值 [单值]">单值</a></span>给出基本群在 Lie 群中的表示. 为构造 $^LG$ 取值的单值表示所需的微分方程是由 Drinfeld, Sokolov 引入的 “oper”. 这个名字是来自 operator, 但同时也带有一个梗: 在俄语中它 (опер) 是条子的意思. (而它们最终都来自拉丁文 opus, opera.)</p>
+<p>现在总体方略变成了这样:</p>
+<p>基本群在 $^LG$ 中的表示 $\to$ Riemann 面 $X$ 上的 oper $\to$ $G$ 的 Kac–Moody 代数的表示 $\to$ $G$-丛模空间上的自守层</p>
+<p>在作者 Frenkel 的博士论文中, 他用繁杂的技术手段构造了 $^LG$ 的 oper 参数化的 Kac–Moody 代数表示. Frenkel 解释了 Langlands 对偶如何出现, 但多年来仍无法理解 Langlands 对偶为何出现.</p>
+<p>Frenkel 感叹道, 这是数学上常有的事. 一个定理, 一波人证明, 一波人检验, 又一波人用它取得新的进展, 但真正的理解或许要数年数十年之后才能出现.
+即便他未能找到答案, 薪火相传, 总会有人找到.</p>
+<p>后来, Beilinson 和 Drinfeld 用 Frenkel 论文中的定理构造了几何 Langlands 对应, 开启了 Langlands 纲领的新篇章.</p>
+<p>Frenkel 在 Langlands Correspondence for Loop Groups 中总结了他在这个领域的工作. 此书于 2007 年问世; 二十年前, 他写下 Kac–Moody 代数的自由场实现 (free-field realization) 的第一行公式, 不知不觉中开启了通向 Langlands 纲领的道路.</p>
+<p>Beilinson 和 Drinfeld 的工作解决了一些长期悬而未决的问题, 但也引发了更多新的问题. 数学就是这样: 新成果揭开未知的面纱, 然而显露出的不仅是答案——它还包含了我们未曾想过的问题.</p>
+<h2>16</h2>
+<p>Langlands 纲领贯通数论、几何、表示论等诸多数学分支, 于纷繁现象中显现统一的模式. 人们拼凑零散的证据, 如考古者面对残损的镶嵌画, 每添一隅, 皆得新见新法, 其所展露之无尽丰饶, 令人叹服. 作者自 Kac–Moody 代数步入此境, 自此为 Langlands 纲领所摄, 遍历数学诸大陆, 研习其文化语言, 一生研究或直承其道, 或受其感发.</p>
+<p>最大的惊喜是 Langlands 纲领与量子物理的联系, 其关键在于数学和物理中的对偶.</p>
+<p>电与磁由电磁学统一描述, 有一种对偶性将两者互换. 1970 年代, 数学家尝试将这种对偶推广到非 Abel 规范理论, 得到了描述核力的理论. 核力包括约束基本粒子中的夸克的 “强力”, 以及导致放射性衰变等现象的 “弱力”.</p>
+<p>每种规范理论中都有一个关键的 Lie 群, 称为规范群. 非 Abel 规范理论的对偶会产生另一个 Lie 群的规范理论, 而这个新的群恰为 Langlands 对偶群. 故而人们自然地认为数学中的 Langlands 纲领与物理学中的电磁对偶有关. 三十年过去, 没有人找到答案.</p>
+<p>Frenkel 与物理学家 Witten 曾就量子对偶与 Langlands 纲领密切交流, 一段时间未获进展.</p>
+<p>一股意外的力量带来了转机. 2003 年, 在罗马的一场会议上, Frenkel 收到了老朋友及同事 Kari Vilonen 的邮件, 说 DARPA (读者注. 美国国防部的科研机构, 在美苏争霸背景下为了争夺科技领域的主导地位而建立) 要资助 Langlands 纲领的研究.
+作者回忆此前 DARPA 并未资助过纯数学研究; 但他以模算术与 RSA 加密为例论证基础科学是一切技术进步的根基. 他还提到, 科研与创新是一个社会的文化标识与精神内核, 关乎国家认同与尊严.</p>
+<p>当时的 DARPA 主任 Anthony Tether (2001-2009 年在位) 十分重视基础研究, 曾要求项目负责人寻找有价值的纯数学项目. 其中一位负责人 Doug Cochran 通过他在 NSF (自然科学基金会) 的朋友、拓扑学家 Ben Mann 了解到 Langlands 纲领—— Mann 虽非此领域专家，但从 NSF 的资助申请中看到了该纲领贯通各数学分支的深远意义, 遂向 Cochran 推荐.</p>
+<p>于是作者一行四人受邀撰写提案, 若获批将获得数百万美元资助, 以协调数十位数学家在该领域开展协同研究. 他们起初颇为犹豫: 数学家历来只拿 NSF 的小额资助, 如此大规模经费, 意味着可能接受公众的高强度监督, 以及同行的质疑与嫉妒. 若项目无实质进展, 不仅自身将受非议, 更可能关闭 DARPA 未来资助纯数学的大门. 但最终, 他们渴望推动 Langlands 纲领的发展, 也认同以大规模投入激活前沿领域这一创新模式, 因而接受了这一挑战. 一行人决定聚焦于 Langlands 纲领与量子物理的联系. 报告大获成功, 他们得到了史上最大的一笔纯数学研究经费. 接着是巨大的兴奋与焦虑.</p>
+<p>幸运的是, Ben Mann 从 NSF 转至 DARPA, 担任该项目的负责人. 他是掌舵这个项目的唯一人选, 既有远见和勇气承担高风险高回报的项目, 又能找到合适的人. 并且他的热情激励着身边的每一个人.</p>
+<p>作者首先联系了 Edward Witten, 邀请他加入项目, 但 Witten 任务缠身, 仅表示祝贺, 未作承诺.
+但恰巧, 物理学家 Peter Goddard 即将出任 IAS (普林斯顿高等研究院) 院长. Frenkel 提议在 IAS 组织一场会议, 汇聚数学家和物理学家, 共同探讨 Langlands 纲领与物理中的对偶性. Goddard 给予了全力支持.</p>
+<p>IAS 是办这场会议最理想的地方. 自 1930 年创立以来, 这里曾汇聚 Einstein, Weil, von Neumann, Gödel 等巨擘, 而当时在职学者中, Langlands 本人自 1972 年起任教授, Witten 也在其中, 另有物理学家 Nathan Seiberg 和 Juan Maldacena, 以及数学家 Pierre Deligne 和 Robert MacPherson 等, 研究领域均与 Langlands 纲领相关.</p>
+<p>2003 年 12 月初的预备会议上, Witten 对于会议表示赞同. 作者于是感到此事可成.</p>
+<p>计划中, Kari, Mark Goresky, Frenkel 和 David Ben-Zvi 将在会上向物理学家介绍 Langlands 纲领.</p>
+<p>为此, 作者进一步学习了电磁对偶. 在小尺度高能量的场合, 电磁场的行为需要用量子场论描述. 作者用罗宋汤 (Borscht) 作比: 一个量子场论就像一碗罗宋汤, 而对偶则是将配料置换的过程, 例如</p>
+<ul>
+<li>甜菜 → 萝卜</li>
+<li>萝卜 → 甜菜</li>
+<li>洋葱 → 土豆</li>
+<li>土豆 → 洋葱</li>
+<li>盐 → 胡椒</li>
+<li>胡椒 → 盐</li>
+</ul>
+<p>菜谱的对称性能让我们了解这道菜的有用信息.</p>
+<p>在量子电磁学中, 对偶性意味着可以通过交换电与磁两类对象而得到相同的理论: 携带电荷的电子应与携带磁荷的粒子——即 “磁单极子”——互换。尽管磁单极子自 1931 年由 Dirac 提出以来尚未在实验中被发现, 物理学家仍尝试构建在理论上具备这种对偶性的量子场论.</p>
+<p><span class="link local"><a href="/超对称.html" title="超对称 [超对称]">超对称</a></span>为构建此类理论提供了关键工具. 传统上, 费米子与玻色子行为迥异, 但超对称性允许二者相互转换, 从而得到更优美, 更易于分析的量子场论. 量子电磁学本身并不具备超对称性, 但具有 “超对称延拓”, 且明确实现了电磁对偶.</p>
+<p>该对偶的核心特征之一是耦合常数的反转: 若原理论中电子电荷为 $e$, 则其对偶理论中的电荷为 $1/e$; 当 $e$ 很小时, $1/e$ 就很大. 量子场论本来只能处理很小的参数值, 但对偶性揭示了二者等价. 正因如此, 此类对偶被视为量子物理的 “圣杯”.</p>
+<p>下一个问题是其它量子场论是否具有类似的对偶性. 电磁力, 弱力, 强力都是规范理论 (杨–Mills 理论), 其规范群分别为 $U(1)$, $SU(2)$, $SU(3)$. 后来 “标准模型” 将其置于一个统一的框架. 标准模型虽统一了除引力外的三种基本力, 但仍无法解释暗物质等众多现象, 故仅是终极理论的部分草稿.</p>
+<p>可以确定的是, 终极理论的最终篇章必将以数学语言写成. 杨振宁与 Mills 提出非阿贝尔规范场论时, 物理学家惊讶地发现其所需的数学形式早在数十年前就已被数学家出于纯粹的逻辑与形式之美所发展. 杨振宁本人曾感叹道, 发现物理世界的结构与深邃的数学概念之间竟有如此内在关联, 这远非单纯的喜悦, 而是一种更深的敬畏.
+毕竟, 数学真理似乎独立于物理世界与人类大脑而存在.</p>
+<p>在一般的超对称规范理论中, 电磁对偶将规范群 $G$ 的规范理论映射为另一个规范理论, 其耦合常数取倒数, 而规范群则变为 $^LG$, 即 $G$ 的 Langlands 对偶群. 这一发现源于 Goddard, Nuyts 与 Olive 对电荷磁荷取值的分析: 在一般规范理论中, 两类荷取值于不同集合, 对偶互换二者, 而恰好存在一个群满足该互换关系. 他们当时并未意识到, 这一构造与 Langlands 十余年前在纯数学语境下引入的对偶群完全一致, 从而在物理与数学之间建立起深刻的意外联系.
+Princeton 的会议处理的正是这个问题.</p>
+<h2>17</h2>
+<p>2004 年 3 月, 会议在 IAS 如期举行. 与会者二十余人, 包括Witten, Langlands, Peter Goddard, David Olive 等数学与自然科学两大学部的重要学者, 项目负责人 Ben Mann 亦在座.</p>
+<p>会议依次讲述了 Langlands 纲领从数论, 调和分析到有限域上曲线, 黎曼曲面的发展脉络, 并重点介绍了 Beilinson–Drinfeld 构造, 作者与 Feigin 关于 Kac–Moody 代数的工作, 及其与二维量子场论的联系. 与常规学术会议不同, 现场互动频繁, 讨论从报告厅延续至餐厅.</p>
+<p>Witten 全程高度投入, 始终坐在前排, 认真聆听, 不断提问. 第三天上午, 他表示已有想法, 希望下午发言. 午后, 他勾勒出两个领域之间可能存在的联系框架, 由此开启了此后他与合作者及众多研究者共同推进的数学与物理交叉新方向.</p>
+<p>Witten 介绍了维数约化 (dimensional reduction). Riemann 面作为实流形是 $2$ 维的, 而规范理论定义在 $4$ 维的时空上. 为沟通两者, 我们考虑两个 Riemann 面的乘积, 它是 $4$ 维的. 想象其中一个 Riemann 面 $X$ 的尺度远小于另一个 Riemann 面 $\Sigma$. 于是 $X\times \Sigma$ 上的 $4$ 维理论近似于 $\Sigma$ 上的一个 $2$ 维理论. 物理学家称之为有效理论 (effective theory).</p>
+<p>当 $X$ 很小时, 以 $G$ 为规范群的超对称规范理论在 $\Sigma\times X$ 上的维数约化是什么 $2$ 维理论?
+实际上, 它是一个 σ-模型, 即它的场是 $\Sigma$ 到一个目标流形 $M(X,G)$ 的映射.</p>
+<p>物理学家发现这些流形的时候, 又发现数学家已经来过了. 数学家把它叫做 Hitchin 模空间.
+1970 年代, Hitchin, Drinfeld, Atiyah, Manin 研究了规范理论中产生的瞬子 (instanton) 方程, Hitchin 将其由 $4$ 维约化到 $3$ 维, 称为单极方程; 这方程有着物理的意义, 同时也有精妙的数学结构.</p>
+<p>人们自然地想要把瞬子方程约化到 $2$ 维. 但物理学家发现方程在平坦的 $2$ 维空间中没有解, 便不再探究. Hitchin 的洞见在于考虑弯曲的 $2$ 维空间即 Riemann 面上的解. 那时的物理学家对这种空间上的量子场论并不感兴趣. Hitchin 发现 Riemann 面上的解的结构非常丰富. 他引入了解的<span class="link local"><a href="/分类空间.html" title="分类空间 [分类空间]">模空间</a></span>, 发现其上有一个超 Kähler 度量, 这在当时是很稀罕的事物.</p>
+<p>作者注. Hitchin 模空间原本属于 Weil Rosetta 石碑的右列 (Riemann 面), 而现今也出现在中间一列, 有限域上的曲线扮演了 Riemann 面的角色.</p>
+<p>数学与物理的互动是双向的, 在不同的时期, 某一方可能在某一思想的发展中占据先导, 随后随着焦点的转移又将主导权让位于另一方. 二者在良性循环中相互汲取灵感, 彼此促进.</p>
+<p>对以 $G$ 为规范群的 $4$ 维规范理论应用电磁对偶, 就会得到规范群为 $^LG$ 的规范理论. 两者对应的有效 $2$ 维 σ-模型 (即 $\Sigma$ 到 $M(X,G)$ 以及 $M(X,^LG)$ 的映射) 相对偶, 所谓<span class="link local"><a href="/镜对称.html" title="“镜对称” [镜对称]">镜像对称</a></span>.</p>
+<p>物理学家对这种 $2$ 维 σ-模型的兴趣来自弦论. 弦论的大意是, 自然界的基础物体不是粒子, 而是一维的 “弦”, 它们在时空中运动, 振动, 产生基本粒子和相互作用. 一维的弦移动产生二维的曲面, 并发生交互产生有洞的曲面. 这个曲面称为世界面 (world sheet), 可表示为一个 Riemann 曲面 $\Sigma$ 到时空 $S$ 的嵌入. 这与 σ-模型的数学结构相同, 只不过这里时空变成了目标流形.</p>
+<p>弦理论的基本想法是: 通过计算 σ-模型, 并对所有可能的 Riemann 面 $\Sigma$ (即弦在固定时空 $S$ 中传播的所有可能路径) 上求和, 可以还原物理世界. 然而, 该理论存在严重的问题, 例如允许存在快子 (超光速运动的基本粒子), 这违反了 Einstein 的相对论.</p>
+<p>引入超对称, 改进为 “超弦理论”, 情况有所改观, 但其数学自洽性要求时空 $S$ 必须是十维的. 有可能我们所处的世界实际是 $4$ 维时空与一个 $6$ 维流形 $M$ 的乘积, 它尺度过小而无法被现有手段探测; 十维理论通过类似的维数约化得到一个有效的四维理论. 该有效理论有望描述我们的宇宙, 并包含标准模型与量子引力, 因而成为近年来超弦理论被广泛研究的核心动机.</p>
+<p>问题的关键在于 $M$ 具体是哪一个 $6$ 维流形. 理论要求 $M$ 满足 Calabi–丘条件 (两位数学家 Eugenio Calabi 与丘成桐在物理学家之前很久就研究了这种流形), 而候选流形的数量据估计可达 $10^{500}$ 种. 究竟哪一个六维流形对应于现实宇宙, 以及如何通过实验加以验证, 是超弦理论尚未解决的关键问题之一.</p>
+<p>回到 Witten 的演讲. 他使用维数约化的技巧, 将 $G$ 与 $^LG$ 的规范理论之间的电磁对偶转化为以 $G$, $^LG$ 的 Hitchin 模空间为目标流形的 σ-模型的镜对称. 他于是问这个镜对称是否关系到 Langlands 纲领.</p>
+<p>Witten 给出的答案令人神往.
+量子场论中有一些层, 称为 D-膜, 起源于超弦理论中开弦的运动的研究.
+例如考虑两个特定的子集 $B_1$, $B_2$, 以及端点分别位于这两个子集上的开弦, 这个结构是 “膜” 的原型. 数学家 Maxim Kontsevich 提出的 “同调镜对称” (homological mirror symmetry) 给出两个 σ-模型中膜的联系. Witten 的主旨是: 同调镜像对称即是 Langlands 对应.</p>
+<p>σ-模型有两种风味, 称为 A-模型与 B-模型. 若以 Hitchin 模空间 $M(X,G)$ 为目标流形的是 A-模型, 则以 $M(X,^LG)$ 为目标流形的是 B-模型. 两种模型中相应的膜称为 A-膜, B-膜.</p>
+<p>Witten 的提案大致如下.</p>
+<p>$X$ 的基本群在 $^LG$ 中的表示 $\to$ $M(X,^LG)$ 中的 B-膜 $\to$ $M(X,G)$ 中的 A-膜 $\to$ $G$-丛模空间上的自守层</p>
+<p>随后的两年中, Witten 与物理学家 Anton Kapustin 合作推进了这一项目. 2006 年四月, 他们发布了 230 页的论文, 在数学和物理圈俱引起轰动.</p>
+<p>我们从镜对称最简单的例子开始介绍其成果. 考虑一个二维环面 $T$, 设它两个半径分别为 $R_1$, $R_2$ 的圆的乘积. 其镜像 $T^\vee$ 仍是环面, 但却是两个半径分别为 $1/R_1$, $R_2$ 的圆的乘积.</p>
+<p>这一对镜像上的膜有如下对应关系, 称为 T-对偶 (T = torus).</p>
+<p>$T$ 上的 B-膜 $\leftrightarrow$ $T^\vee$ 上的 A-膜</p>
+<p>聚集在 $T$ 的一个点上的膜 (“零膜”) 对应的是弥漫在整个 $T^\vee$ 上的膜 (它是 $T^\vee$ 的基本群的一个表示). 该现象与 Fourier 变换中 δ-函数与单频率波的对应相似.</p>
+<p>用环面的镜对称可以描述 Hitchin 模空间上膜的镜对称. Hitchin 模空间是个纤维丛, 底空间为线性空间, 纤维为环面. 而镜对称另一侧的 Hitchin 模空间是同一底空间上的另一纤维丛, 其纤维为前者纤维的对偶环面.</p>
+<p>考虑 Hitchin 模空间 $M(X,^LG)$ 的一点 $p$, 落在底空间的点 $b$ 上. 那么 $p$ 对应的零膜的镜像是 $M(X,G)$ 在 $b$ 上的整个纤维上弥漫的 A-膜.</p>
+<p>这种对偶此前在 Andrew Strominger, 丘成桐, Eric Zaslow 三人的研究中已有论述, 称为 SYZ 原理; 其思路为将一般流形的镜对称通过纤维丛结构化归到环面的镜对称. 在 Hitchin 模空间上恰好有这种结构, 于是 SYZ 原理就可发挥作用.</p>
+<p>Hitchin 模空间 $M(X,^LG)$ 的点</p>
+</details></section></details></section></footer></article></div></body></html>

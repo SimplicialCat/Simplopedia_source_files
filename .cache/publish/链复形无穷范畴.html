@@ -1,0 +1,1127 @@
+<!DOCTYPE html>
+<html lang="en-US"><head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<meta name="viewport" content="width=device-width"><title>链复形无穷范畴</title><link rel="icon" href="/assets/favicon.ico" /><style>
+  @font-face {
+    font-family: 'NewCM10';
+    src: url(assets/NewCM10-Book.otf) format('opentype');
+    font-weight: 400;
+    font-style: normal;
+  }
+
+  @font-face {
+    font-family: 'NewCM10';
+    src: url(assets/NewCM10-Italic.otf) format('opentype');
+    font-weight: 400;
+    font-style: italic;
+  }
+
+  @font-face {
+    font-family: 'NewCM10';
+    src: url(assets/NewCM10-Bold.otf) format('opentype');
+    font-weight: 700;
+    font-style: normal;
+  }
+
+  body {
+    --text-font-family: "NewCM10", serif !important;
+  }
+</style><template id="inline-section">
+  <section class="inline block" data-taxon="">
+    <details open="">
+      <summary>
+        <header>
+          <h1>
+            <span class="taxon"></span>
+            <div id="title"></div>
+          </h1>
+        </header>
+      </summary>
+      <div id="content"></div>
+    </details>
+  </section>
+</template>
+
+<script>
+  function inlineSection(template, section, taxon, title) {
+    taxon = taxon || section.getAttribute("taxon") || null;
+    title = title || section.getAttribute("title") || "";
+
+    const clone = template.content.cloneNode(true);
+    clone.querySelector("section").dataset.taxon = taxon;
+    clone.querySelector(".taxon").textContent = taxon ? `${taxon}. ` : "";
+    clone.querySelector("#title").replaceWith(title);
+    clone.querySelector("#content").replaceWith(...section.childNodes);
+
+    if (section.hasAttribute("close")) {
+      clone.querySelector("details").removeAttribute("open");
+    }
+    
+    section.replaceWith(clone);
+  }
+
+  const tagTaxonTable = {
+    "exegesis": "Exegesis",
+    "definition": "Definition",
+    "proposition": "Proposition",
+    "remark": "Remark",
+    "conjecture": "Conjecture",
+    "postulate": "Postulate",
+    "claim": "Claim",
+    "observation": "Observation",
+    "fact": "Fact",
+    "hypothesis": "Hypothesis",
+    "axiom": "Axiom",
+    "lemma": "Lemma",
+    "theorem": "Theorem",
+    "corollary": "Corollary",
+    "example": "Example", 
+    "proof": "Proof",
+  };
+
+  document.addEventListener("DOMContentLoaded", () => {
+    const template = document.getElementById("inline-section");
+
+    [...document.getElementsByTagName("block")].forEach(section => inlineSection(template, section));
+
+    Object.entries(tagTaxonTable).forEach(([tag, taxon]) => {
+      [...document.getElementsByTagName(tag)].forEach(section => inlineSection(template, section, taxon));
+    });
+  });
+</script><script>
+  function toggleDetailsOpen() {
+    const details = document.querySelector("#toc>div>details");
+    if (!details) return;
+
+    if (window.matchMedia("(max-width: 1000px)").matches) {
+      details.removeAttribute("open");
+    } else {
+      details.setAttribute("open", "");
+    }
+  }
+
+  document.addEventListener("DOMContentLoaded", toggleDetailsOpen);
+  window.addEventListener("resize", toggleDetailsOpen);
+</script><style>
+  theme-option {
+    display: inline-block;
+  }
+
+  theme-option>input {
+    display: none;
+  }
+
+  theme-option>label {
+    color: var(--slug-color);
+  }
+
+  theme-option>label:hover {
+    background-color: var(--hover-color-link);
+  }
+
+  theme-option:has(input:checked)>label {
+    color: var(--link-color);
+  }
+
+  theme-option>label::before {
+    content: "[";
+    color: rgba(0, 0, 0, 0);
+  }
+
+  theme-option>label::after {
+    content: "]";
+    color: rgba(0, 0, 0, 0);
+  }
+
+  theme-option:has(input:checked)>label::before {
+    color: var(--link-color);
+  }
+
+  theme-option:has(input:checked)>label::after {
+    color: var(--link-color);
+  }
+</style>
+
+<template id="theme-option-template">
+  <input type="radio" name="theme" />
+  <label></label>
+</template>
+
+<script>
+  const THEME_KEY = `kodama-theme`;
+
+  function storeSelectedTheme(name) {
+    localStorage.setItem(THEME_KEY, name);
+  }
+
+  function getCurrentTheme() {
+    return localStorage.getItem(THEME_KEY) || window.primaryTheme;
+  }
+
+  function selectTheme(themeName) {
+    storeSelectedTheme(themeName);
+    requestAnimationFrame(applyDynamicColorInvert);
+  }
+
+  function applyFavorTheme() {
+    const favoredTheme = getCurrentTheme();
+    if (favoredTheme) {
+      const selector = `input[type='radio'][id='${favoredTheme}']`;
+      const favoredOption = window.themeOptions.querySelector(selector);
+
+      if (favoredOption) {
+        favoredOption.checked = true;
+      } else if (window.primaryOption) {
+        // Fallback to primary theme, if the favored theme is not found
+        // e.g., when the theme options have changed, and the stored theme is no longer available.
+        window.primaryOption.checked = true;
+      }
+    }
+    applyDynamicColorInvert();
+  }
+
+  document.addEventListener("DOMContentLoaded", function () {
+    window.themeOptions = document.getElementById("theme-options");
+    const templateContent = document.getElementById("theme-option-template").content;
+
+    customElements.define(
+      "theme-option",
+      class extends HTMLElement {
+        constructor() {
+          super();
+
+          const node = templateContent.cloneNode(true);
+          const themeName = this.getAttribute("name");
+
+          const input = node.querySelector("input");
+          input.setAttribute("id", themeName);
+          input.setAttribute("value", themeName);
+
+          const label = node.querySelector("label");
+          label.setAttribute("for", themeName);
+          label.addEventListener("click", () => selectTheme(themeName));
+
+          while (this.firstChild) {
+            label.appendChild(this.firstChild);
+          }
+          this.appendChild(node);
+        }
+      },
+    );
+
+    window.primaryOption = window.themeOptions.querySelector("input[type='radio']");
+    window.primaryTheme = primaryOption?.value;
+
+    applyFavorTheme();
+  });
+</script>
+
+<script>
+  const clamp = (value) => Math.max(0, Math.min(255, value));
+
+  const multiply = ([r, g, b], matrix) => {
+    const nr = clamp(r * matrix[0] + g * matrix[1] + b * matrix[2]);
+    const ng = clamp(r * matrix[3] + g * matrix[4] + b * matrix[5]);
+    const nb = clamp(r * matrix[6] + g * matrix[7] + b * matrix[8]);
+    return [nr, ng, nb];
+  };
+
+  const hueRotate = ([r, g, b], angle = 0) => {
+    const rad = (angle / 180) * Math.PI;
+    const sin = Math.sin(rad);
+    const cos = Math.cos(rad);
+    const matrix = [
+      0.213 + cos * 0.787 - sin * 0.213,
+      0.715 - cos * 0.715 - sin * 0.715,
+      0.072 - cos * 0.072 + sin * 0.928,
+      0.213 - cos * 0.213 + sin * 0.143,
+      0.715 + cos * 0.285 + sin * 0.140,
+      0.072 - cos * 0.072 - sin * 0.283,
+      0.213 - cos * 0.213 - sin * 0.787,
+      0.715 - cos * 0.715 + sin * 0.715,
+      0.072 + cos * 0.928 + sin * 0.072,
+    ];
+    return multiply([r, g, b], matrix);
+  };
+
+  const grayscale = ([r, g, b], value = 1) => {
+    const matrix = [
+      0.2126 + 0.7874 * (1 - value),
+      0.7152 - 0.7152 * (1 - value),
+      0.0722 - 0.0722 * (1 - value),
+      0.2126 - 0.2126 * (1 - value),
+      0.7152 + 0.2848 * (1 - value),
+      0.0722 - 0.0722 * (1 - value),
+      0.2126 - 0.2126 * (1 - value),
+      0.7152 - 0.7152 * (1 - value),
+      0.0722 + 0.9278 * (1 - value),
+    ];
+    return multiply([r, g, b], matrix);
+  };
+
+  const sepia = ([r, g, b], value = 1) => {
+    const matrix = [
+      0.393 + 0.607 * (1 - value),
+      0.769 - 0.769 * (1 - value),
+      0.189 - 0.189 * (1 - value),
+      0.349 - 0.349 * (1 - value),
+      0.686 + 0.314 * (1 - value),
+      0.168 - 0.168 * (1 - value),
+      0.272 - 0.272 * (1 - value),
+      0.534 - 0.534 * (1 - value),
+      0.131 + 0.869 * (1 - value),
+    ];
+    return multiply([r, g, b], matrix);
+  };
+
+  const saturate = ([r, g, b], value = 1) => {
+    const matrix = [
+      0.213 + 0.787 * value,
+      0.715 - 0.715 * value,
+      0.072 - 0.072 * value,
+      0.213 - 0.213 * value,
+      0.715 + 0.285 * value,
+      0.072 - 0.072 * value,
+      0.213 - 0.213 * value,
+      0.715 - 0.715 * value,
+      0.072 + 0.928 * value,
+    ];
+    return multiply([r, g, b], matrix);
+  };
+
+  const linear = ([r, g, b], slope = 1, intercept = 0) => {
+    const scale = 255;
+    return [
+      clamp(r * slope + intercept * scale),
+      clamp(g * slope + intercept * scale),
+      clamp(b * slope + intercept * scale),
+    ];
+  };
+
+  const brightness = (rgb, value = 1) => linear(rgb, value);
+  const contrast = (rgb, value = 1) => linear(rgb, value, -0.5 * value + 0.5);
+
+  const invert = ([r, g, b], value = 1) => {
+    const nr = (value + r / 255 * (1 - 2 * value)) * 255;
+    const ng = (value + g / 255 * (1 - 2 * value)) * 255;
+    const nb = (value + b / 255 * (1 - 2 * value)) * 255;
+    return [clamp(nr), clamp(ng), clamp(nb)];
+  };
+
+  // Code taken from https://stackoverflow.com/a/9493060/2688027, licensed under CC BY-SA.
+  const rgbToHsl = (r, g, b) => {
+    r /= 255; g /= 255; b /= 255;
+    const max = Math.max(r, g, b);
+    const min = Math.min(r, g, b);
+    let h, s, l = (max + min) / 2;
+    if (max === min) {
+      h = s = 0;
+    } else {
+      const d = max - min;
+      s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
+      switch (max) {
+        case r: h = (g - b) / d + (g < b ? 6 : 0); break;
+        case g: h = (b - r) / d + 2; break;
+        case b: h = (r - g) / d + 4; break;
+      }
+      h /= 6;
+    }
+    return { h: h * 100, s: s * 100, l: l * 100 };
+  };
+
+  const applyFilters = (rgb, [inv, sep, sat, hue, bri, con]) => {
+    let color = [...rgb];
+    color = invert(color, inv / 100);
+    color = sepia(color, sep / 100);
+    color = saturate(color, sat / 100);
+    color = hueRotate(color, hue * 3.6);
+    color = brightness(color, bri / 100);
+    color = contrast(color, con / 100);
+    return color;
+  };
+
+  const lossFn = (targetRgb, filters) => {
+    const resultRgb = applyFilters([0, 0, 0], filters);
+    const targetHsl = rgbToHsl(...targetRgb);
+    const resultHsl = rgbToHsl(...resultRgb);
+    return (
+      Math.abs(resultRgb[0] - targetRgb[0]) +
+      Math.abs(resultRgb[1] - targetRgb[1]) +
+      Math.abs(resultRgb[2] - targetRgb[2]) +
+      Math.abs(resultHsl.h - targetHsl.h) +
+      Math.abs(resultHsl.s - targetHsl.s) +
+      Math.abs(resultHsl.l - targetHsl.l)
+    );
+  };
+
+  const fix = (value, idx) => {
+    let max = 100;
+    if (idx === 2) max = 7500;                  // saturate
+    else if (idx === 4 || idx === 5) max = 200; // brightness, contrast
+    if (idx === 3) { // hue-rotate
+      if (value > max) return value % max;
+      if (value < 0) return max + (value % max);
+      return value;
+    }
+    return Math.max(0, Math.min(max, value));
+  };
+
+  const spsa = (targetRgb, A, a, c, initial, iters) => {
+    const alpha = 1;
+    const gamma = 1 / 6;
+    let values = [...initial];
+    let best = [...values];
+    let bestLoss = Infinity;
+
+    for (let k = 0; k < iters; k++) {
+      const ck = c / Math.pow(k + 1, gamma);
+      const deltas = Array(6).fill().map(() => (Math.random() > 0.5 ? 1 : -1));
+      const highArgs = values.map((v, i) => v + ck * deltas[i]);
+      const lowArgs = values.map((v, i) => v - ck * deltas[i]);
+      const lossDiff = lossFn(targetRgb, highArgs) - lossFn(targetRgb, lowArgs);
+
+      values = values.map((v, i) => {
+        const g = (lossDiff / (2 * ck)) * deltas[i];
+        const ak = a[i] / Math.pow(A + k + 1, alpha);
+        return fix(v - ak * g, i);
+      });
+
+      const loss = lossFn(targetRgb, values);
+      if (loss < bestLoss) {
+        best = [...values];
+        bestLoss = loss;
+      }
+    }
+    return { values: best, loss: bestLoss };
+  };
+
+  // Threshold for acceptable color loss. This value determines when the SPSA algorithm stops early.
+  // A loss below this value is considered visually indistinguishable for most use cases.
+  // The value 25 was determined empirically to balance performance and color accuracy.
+  const ACCEPTABLE_COLOR_LOSS = 25;
+
+  const solveWide = (targetRgb) => {
+    const A = 5;
+    const c = 15;
+    const a = [60, 180, 18000, 600, 1.2, 1.2];
+    let best = { loss: Infinity, values: null };
+    for (let i = 0; best.loss > ACCEPTABLE_COLOR_LOSS && i < 3; i++) {
+      const initial = [50, 20, 3750, 50, 100, 100];
+      const result = spsa(targetRgb, A, a, c, initial, 1000);
+      if (result.loss < best.loss) best = result;
+    }
+    return best;
+  };
+
+  const solveNarrow = (targetRgb, wideResult) => {
+    const A = wideResult.loss;
+    const c = 2;
+    const A1 = A + 1;
+    const a = [0.25 * A1, 0.25 * A1, A1, 0.25 * A1, 0.2 * A1, 0.2 * A1];
+    return spsa(targetRgb, A, a, c, wideResult.values, 500);
+  };
+
+  const cssFilterString = (filters) => {
+    const [inv, sep, sat, hue, bri, con] = filters.map(Math.round);
+    const hueDeg = Math.round(hue * 3.6);
+    return `filter: invert(${inv}%) sepia(${sep}%) saturate(${sat}%) hue-rotate(${hueDeg}deg) brightness(${bri}%) contrast(${con}%);`;
+  };
+
+  const solveColor = (targetRgb) => {
+    const wide = solveWide(targetRgb);
+    const narrow = solveNarrow(targetRgb, wide);
+    return {
+      values: narrow.values,
+      loss: narrow.loss,
+      filter: cssFilterString(narrow.values),
+    };
+  };
+
+  // Reuse a single canvas / context to avoid memory leaks
+  const colorParseCanvas = document.createElement('canvas');
+  colorParseCanvas.width = 1;
+  colorParseCanvas.height = 1;
+  const colorParseContext = colorParseCanvas.getContext('2d');
+
+  const toRGBArray = (cssColor) => {
+    colorParseContext.fillStyle = cssColor;
+    colorParseContext.fillRect(0, 0, 1, 1);
+
+    // The `getImageData().data` returns a Uint8ClampedArray with 4 values per pixel (RGBA). 
+    // also see: https://developer.mozilla.org/zh-CN/docs/Web/API/ImageData/data
+    const rgba = colorParseContext.getImageData(0, 0, 1, 1).data;
+    return Array.from(rgba.slice(0, 3));
+  };
+
+  const DYNAMIC_STYLE_ID = 'dynamic-color-invert-style';
+  const SOLVED_COLOR_KEY = "solved-";
+
+  function memorizedSolvedFilter(color) {
+    const colorKey = SOLVED_COLOR_KEY + color;
+    const storedFilterOption = localStorage.getItem(colorKey);
+    if (storedFilterOption) {
+      return storedFilterOption;
+    } else {
+      const filter = solveColor(color).filter;
+      localStorage.setItem(colorKey, filter);
+      return filter;
+    }
+  }
+
+  function applyDynamicColorInvert() {
+    const textColor = getComputedStyle(document.body).getPropertyValue('--text-color');
+    if (textColor && textColor.length > 0) {
+      const rgb = toRGBArray(textColor);
+      const filter = memorizedSolvedFilter(rgb);
+
+      const existingStyle = document.getElementById(DYNAMIC_STYLE_ID);
+      if (existingStyle) {
+        existingStyle.textContent = `.color-invert {${filter}}`;
+      } else {
+        const style = document.createElement('style');
+        style.id = DYNAMIC_STYLE_ID;
+        style.textContent = `.color-invert {${filter}}`;
+        document.head.appendChild(style);
+      }
+    }
+  }
+</script><script>
+  (() => {
+    const url = "/kodama.json";
+    const interval = 1000; // 1 second
+
+    let lastModified = null;
+
+    async function check() {
+      try {
+        const res = await fetch(url + "?t=" + Date.now(), {
+          method: "HEAD",
+          cache: "no-store",
+        });
+
+        const lm = res.headers.get("last-modified");
+
+        if (lastModified && lm && lm !== lastModified) {
+          location.reload();
+          return;
+        }
+
+        lastModified = lm || lastModified;
+      } catch (e) {
+        // Ignore
+        console.warn("Reload check failed:", e);
+      }
+
+      setTimeout(check, interval);
+    }
+
+    check();
+  })();
+</script><!-- Also see: https://katex.org/docs/autorender -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.25/dist/katex.min.css" integrity="sha384-WcoG4HRXMzYzfCgiyfrySxx90XSl2rxY5mnVY5TwtWE6KLrArNKn0T/mOgNL0Mmi" crossorigin="anonymous">
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.25/dist/katex.min.js" integrity="sha384-J+9dG2KMoiR9hqcFao0IBLwxt6zpcyN68IgwzsCSkbreXUjmNVRhPFTssqdSGjwQ" crossorigin="anonymous"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.25/dist/contrib/auto-render.min.js" integrity="sha384-hCXGrW6PitJEwbkoStFjeJxv+fSOOQKOPbJxSfM6G5sWZjAyWhXiTIIAmQqnlLlh" crossorigin="anonymous"></script>
+<!-- Also see: https://github.com/KaTeX/KaTeX/tree/main/contrib/copy-tex -->
+<script src="https://cdn.jsdelivr.net/npm/katex@0.16.25/dist/contrib/copy-tex.min.js" integrity="sha384-HORx6nWi8j5/mYA+y57/9/CZc5z8HnEw4WUZWy5yOn9ToKBv1l58vJaufFAn9Zzi" crossorigin="anonymous"></script>
+
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    renderMathInElement(document.body, {
+      delimiters: [
+        { left: "$$", right: "$$", display: true },
+        { left: "$", right: "$", display: false },
+        { left: "\\(", right: "\\)", display: false },
+        { left: "\\[", right: "\\]", display: true },
+      ],
+      trust: true,
+      strict: false,
+      throwOnError: false,
+      minRuleThickness: 0.05,
+    });
+  });
+</script>
+<link rel="stylesheet" href="/main.css"><style>
+@media only screen and (min-width: 1000px) {
+  #grid-wrapper { grid-template-columns: var(--article-max-width) var(--toc-max-width); }
+  nav#toc { max-width: max-content; }
+}
+</style></head><body><header class="header"><nav class="nav"><div class="logo"><span class="cursor-pointer" onclick="window.location.href='/index.html'" title="单纯百科 Simplopedia">« 单纯百科 Simplopedia</span></div></nav></header><div id="grid-wrapper" style="grid-template-areas: 'article toc';" data-base-url="./"><nav id="toc" class="sticky-nav mobile-sticky-nav"><div id="theme-options"><style>
+  body:has(input[value="furina"]:checked) {
+    --article-max-width: 110ex; /* default: 90ex */
+
+    --color-Furina-deep-navy: #253085;
+    --color-Furina-royal-blue: #465BCF;
+    --color-Furina-aqua-cyan: #6AC6E8;
+    --color-Furina-frost-white: #FAFBFC;
+    --color-Furina-misty-blue: #C4D7ED;
+    --color-Furina-vivid-sapphire: #5670E9;
+    --color-Furina-luminous-hydro: #70DBFF;
+    --color-Furina-bright-periwinkle: #8DA4F1;
+    --color-Furina-vintage-gold: #BD9368;
+    --color-Furina-vintage-gold-light: #DDB368;
+    --color-Furina-vintage-gold-ultra-light: #FDF388;
+
+    --background-color: var(--color-Furina-frost-white);
+    --link-color: var(--color-Furina-vivid-sapphire);
+    --slug-color: var(--color-Furina-aqua-cyan);
+    --logo-color: var(--color-Furina-deep-navy);
+
+    --block-background-color: #FFFFFF;
+    --shadow-color: rgba(27, 63, 143, 0.06);
+    --radius: 5px;
+    --margin-left: 14px;
+
+    --hover-color-block: var(--block-background-color);
+    --logo-hover-color: #88d;
+    --span-tag-color: #88d;
+    --article-tag-color: #88d;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    body:has(input[value="furina"]:checked) {
+      --color-Furina-deep-navy: #B5C0F5;
+      --color-Furina-royal-blue: #D6EBFF;
+
+      --background-color: #2f2f2f;
+      --block-background-color: #3a3a3a;
+    }
+  }
+
+  .block {
+    /*2026-3-16 21:10 新增*/
+    padding: 15px;
+    margin-top: 6px;
+    margin-bottom: 6px;
+
+    border-radius: var(--radius);
+    background-color: var(--block-background-color);
+    box-shadow: 0 2px 12px var(--shadow-color);
+  }
+
+  .footnote-definition {
+    margin-left: var(--margin-left);
+  }
+
+  h5,
+  h6,
+  p {
+    margin: 5px;
+  }
+
+  tr {
+    border-bottom: 1px solid var(--color-Furina-bright-periwinkle);
+  }
+
+  /* 可选：去除表头下方的重复横线（如果表头需要特殊样式） */
+  thead tr {
+    border-bottom: 2px solid var(--color-Furina-deep-navy);
+  }
+
+  /* 去除最后一行的边框 */
+  tbody tr:last-child {
+    border-bottom: none;
+  }
+
+  .footnote-definition>p {
+    display: inline;
+    margin-left: 0;
+    color: var(--color-Furina-bright-periwinkle);
+    font-size: small;
+  }
+
+  article > section > details > summary > header > h1 {
+    font-weight: 600;
+    font-size: 1.75rem !important;
+  }
+
+  h2 {
+    font-weight: 500;
+    font-size: 1.5rem !important;
+    color: var(--color-Furina-deep-navy);
+    margin-bottom: 10px;
+    border-bottom: 1px solid #88d;
+    padding-bottom: 1px;
+    /* 增加底部内边距让横线和文字有间距 */
+  }
+
+  h2::before {
+    content: "\2726";
+    /* ✦ 的Unicode转义码 */
+    display: inline-block;
+    margin-right: 0.3em;
+    /*color: var(--color-Furina-vintage-gold-light);*/
+    /* 替换 color 属性，改为以下背景和裁剪属性 */
+    background: linear-gradient(150deg,
+        var(--color-Furina-vintage-gold-ultra-light) 30%,
+        var(--color-Furina-vintage-gold-light) 60%,
+        var(--color-Furina-vintage-gold) 90%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    /* 将文字颜色设为透明以显示背景 */
+    /* 组合径向渐变（中心高光）和线性渐变（基础色调） */
+    /*background: radial-gradient(
+      ellipse at center,
+      var(--color-Furina-vintage-gold-ultra-light) 20%,
+      transparent 70%
+    ),
+    linear-gradient(
+      to bottom,
+      var(--color-Furina-vintage-gold-light),
+      var(--color-Furina-vintage-gold)
+    );
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent; */
+    filter: drop-shadow(0px 1px 1px rgba(184, 150, 131, 0.5));
+    /* 可选：增加与主色呼应的柔和投影 */
+    font-weight: normal;
+  }
+
+
+  h3 {
+    font-weight: 700;
+    color: var(--color-Furina-royal-blue);
+    margin-bottom: 5px;
+  }
+
+  h3::before {
+    content: "\2726";
+    /* ✦ 的Unicode转义码 */
+    display: inline-block;
+    margin-left: 0.06em;
+    margin-right: 0.36em;
+    /*color: var(--color-Furina-vintage-gold-ultra-light);*/
+    background: linear-gradient(150deg,
+        var(--color-Furina-vintage-gold-ultra-light) 20%,
+        var(--color-Furina-vintage-gold-light) 90%,
+        var(--color-Furina-vintage-gold) 95%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    font-weight: normal;
+  }
+
+  h4 {
+    text-indent: var(--marginleft);
+    font-weight: 700;
+    color: #696cd9;
+    margin-bottom: 0;
+  }
+
+  h5 {
+    text-indent: var(--marginleft);
+    font-weight: 700;
+    color: #8a8ff4;
+    margin-bottom: 0;
+  }
+
+  h6 {
+    text-indent: var(--marginleft);
+    font-weight: 700;
+    color: #aaaff4;
+    margin-bottom: 0;
+  }
+
+  code, pre, .mono {
+    font-family: "Liberation Mono", "Courier New", monospace;
+    font-size: 0.9em; /* 可选微调尺寸 */
+  }
+
+  @media only screen and (max-width: 1000px) {
+    #grid-wrapper>nav {
+      display: none !important;
+    }
+  }
+
+  #toc,
+  #toc .block {
+    background: none !important;
+    box-shadow: none !important;
+  }
+
+  ul {
+    margin: 5px;
+    margin-left: calc(5px + 2em);
+    padding-left: 0;
+    list-style-type: none;
+  }
+
+  ul li {
+    margin-bottom: 5px;
+    position: relative;
+    padding-left: 0;
+    /*color: var(--text-secondary);*/
+  }
+
+  ul li::before {
+    content: '✦';
+    position: absolute;
+    left : -1em;
+    /*color: var(--color-Furina-vintage-gold-ultra-light);*/
+    font-size: 0.9em;
+  }
+
+  .metadata {
+    color: var(--article-tag-color);
+  }
+
+  .metadata ul {
+    margin : 0;
+  }
+
+  .metadata li::before {
+    content: none;
+  }
+
+  .music-player button {
+    text-decoration: none;
+  }
+
+  .music-player button:hover {
+    text-decoration: underline;
+    text-decoration-color: var(--color-Furina-vintage-gold-light);
+    /* 金色 */
+    text-underline-offset: 6px;
+    /* 调整下划线与文字距离 */
+    text-decoration-thickness: 1px;
+    /* 线条粗细 */
+  }
+</style>
+
+<theme-option name="furina" style="display: none;">furina</theme-option></div></nav>
+
+<article><section class="block" data-taxon=""><details open><summary id="链复形无穷范畴"><header><h1><span class="taxon"></span>链复形无穷范畴 <a class="slug" href="/链复形无穷范畴.html">[链复形无穷范畴]</a><a class="edit" href="vscode://file/E:/Simplopedia_source/trees/%E9%93%BE%E5%A4%8D%E5%BD%A2%E6%97%A0%E7%A9%B7%E8%8C%83%E7%95%B4.md">[edit]</a></h1><div class="metadata"><ul><li class="meta-item">百科</li><li class="meta-item"><span class="link local"><a href="/SimplicialCat.html" title="单纯猫 [SimplicialCat]">SimplicialCat</a></span></li></ul></div></header></summary>
+<h2>定义</h2>
+<p>设 $\mathcal A$ 为<span class="link local"><a href="/加性范畴.html" title="加性范畴 [加性范畴]">加性范畴</a></span>, 记 $\mathsf {Ch}(\mathcal A)$ 为其中<span class="link local"><a href="/链复形.html" title="链复形 [链复形]">链复形</a></span>的范畴 ($1$-范畴).</p>
+<p>记 $S$ 为 $\mathcal A$ 中<span class="link local"><a href="/链同伦等价.html" title="链同伦等价 [链同伦等价]">链同伦等价</a></span>的全体, 定义<strong>链复形 ∞-范畴</strong>为<span class="link local"><a href="/局部化(范畴论).html" title="局部化 (范畴论) [局部化(范畴论)]">局部化</a></span>
+$$
+\mathsf K(\mathcal A) := \mathsf {Ch}(\mathcal A)[S^{-1}].
+$$
+它是一个<span class="link local"><a href="/稳定∞-范畴.html" title=" [稳定∞-范畴]">稳定无穷范畴</a></span>. (它也是 $\mathsf {Ch}(\mathcal A)$ 作为<span class="link local"><a href="/微分分次范畴.html" title="微分分次范畴 [微分分次范畴]">微分分次范畴</a></span>的<span class="link local"><a href="/微分分次脉.html" title="“微分分次脉” [微分分次脉]">微分分次脉</a></span>.)</p>
+<p>注意与<span class="link local"><a href="/导出范畴.html" title="导出范畴 [导出范畴]">导出范畴</a></span>的区别.</p>
+<h2>性质</h2>
+<p><strong>例</strong>. 拓扑空间映射的同伦诱导奇异链复形态射的同伦, 链同伦的两个态射诱导相同的同调群同态; 这就是说同调群 $H_*\colon \mathsf{Top} \to \mathsf{Ab}^{\mathbb{Z}}$ 有如下分解:
+$$
+\mathsf{Top} \overset{\operatorname{Sing}}{\to} \mathsf{K}(\mathsf{Ab}) \overset{H_*}{\to} \mathsf{Ab}^{\mathbb{Z}}.
+$$</p>
+<p><strong>命题</strong>. $\mathsf {Ch}(\mathcal A)$ 上存在一个<span class="link local"><a href="/模型范畴.html" title="“模型范畴” [模型范畴]">模型范畴</a></span>结构使得</p>
+<ul>
+<li>弱等价恰为拟同构;</li>
+<li>余纤维化恰为逐项的单射.</li>
+</ul>
+<p>在这种模型结构中, 纤维性对象与内射对象有关. (k-injectivity?)</p>
+<p><strong>命题</strong>. 存在正合的伴随函子
+$$
+\mathsf K(\mathcal A) \rightleftarrows \mathsf D(\mathcal A),
+$$
+其中右伴随 $\mathsf D(\mathcal A)\to\mathsf K(\mathcal A)$ 全忠实, 左伴随 $\mathsf K(\mathcal A)\to\mathsf D(\mathcal A)$ 是一种纤维性替换, 其核为 $\mathsf K(\mathcal A)$ 中的零调复形.</p>
+<h2>t-结构</h2>
+<p>$\mathsf D(\mathcal A)$ 上有明显的 <span class="link local"><a href="/t-结构.html" title="t-结构 [t-结构]">t-结构</a></span> $(\mathsf D(\mathcal A)^{\leq 0},\mathsf D(\mathcal A)^{\geq 0})$, 且 $H^0$ 诱导等价 $\mathsf D(\mathcal A)^\heartsuit \to \mathcal A$.</p>
+<h3>有界导出范畴</h3>
+<p>设 Abel 范畴 $\mathcal A$ 具有足够多内射对象. 定义 $\mathsf D^+(\mathcal A) = N_{\text{dg}}(\mathsf {Ch}^+(\mathcal A_{\text{inj}}))$.</p>
+<p>设 Abel 范畴 $\mathcal A$ 具有足够多投射对象. 定义 $\mathsf D^-(\mathcal A) = N_{\text{dg}}(\mathsf {Ch}^-(\mathcal A_{\text{proj}}))\simeq\mathsf D^{+}(\mathcal A^{\text{op}})^{\text{op}}$.</p>
+<p>$\mathsf D^-(\mathcal A)$ 具有如下泛性质. 对任意带有左完备 t-结构的<span class="link local"><a href="/稳定无穷范畴.html" title="稳定范畴 [稳定无穷范畴]">稳定无穷范畴</a></span> $\mathcal C$, 如下资料等价:</p>
+<ul>
+<li>t-右正合函子 $\mathsf D^-(\mathcal A)\to\mathcal C$, 将 $\mathcal A_{\text{proj}}$ 映射到 $\mathcal C^\heartsuit$;</li>
+<li>右正合函子 $\mathcal A\to\mathcal C^\heartsuit$.</li>
+</ul>
+<p>对于右正合函子 $\mathcal A\to\mathcal C^\heartsuit$, 称对应的函子 $\mathsf D^-(\mathcal A)\to\mathcal C$ 为其<span class="link local"><a href="/导出函子.html" title="导出函子 [导出函子]">导出函子</a></span>.</p>
+<h2>相关概念</h2>
+<p><span class="link local"><a href="/微分分次范畴.html" title="微分分次范畴 [微分分次范畴]">微分分次范畴</a></span>: 充实于 $1$-范畴 $\mathsf {Ch}(\mathsf {Ab})$ 的范畴.</p>
+</details></section><footer><section class="block link-list" id="backlinks"><details open><summary><header><h1>关联页面</h1></header></summary><section class="block" data-taxon=""><details ><summary id="A∞-代数"><header><h1><span class="taxon"></span>A∞-代数 <a class="slug" href="/A∞-代数.html">[A∞-代数]</a><a class="edit" href="vscode://file/E:/Simplopedia_source/trees/A%E2%88%9E-%E4%BB%A3%E6%95%B0.md">[edit]</a></h1><div class="metadata"><ul><li class="meta-item">百科</li><li class="meta-item"><span class="link local"><a href="/SimplicialCat.html" title="单纯猫 [SimplicialCat]">SimplicialCat</a></span></li></ul></div></header></summary>
+<h2>观念</h2>
+<p>$A_\infty$-代数就是<span class="link local"><a href="/结合代数.html" title="结合代数 [结合代数]">结合代数</a></span>, 不过这个名字的出现往往意味着人们要用 <span class="link local"><a href="/A∞-算畴.html" title="结合算畴 [A∞-算畴]">$A_\infty$-算畴</a></span>的一些具体<span class="link local"><a href="/数学对象的表现.html" title="数学对象的表现 [数学对象的表现]">表现</a></span>来谈论结合代数, 即所谓 “<span class="link local"><a href="/融贯.html" title="融贯 [融贯]">融贯</a></span>” <span class="link local"><a href="/结合代数.html" title="结合代数 [结合代数]">结合代数</a></span>.</p>
+<p>拓扑空间范畴中的 $A_\infty$-代数又叫 <span class="link local"><a href="/A∞-空间.html" title="“A∞-空间” [A∞-空间]">$A_\infty$-空间</a></span>.</p>
+<p>有的文献中 “$A_\infty$-代数” 特指<span class="link local"><a href="/链复形无穷范畴.html" title="链复形无穷范畴 [链复形无穷范畴]">链复形无穷范畴</a></span>中的 $A_\infty$-代数.</p>
+<h2>例</h2>
+<h3>链复形 $A_\infty$-代数</h3>
+</details></section><section class="block" data-taxon=""><details ><summary id="三角范畴"><header><h1><span class="taxon"></span>“三角范畴” <a class="slug" href="/三角范畴.html">[三角范畴]</a><a class="edit" href="vscode://file/E:/Simplopedia_source/trees/%E4%B8%89%E8%A7%92%E8%8C%83%E7%95%B4.md">[edit]</a></h1><div class="metadata"><ul><li class="meta-item">百科</li><li class="meta-item"><span class="link local"><a href="/SimplicialCat.html" title="单纯猫 [SimplicialCat]">SimplicialCat</a></span></li></ul></div></header></summary>
+<p>三角范畴是范畴上的一种结构, 最早由 Verdier (1963年) 从<span class="link local"><a href="/导出范畴.html" title="导出范畴 [导出范畴]">导出范畴</a></span>的结构抽象而来.</p>
+<h2>定义</h2>
+<p>设 $\mathsf D$ 为加性范畴. (若它是 <span class="link local"><a href="/Abel范畴.html" title="Abel 范畴 [Abel范畴]">Abel 范畴</a></span>, 则一切都是显然的.) 三角范畴的结构包括<strong>位移函子</strong> (shift functor) $T\colon \mathsf D\to \mathsf D$ (加性等价), 以及一族<strong>特殊三角</strong> (distinguished triangle, 或正合三角 exact triangle) $A\to B\to C\to T(A)$. 有时我们又将 $T(A)$ 记作 $A[1]$, 记 $[n]$ 为其 $n$ 次复合.</p>
+<p>特殊三角满足如下公理.</p>
+<p><strong>TR1</strong>.</p>
+<ol>
+<li>对任意对象 $A$, $A\overset{\operatorname{id}}{\to} A \to 0 \to A[1]$ 是特殊三角.</li>
+<li>同构于特殊三角的三角也是特殊三角.</li>
+<li>任意态射 $f$ 都可补全为特殊三角 $A\overset f\to B\to C\to A[1]$.</li>
+</ol>
+<p><strong>TR2</strong> (旋转公理).</p>
+<p>如下两个三角, 若其中之一是特殊三角, 则另一个也是特殊三角:
+$$
+A \overset{f}{\to} B \overset{g}{\to} C \overset{h}{\to} A[1],
+$$
+$$
+B \overset{g}{\to} C \overset{h}{\to} A[1]\overset{-f[1]}{\to}B[1].
+$$</p>
+<p>通常我们如下画特殊三角:
+$$
+\begin{array}
+	{ccc}
+	X &amp; \to &amp; Y\\
+	&amp;\hspace{-1em}_{+1}\nwarrow\quad\quad\swarrow&amp;\\
+	&amp;Z&amp;
+\end{array}
+$$</p>
+<p><strong>TR3</strong> (锥的弱唯一性).</p>
+<p>存在 (但不唯一) 态射使下图交换:
+$$
+\begin{array}
+	{ccccccc}
+	X &amp; \to &amp; Y &amp; \to &amp; Z &amp; \to &amp; X[1]\\
+	\downarrow &amp; &amp;\downarrow &amp; &amp;\downarrow\exists\hspace{-1em} &amp; &amp;\downarrow\\
+	X' &amp; \to &amp; Y' &amp; \to &amp; Z' &amp; \to &amp; X'[1]
+\end{array}
+$$
+(问题: 什么意义下它唯一? coherence?)</p>
+<p><strong>TR4</strong> (八面体公理).</p>
+<p>(理论成功的关键)</p>
+<p>$$
+\begin{array}
+{ccccccc}
+X &amp; \to &amp; Y &amp; \to &amp; Q_1 &amp; \to &amp; X[1]\\
+&amp; \searrow &amp; \downarrow &amp;&amp; \downarrow &amp;&amp;\\
+&amp;&amp;Z &amp; \to &amp; Q_2 &amp; \to &amp; X[1]\\
+&amp;&amp;\downarrow &amp; \swarrow\\
+&amp;&amp; Q_3\\
+&amp;&amp; \downarrow\\
+&amp;&amp; Y[1]
+\end{array}
+$$
+若有 $X\to Y\to Z$, 则有特殊三角 $Q_1\to Q_2\to Q_3$.</p>
+<h3>同调函子</h3>
+<p>函子 $F\colon  \mathsf D\to\mathsf {Ab}$ 称为<strong>同调函子</strong>是指它将特殊三角 $X\to Y\to Z\to X[1]$ 对应到正合列 $F(X)\to F(Y)\to F(Z)$.</p>
+<p><strong>例</strong>. 对任意 $W\in \mathsf D$, $\operatorname{Hom}(W,-)$ 是同调函子. 这是由于如下图表:
+$$
+\begin{array}
+	{ccccccc}
+	W &amp; = &amp; W &amp; \to &amp; 0 &amp; \to &amp; W[1]\\
+	\downarrow\exists\hspace{-1em} &amp; &amp;\downarrow &amp; &amp;\downarrow &amp; &amp;\downarrow\exists\hspace{-1em}\\
+	X &amp; \to &amp; Y &amp; \to &amp; Z &amp; \to &amp; X[1]
+\end{array}
+$$</p>
+<h2>性质</h2>
+<p>若 $X\overset{f}{\to} Y\overset{g}{\to} Z\to X[1]$ 是特殊三角, 则 $gf=0$. 这是由于如下图表:
+$$
+\begin{array}
+	{ccccccc}
+	X &amp; = &amp; X &amp; \to &amp; 0 &amp; \to &amp; X[1]\\
+	\downarrow &amp; &amp;\downarrow f\hspace{-1em} &amp; &amp;\downarrow\exists\hspace{-1em} &amp; &amp;\downarrow\\
+	X &amp; \underset{f}{\to} &amp; Y &amp; \underset{g}{\to} &amp; Z &amp; \to &amp; X[1]
+\end{array}
+$$</p>
+<h2>同伦范畴</h2>
+<p>加性范畴 $\mathcal A$ 的<span class="link local"><a href="/链复形无穷范畴.html" title="链复形无穷范畴 [链复形无穷范畴]">链复形无穷范畴</a></span> $\mathsf {Ch}(\mathcal A)$ 的<span class="link local"><a href="/同伦范畴.html" title="“同伦范畴” [同伦范畴]">链复形范畴的同伦范畴</a></span> $\mathsf K(\mathcal A)$ (态射是链映射的同伦类) 是三角范畴.</p>
+</details></section><section class="block" data-taxon=""><details ><summary id="带弱等价的范畴"><header><h1><span class="taxon"></span>带弱等价的范畴 <a class="slug" href="/带弱等价的范畴.html">[带弱等价的范畴]</a><a class="edit" href="vscode://file/E:/Simplopedia_source/trees/%E5%B8%A6%E5%BC%B1%E7%AD%89%E4%BB%B7%E7%9A%84%E8%8C%83%E7%95%B4.md">[edit]</a></h1><div class="metadata"><ul><li class="meta-item">百科</li><li class="meta-item"><span class="link local"><a href="/SimplicialCat.html" title="单纯猫 [SimplicialCat]">SimplicialCat</a></span></li></ul></div></header></summary>
+<h2>观念</h2>
+<p>带弱等价的范畴是<span class="link local"><a href="/∞-范畴.html" title=" [∞-范畴]">无穷范畴</a></span>的一种<span class="link local"><a href="/数学对象的表现.html" title="数学对象的表现 [数学对象的表现]">表现</a></span>方式, 可通过<span class="link local"><a href="/范畴的局部化.html" title="“范畴的局部化” [范畴的局部化]">范畴的局部化</a></span>变为 ∞-范畴. 一个具体的模型是 <span class="link local"><a href="/Dwyer–Kan单纯局部化.html" title="“Dwyer–Kan 单纯局部化” [Dwyer–Kan单纯局部化]">Dwyer–Kan 单纯局部化</a></span>, 它将一个带弱等价的范畴变为单纯充实范畴, 即<span class="link local"><a href="/∞-范畴.html" title=" [∞-范畴]">无穷范畴</a></span>的一个模型.</p>
+<p>带弱等价的范畴之间的<strong>保持弱等价</strong>的函子可用于<span class="link local"><a href="/数学对象的表现.html" title="数学对象的表现 [数学对象的表现]">表现</a></span>对应的 <span class="link local"><a href="/无穷范畴.html" title="无穷范畴 [无穷范畴]">$\infty$-范畴</a></span>之间的函子.
+对于某些不保持弱等价的函子, 也可以通过谨慎地选择等价类的代表来得到 <span class="link local"><a href="/无穷范畴.html" title="无穷范畴 [无穷范畴]">$\infty$-范畴</a></span>之间的函子.</p>
+<h2>定义</h2>
+<p><strong>带弱等价的范畴</strong>是指一个范畴 $\mathcal C$ 带有一族指定的态射 $W$, 其中包含 $\mathcal C$ 中所有的同构, 满足某些封闭性质 (如三选二性质, $f,g,gf$ 中任意两者属于 $W$ 则第三者属于 $W$).</p>
+<h2>例</h2>
+<h3>链复形</h3>
+<p><span class="link local"><a href="/链复形.html" title="链复形 [链复形]">链复形</a></span>的<span class="link local"><a href="/拟同构.html" title="拟同构 [拟同构]">拟同构</a></span>是一种弱等价. 这表现了<span class="link local"><a href="/链复形无穷范畴.html" title="链复形无穷范畴 [链复形无穷范畴]">链复形 $\infty$-范畴</a></span>.</p>
+</details></section><section class="block" data-taxon=""><details ><summary id="广义同调"><header><h1><span class="taxon"></span>广义同调 <a class="slug" href="/广义同调.html">[广义同调]</a><a class="edit" href="vscode://file/E:/Simplopedia_source/trees/%E5%B9%BF%E4%B9%89%E5%90%8C%E8%B0%83.md">[edit]</a></h1><div class="metadata"><ul><li class="meta-item">百科</li><li class="meta-item"><span class="link local"><a href="/SimplicialCat.html" title="单纯猫 [SimplicialCat]">SimplicialCat</a></span></li></ul></div></header></summary>
+<h2>观念</h2>
+<p>广义同调一般是指空间范畴 (或<span class="link local"><a href="/生象.html" title="生象, ∞-群胚 [生象]">生象</a></span>的范畴) 到 Abel 群范畴 (或<span class="link local"><a href="/链复形无穷范畴.html" title="链复形无穷范畴 [链复形无穷范畴]">链复形范畴</a></span>, <span class="link local"><a href="/谱.html" title="谱 (稳定同伦论) [谱]">谱</a></span>范畴) 的满足某些同调公理的函子, 在空间较好的情形可由<span class="link local"><a href="/谱.html" title="谱 (稳定同伦论) [谱]">谱</a></span>表现:
+$$
+E_n(X) = \pi_n(X\wedge E).
+$$</p>
+<p>除了用谱表示的广义同调外, 还有其它一些概念可作为同调的推广, 如<span class="link local"><a href="/分解同调.html" title="分解同调 [分解同调]">分解同调</a></span>. 详见<span class="link local"><a href="/同调.html" title="同调 [同调]">同调</a></span>.</p>
+<h2>定义</h2>
+<h3>初等定义</h3>
+<p>定义<strong>同调理论</strong>为满足如下条件 (Eilenberg–Steenrod 公理) 的函子
+$$
+H\colon \mathsf{Top}\to\mathsf{Chain}(\mathbb{Z})
+$$
+(这里 $\mathsf{Chain}(\mathbb{Z})$ 是 $\mathbb{Z}$-模链复形构成的 $1$-范畴):</p>
+<ul>
+<li>$H$ 将同伦变为链同伦; (这是说 $H$ 表现了 $\infty$-范畴之间的函子 $\mathsf{Ani}\to\mathsf{Chain}(\mathbb{Z})$, 这里 $\mathsf{Chain}(\mathbb{Z})$ 是关于链同伦等价局部化得到的 $\infty$-范畴, 见<span class="link local"><a href="/链复形无穷范畴.html" title="链复形无穷范畴 [链复形无穷范畴]">链复形 $\infty$-范畴</a></span>.)</li>
+<li>$H$ 将无交并变为直和; (这是说 $H$ 保持余积)</li>
+<li>(切除法则, 或称 Mayer–Vietoris 法则) 设 $Z\to X$, $Z\to Y$ 为闭 CW 子复形, 则 $H(X\cup_Z Y)\simeq \operatorname{Cone}(H(Z)\to H(X)\oplus H(Y))$. (这基本上就是说 $H$ 保持 $\infty$-范畴意义下的推出, 因为映射锥表现的正是 $\infty$-范畴中的推出.)</li>
+</ul>
+<p>对任意 Abel 群 $G$, 存在 (同伦等价意义下) 唯一的同调理论 $H$ 使得 $H(*)\simeq G$.</p>
+</details></section><section class="block" data-taxon=""><details ><summary id="微分分次Lie代数"><header><h1><span class="taxon"></span>微分分次 Lie 代数 <a class="slug" href="/微分分次Lie代数.html">[微分分次Lie代数]</a><a class="edit" href="vscode://file/E:/Simplopedia_source/trees/%E5%BE%AE%E5%88%86%E5%88%86%E6%AC%A1Lie%E4%BB%A3%E6%95%B0.md">[edit]</a></h1><div class="metadata"><ul><li class="meta-item">百科</li><li class="meta-item"><span class="link local"><a href="/SimplicialCat.html" title="单纯猫 [SimplicialCat]">SimplicialCat</a></span></li></ul></div></header></summary>
+<p>微分分次 Lie 代数是<span class="link local"><a href="/链复形无穷范畴.html" title="链复形无穷范畴 [链复形无穷范畴]">链复形范畴</a></span>中的 <span class="link local"><a href="/Lie代数.html" title="Lie 代数 [Lie代数]">Lie 代数</a></span>.</p>
+<h2>定义</h2>
+<p>微分分次 Lie 代数 (DGLA) $(L,[-,-],d)$ 由 $\mathbb{Z}$-分次线性空间 $L=\bigoplus_{i\in\mathbb{Z}} L^i$, Lie 括号 $[-,-]\colon L^i\times L^j\to L^{i+j}$ 以及微分 $d\colon L^i \to L^{i+1}$ 构成, 满足</p>
+<ul>
+<li>分次交换性
+$$[b,a]=(-1)^{\bar a\bar b}[a,b],$$</li>
+<li>Jacobi 恒等式
+$$
+[a,[b,c]] = [[a,b],c]+ (-1)^{\bar a \bar b}[b,[a,c]],
+$$</li>
+<li>Leibniz 法则
+$$
+d[a,b]=[da,b]+(-1)^{\bar a}[a,db],
+$$</li>
+<li>以及 $dd=0$.</li>
+</ul>
+<p>Jacobi 恒等式可理解为, 对于 $a\in L^i$, $\operatorname{ad}(a)$ 是 $i$ 阶导子.</p>
+<h2>例</h2>
+<p>对微分流形 $M$, Lie 代数 $\mathfrak g$, $M$ 上的 $\mathfrak g$-值微分形式 $\big(\Omega^\bullet(M,\mathfrak g),[-,-],d\big)$ 是微分分次 Lie 代数.</p>
+</details></section><section class="block" data-taxon=""><details ><summary id="滤过"><header><h1><span class="taxon"></span>滤对象 <a class="slug" href="/滤过.html">[滤过]</a><a class="edit" href="vscode://file/E:/Simplopedia_source/trees/%E6%BB%A4%E8%BF%87.md">[edit]</a></h1><div class="metadata"><ul><li class="meta-item">百科</li><li class="meta-item"><span class="link local"><a href="/SimplicialCat.html" title="单纯猫 [SimplicialCat]">SimplicialCat</a></span></li></ul></div></header></summary>
+<p>本页讨论一般 $(\infty,1)$-范畴中的滤对象. 另见 <span class="link local"><a href="/滤对象(1-范畴).html" title="1-范畴中的滤对象 [滤对象(1-范畴)]">$1$-范畴中的滤对象</a></span>.</p>
+<h2>定义</h2>
+<p>范畴 $\mathcal C$ 中的<strong>滤对象</strong> (filtered object) 是一个序列
+$$
+X_\bullet = (\cdots\to X_{-1}\to X_0 \to X_1\to \cdots),
+$$
+即偏序集 $(\mathbb Z,\leq)$ 到范畴 $\mathcal C$ 的函子.
+另一种形式的滤对象是
+$$
+X^\bullet = (\cdots \to X_{1} \to X_0 \to X_{-1}\to\cdots),
+$$
+即 $\mathbb Z^{\mathrm{op}}$ 到 $\mathcal C$ 的函子.
+为了区分两种形式的滤对象, 可分别称之为上升滤对象和下降滤对象.</p>
+<p>有时我们想象滤对象中的态射为单射 (含入映射), 但一般 (尤其在 <span class="link local"><a href="/无穷范畴.html" title="无穷范畴 [无穷范畴]">∞-范畴</a></span>语境中) 不需要这个条件.</p>
+<p>范畴 $\mathcal C$ 中一个对象 $X$ 的<strong>滤过</strong> (filtration) 是指一个滤对象 $X_\bullet$, 满足 $X\simeq\operatorname{colim}X_\bullet$.</p>
+<h2>例</h2>
+<p>对于 CW 复形 $X$, 有滤过
+$$
+\operatorname{sk}_0X \to \operatorname{sk}_1X \to \cdots.
+$$</p>
+<p>Lie 代数 $\mathfrak g$ 的<span class="link local"><a href="/泛包络代数.html" title="泛包络代数 (Lie 代数) [泛包络代数]">泛包络代数</a></span> $U\mathfrak g$ 有自然的滤过
+$$
+(U\mathfrak g)_0 \hookrightarrow (U\mathfrak g)_1 \hookrightarrow (U\mathfrak g)_2\hookrightarrow\cdots.
+$$</p>
+<p>流形 (概形) $X$ 上的<span class="link local"><a href="/微分层.html" title="微分算子层 [微分层]">微分算子层</a></span> $\mathcal D_X$ 有自然的滤过
+$$
+(\mathcal D_X)_0 \hookrightarrow (\mathcal D_X)_1 \hookrightarrow (\mathcal D_X)_2 \hookrightarrow\cdots.
+$$</p>
+<h3>典范滤过</h3>
+<p><span class="link local"><a href="/链复形无穷范畴.html" title="链复形无穷范畴 [链复形无穷范畴]">链复形范畴</a></span>或<span class="link local"><a href="/导出范畴.html" title="导出范畴 [导出范畴]">导出范畴</a></span>的对象, 即链复形
+$$
+X = (\cdots\to X_1\to X_0 \to X_{-1}\to\cdots)
+$$
+具有典范的上升滤过 (todo: 方向合理吗)
+$$
+\tau_{\leq i} X= (\cdots\to 0 \to \operatorname{cofib}(X_{i+1}\to X_i) \to X_{i-1}\to X_{i-2}\to \cdots).
+$$
+以及典范的下降滤过
+$$
+\tau_{\geq i} X= (\cdots\to X_{i+2}\to X_{i+1} \to \operatorname{fib}(X_{i}\to X_{i-1}) \to 0\to \cdots).
+$$</p>
+<h2>性质</h2>
+<h3>谱序列</h3>
+<p>设 $\mathcal C$ 为<span class="link local"><a href="/稳定无穷范畴.html" title="稳定范畴 [稳定无穷范畴]">稳定范畴</a></span>, 带有 <span class="link local"><a href="/t-结构.html" title="t-结构 [t-结构]">t 结构</a></span>且其心为 <span class="link local"><a href="/Abel范畴.html" title="Abel 范畴 [Abel范畴]">Abel 范畴</a></span> $\mathcal A$. 那么对 $\mathcal C$ 中的滤对象 $X$ 可构造 $\mathcal A$ 中的<span class="link local"><a href="/谱序列.html" title="谱序列 [谱序列]">谱序列</a></span>. 见<span class="link local"><a href="/滤对象的谱序列.html" title="滤对象的谱序列 [滤对象的谱序列]">滤对象的谱序列</a></span>.</p>
+<h2>相关概念</h2>
+<p><span class="link local"><a href="/关联分次代数.html" title="关联分次对象 [关联分次代数]">关联分次对象</a></span></p>
+<p><span class="link local"><a href="/同伦纤维塔.html" title="“同伦纤维塔” [同伦纤维塔]">同伦纤维塔</a></span></p>
+</details></section><section class="block" data-taxon=""><details ><summary id="稳定无穷范畴"><header><h1><span class="taxon"></span>稳定范畴 <a class="slug" href="/稳定无穷范畴.html">[稳定无穷范畴]</a><a class="edit" href="vscode://file/E:/Simplopedia_source/trees/%E7%A8%B3%E5%AE%9A%E6%97%A0%E7%A9%B7%E8%8C%83%E7%95%B4.md">[edit]</a></h1><div class="metadata"><ul><li class="meta-item">百科</li><li class="meta-item"><span class="link local"><a href="/SimplicialCat.html" title="单纯猫 [SimplicialCat]">SimplicialCat</a></span></li></ul></div></header></summary>
+<h2>观念</h2>
+<p>以下的范畴均默认为 $(\infty,1)$-范畴.</p>
+<p>稳定范畴是类似于<span class="link local"><a href="/谱.html" title="谱 (稳定同伦论) [谱]">谱</a></span>范畴 <span class="link local"><a href="/Sp.html" title="Sp [Sp]">$\mathsf{Sp}$</a></span> 的, 具有一对互逆的<span class="link local"><a href="/环路空间.html" title="环路空间 [环路空间]">环路空间</a></span>和<span class="link local"><a href="/逆环路空间.html" title="逆环路空间 [逆环路空间]">逆环路空间</a></span> (<span class="link local"><a href="/纬悬.html" title="纬悬 [纬悬]">纬悬</a></span>) 函子的范畴.</p>
+<h2>定义</h2>
+<p><strong>稳定范畴</strong>是满足如下条件的范畴 $\mathcal C$:</p>
+<ul>
+<li>$\mathcal C$ 具有有限极限和有限余极限; 特别地, 具有零对象 $0$, 以及态射的纤维, 余纤维;</li>
+<li>$\mathcal C$ 中的拉回方块等同于推出方块; 特别地, <span class="link local"><a href="/纤维列.html" title="纤维列 [纤维列]">纤维列</a></span>等同于<span class="link local"><a href="/余纤维列.html" title="“余纤维列” [余纤维列]">余纤维列</a></span>;</li>
+<li><span class="link local"><a href="/纬悬.html" title="纬悬 [纬悬]">纬悬</a></span>函子 $\Sigma\colon \mathcal C\to\mathcal C$ 与<span class="link local"><a href="/环路空间.html" title="环路空间 [环路空间]">环路空间</a></span>函子 $\Omega\colon \mathcal C\to \mathcal C$ 构成一对互逆的范畴等价.</li>
+</ul>
+<p><strong>记号</strong>. 对稳定范畴的对象 $X$ 以及整数 $n$, 记
+$$
+    X[n] = \Sigma^n X,
+$$
+$$
+    X[-n] = \Omega^n X.
+$$</p>
+<h2>性质</h2>
+<h3>稳定化</h3>
+<p>具有有限极限的范畴都有<span class="link local"><a href="/稳定化.html" title="稳定化 [稳定化]">稳定化</a></span>.</p>
+<h3>谱充实</h3>
+<p>稳定范畴自然地<span class="link local"><a href="/充实.html" title=" [充实]">充实</a></span>于<span class="link local"><a href="/谱.html" title="谱 (稳定同伦论) [谱]">谱</a></span>的范畴. 对于稳定范畴 $\mathcal C$ 中的对象 $X,Y$, 映射谱 $\underline{\operatorname{Hom}}(X,Y)$ 可如下定义:
+$$
+\underline{\operatorname{Hom}}(X,Y)_n = \operatorname{Hom}(X,Y[n]).
+$$</p>
+<h3>同伦范畴</h3>
+<p>稳定范畴的<span class="link local"><a href="/同伦范畴.html" title="“同伦范畴” [同伦范畴]">同伦范畴</a></span>是<span class="link local"><a href="/三角范畴.html" title="“三角范畴” [三角范畴]">三角范畴</a></span>. 例如两个对象 $X,Y$ 的直和 $X\oplus Y$ 既为范畴论和 $X+Y$, 又为范畴论积 $X\times Y$, 两者同构.</p>
+<h3>对偶对称性</h3>
+<p>稳定范畴的对偶仍是稳定范畴.</p>
+<h2>例</h2>
+<p>$1$-范畴不可能是稳定范畴, 除非它是平凡的 (等价于终范畴 $1$).</p>
+<p><span class="link local"><a href="/谱.html" title="谱 (稳定同伦论) [谱]">谱</a></span>的范畴是最基本的稳定范畴, 它是<span class="link local"><a href="/∞Grpd.html" title=" [∞Grpd]">生象</a></span>范畴的<span class="link local"><a href="/稳定化.html" title="稳定化 [稳定化]">稳定化</a></span>.</p>
+<p>对于 <span class="link local"><a href="/Abel范畴.html" title="Abel 范畴 [Abel范畴]">Abel 范畴</a></span> $\mathcal A$, 其上的有界链复形范畴 $\operatorname{Ch}^{\text{b}}(\mathcal A)$ 构成稳定无穷范畴. 见<span class="link local"><a href="/链复形无穷范畴.html" title="链复形无穷范畴 [链复形无穷范畴]">链复形无穷范畴</a></span>.</p>
+<h2>相关概念</h2>
+<p><span class="link local"><a href="/K-理论.html" title="“K-理论” [K-理论]">K-理论</a></span>, <span class="link local"><a href="/t-结构.html" title="t-结构 [t-结构]">t-结构</a></span></p>
+</details></section><section class="block" data-taxon=""><details ><summary id="结合代数"><header><h1><span class="taxon"></span>结合代数 <a class="slug" href="/结合代数.html">[结合代数]</a><a class="edit" href="vscode://file/E:/Simplopedia_source/trees/%E7%BB%93%E5%90%88%E4%BB%A3%E6%95%B0.md">[edit]</a></h1><div class="metadata"><ul><li class="meta-item">百科</li><li class="meta-item"><span class="link local"><a href="/SimplicialCat.html" title="单纯猫 [SimplicialCat]">SimplicialCat</a></span></li></ul></div></header></summary><h2>观念</h2>
+<p>结合代数, 又叫 $\mathbb E_1$-代数, <span class="link local"><a href="/A∞-代数.html" title="A∞-代数 [A∞-代数]">$A_\infty$-代数</a></span>, 是若干元素可以<strong>有序</strong>地结合起来的结构. 给定 $n$ 个元素的<strong>有序</strong>组 $(x_1,\cdots,x_n)$, 仅有<strong>唯一</strong>的方式将它们结合起来 $x_1\cdots x_n$, 即结合的最终结果 “与加括号的方式无关”.</p>
+<p>在结合代数的结构之上, 可以考虑 “结合代数中的结合代数” (<span class="link local"><a href="/E2-代数.html" title="E2 代数 [E2-代数]">$\mathbb E_2$-代数</a></span>), “结合代数中的结合代数中的结合代数” ($\mathbb E_3$-代数), …, 以至于无穷. 在无穷处, $\mathbb E_\infty$-代数就是<span class="link local"><a href="/交换代数.html" title="交换代数 [交换代数]">交换代数</a></span>.</p>
+<h2>定义</h2>
+<h3>使用算畴</h3>
+<p>结合代数可定义为<span class="link local"><a href="/A∞-算畴.html" title="结合算畴 [A∞-算畴]">结合算畴</a></span>上的<span class="link local"><a href="/算畴上的代数.html" title="算畴上的代数 [算畴上的代数]">代数</a></span>. 参见<span class="link local"><a href="/算畴.html" title="算畴 [算畴]">算畴</a></span>.</p>
+<h3>使用语法范畴</h3>
+<h4>积幺半范畴</h4>
+<p>在<span class="link local"><a href="/积幺半范畴.html" title="积幺半范畴 [积幺半范畴]">积幺半范畴</a></span>的特殊情形, 结合代数是幺半群的 <span class="link local"><a href="/Lawvere理论.html" title="Lawvere 理论 [Lawvere理论]">Lawvere 理论</a></span>的模型, 即其<span class="link local"><a href="/语法范畴.html" title="语法范畴 [语法范畴]">语法范畴</a></span>为有限生成自由幺半群的范畴的对偶, 具体地:</p>
+<ul>
+<li>其对象为有限集;</li>
+<li>态射 $\{x_1,\cdots,x_n\}\to \{y_1,\cdots,y_m\}$ 为形如 $y_i = f_i(x_1,\cdots,x_n)$ 的变量代换, 每个 $f_i$ 为幺半群的理论中的公式, 即 $\{x_1,\cdots,x_n\}$ 上的一个<span class="link local"><a href="/列表.html" title="列表 [列表]">列表</a></span>; 等价地, 一个态射是 $\{y_1,\cdots,y_m\}$ 到 $\{x_1,\cdots,x_n\}$ 生成的自由幺半群的一个集合映射.</li>
+</ul>
+<p>那么<span class="link local"><a href="/积幺半范畴.html" title="积幺半范畴 [积幺半范畴]">积幺半范畴</a></span> $\mathcal C$ 中的结合代数即是上述范畴到 $\mathcal C$ 的保持有限<span class="link local"><a href="/积(范畴论).html" title="积 (范畴论) [积(范畴论)]">积</a></span>的函子.</p>
+<h4>一般幺半范畴</h4>
+<p>在一般的<span class="link local"><a href="/幺半范畴.html" title="幺半范畴 [幺半范畴]">幺半范畴</a></span>中, 结合代数可由如下<span class="link local"><a href="/语法范畴.html" title="语法范畴 [语法范畴]">语法范畴</a></span>定义:</p>
+<ul>
+<li>其对象为有限全序集 (包括空集);</li>
+<li>其态射为<span class="link local"><a href="/偏序集.html" title="偏序集 [偏序集]">偏序集</a></span>映射;</li>
+<li>幺半结构为
+$$
+\{a_1 &lt; \cdots &lt; a_n\} \otimes \{b_1 &lt; \cdots &lt; b_m\} = \{a_1 &lt; \cdots &lt; a_n &lt; b_1 &lt; \cdots &lt; b_m\}.
+$$
+注意这个幺半结构<strong>不是</strong>对称幺半结构, <strong>不存在</strong>自然同构 $A\otimes B\simeq B\otimes A$.</li>
+</ul>
+<p>该幺半范畴的底层范畴就是<span class="link local"><a href="/单纯形范畴.html" title="单纯形范畴 [单纯形范畴]">增广单纯形范畴</a></span> $\Delta_+$, 其中的单点集是<span class="link local"><a href="/游走.html" title="游走 [游走]">游走</a></span>的结合代数.</p>
+<h4>对称幺半范畴</h4>
+<p>在一般的<span class="link local"><a href="/对称幺半范畴.html" title="对称幺半范畴 [对称幺半范畴]">对称幺半范畴</a></span>中, 结合代数可由如下<span class="link local"><a href="/语法范畴.html" title="语法范畴 [语法范畴]">语法范畴</a></span>定义:</p>
+<ul>
+<li>其对象为有限集;</li>
+<li>态射 $X\to Y$ 是一个集合映射 $f\colon X\to Y$ 配备每个点的原像 $f^{-1}(y)$ 的一个<span class="link local"><a href="/全序集.html" title="全序集 [全序集]">全序</a></span>;</li>
+<li>对称幺半结构为无交并.</li>
+</ul>
+<p>这个范畴是一个 <span class="link local"><a href="/PROP.html" title="PROP [PROP]">PROP</a></span>.</p>
+<h2>性质</h2>
+<h3>具体表现</h3>
+<p><span class="link local"><a href="/链复形无穷范畴.html" title="链复形无穷范畴 [链复形无穷范畴]">链复形范畴</a></span>中的结合代数有很具体的<span class="link local"><a href="/数学对象的表现.html" title="数学对象的表现 [数学对象的表现]">表现</a></span>. 见 <span class="link local"><a href="/A∞-代数.html" title="A∞-代数 [A∞-代数]">$A_\infty$-代数</a></span>.</p>
+<h2>例</h2>
+</details></section><section class="block" data-taxon=""><details ><summary id="链复形范畴的同伦范畴"><header><h1><span class="taxon"></span>“链复形范畴的同伦范畴” <a class="slug" href="/链复形范畴的同伦范畴.html">[链复形范畴的同伦范畴]</a><a class="edit" href="vscode://file/E:/Simplopedia_source/trees/%E9%93%BE%E5%A4%8D%E5%BD%A2%E8%8C%83%E7%95%B4%E7%9A%84%E5%90%8C%E4%BC%A6%E8%8C%83%E7%95%B4.md">[edit]</a></h1><div class="metadata"><ul><li class="meta-item">百科</li><li class="meta-item"><span class="link local"><a href="/SimplicialCat.html" title="单纯猫 [SimplicialCat]">SimplicialCat</a></span></li></ul></div></header></summary>
+<p>本页介绍<span class="link local"><a href="/链复形无穷范畴.html" title="链复形无穷范畴 [链复形无穷范畴]">链复形无穷范畴</a></span>的<span class="link local"><a href="/同伦范畴.html" title="“同伦范畴” [同伦范畴]">同伦范畴</a></span>.</p>
+<p><span class="link local"><a href="/加性范畴.html" title="加性范畴 [加性范畴]">加性范畴</a></span> $\mathcal A$ 的链复形范畴 $\mathsf {Ch}(\mathcal A)$ 的<span class="link local"><a href="/链复形范畴的同伦范畴.html" title="“链复形范畴的同伦范畴” [链复形范畴的同伦范畴]">链复形范畴的同伦范畴</a></span> $\mathsf K(\mathcal A)$ (态射是链映射的同伦类) 是<span class="link local"><a href="/三角范畴.html" title="“三角范畴” [三角范畴]">三角范畴</a></span>.</p>
+<p>定义 $\mathsf K(\mathcal A)$ 中的逐项分裂序列 (termwise splitting sequence) $0\to A \to B\to C \to 0$ 为存在收缩 $r\colon B\to A$ 与截面 $s\colon C\to B$ 的短正合列.</p>
+<p><strong>例</strong>. 对于 $\alpha\colon A\to B$, <strong>映射锥</strong> $C=B\oplus A[1]$, $C^n=B^n\oplus A^{n+1}$ 构成逐项分裂序列
+$$
+0\to B\to C \to A[1]\to 0,$$其中 $C$ 上的微分
+$$
+d=\begin{pmatrix}
+d_B &amp; \alpha \\
+&amp; -d_A
+\end{pmatrix}.
+$$</p>
+<blockquote>
+<p>“几乎所有” 特殊三角都是映射锥.</p>
+</blockquote>
+<h3>范畴 E(A)</h3>
+<p>令 $E(\mathcal A)$ 为 $\mathsf K(\mathcal A)$ 中正合列的范畴, 它是</p>
+<ul>
+<li>严格满子范畴 (对同构封闭);</li>
+<li>饱和子范畴 (对取直和项封闭);</li>
+<li>三角子范畴 (特殊三角中两者属于这个子范畴, 则第三者属于这个子范畴).</li>
+</ul>
+<p>定义 $\mathsf K(\mathcal A)$ 的子范畴
+$$
+E(\mathcal A)^\perp = \{X\in\mathsf K(\mathcal A):\operatorname{Hom}(E,X)=0\,\forall E\in E(\mathcal A)\}.
+$$</p>
+<p>若一个对象到 $E(\mathcal A)^{\perp}$ 中的对象有<strong>拟同构</strong>, 则这个拟同构的映射锥为 $E(\mathcal A)$ 的对象.</p>
+<p><strong>例</strong>. 内射对象组成的下有界链复形属于 $E(\mathcal A)^\perp$. (这说明内射下有界复形在定义<span class="link local"><a href="/导出范畴.html" title="导出范畴 [导出范畴]">导出范畴</a></span>时是一种良好的 “替代”.)</p>
+<p><span class="link local"><a href="/导出范畴.html" title="导出范畴 [导出范畴]">导出范畴</a></span>作为 Verdier 商:
+$$
+\begin{array}
+	{ccccc}
+	E(\mathcal A) &amp;\to&amp; \mathsf K(\mathcal A) &amp;\to&amp; \mathsf D(\mathcal A)\\
+	&amp;&amp; \uparrow &amp; \nearrow \text{equivalence}\hspace{-5em}&amp;\\
+	&amp;&amp; E(\mathcal A)^\perp &amp;&amp;
+\end{array}
+$$
+<span class="link local"><a href="/凝聚层的导出范畴.html" title="凝聚层的导出范畴 [凝聚层的导出范畴]">凝聚层的导出范畴</a></span>的<span class="link local"><a href="/半正交分解.html" title=" [半正交分解]">半正交分解</a></span> (?)</p>
+</details></section></details></section></footer></article></div></body></html>

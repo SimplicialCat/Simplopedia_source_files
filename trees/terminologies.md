@@ -16,7 +16,7 @@ author: [SimplicialCat](SimplicialCat.md)
 |dependent type|[依值类型](依值类型.md)|依赖类型|
 |groupoid|[群胚](群胚.md)|广群|
 |homotopy-coherent|[融贯](融贯.md)||
-|lax|松|
+|lax|[松](松函子.md)|
 |locale|[位象](位象.md)|
 |nerve|[脉](脉.md)|神经|
 |operad|[算畴](算畴.md)|
@@ -24,14 +24,21 @@ author: [SimplicialCat](SimplicialCat.md)
 |presheaf|[预层](预层.md)|预束|
 |profunctor|[代函子](代函子.md)|
 |quasicoherent sheaf|[拟凝聚层](拟凝聚层.md)||
-|section|截面||
+|section|[截面](整体截面.md)||
 |sheaf|[层](层.md)|束|
 |site|[景](景.md)||
 |stack|[叠](叠.md)|栈|
-|stalk|茎|
+|stalk|[茎](茎.md)|
 |topos|[意象](意象.md)|拓扑斯|
 |torsor|[主丛](主丛.md)|旋子, 扭子, 挠子|
 |walking|[游走](游走.md)||
+
+## 未确定的术语
+
+|原文|译文|
+|--|--|
+|Gestalt|[](term-gestalt.md)|
+|suave|[](term-suave.md)|
 
 ## 相关内容
 

@@ -1,0 +1,1872 @@
+<!DOCTYPE html>
+<html lang="en-US"><head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<meta name="viewport" content="width=device-width"><title>意象</title><link rel="icon" href="/assets/favicon.ico" /><style>
+  @font-face {
+    font-family: 'NewCM10';
+    src: url(assets/NewCM10-Book.otf) format('opentype');
+    font-weight: 400;
+    font-style: normal;
+  }
+
+  @font-face {
+    font-family: 'NewCM10';
+    src: url(assets/NewCM10-Italic.otf) format('opentype');
+    font-weight: 400;
+    font-style: italic;
+  }
+
+  @font-face {
+    font-family: 'NewCM10';
+    src: url(assets/NewCM10-Bold.otf) format('opentype');
+    font-weight: 700;
+    font-style: normal;
+  }
+
+  body {
+    --text-font-family: "NewCM10", serif !important;
+  }
+</style><template id="inline-section">
+  <section class="inline block" data-taxon="">
+    <details open="">
+      <summary>
+        <header>
+          <h1>
+            <span class="taxon"></span>
+            <div id="title"></div>
+          </h1>
+        </header>
+      </summary>
+      <div id="content"></div>
+    </details>
+  </section>
+</template>
+
+<script>
+  function inlineSection(template, section, taxon, title) {
+    taxon = taxon || section.getAttribute("taxon") || null;
+    title = title || section.getAttribute("title") || "";
+
+    const clone = template.content.cloneNode(true);
+    clone.querySelector("section").dataset.taxon = taxon;
+    clone.querySelector(".taxon").textContent = taxon ? `${taxon}. ` : "";
+    clone.querySelector("#title").replaceWith(title);
+    clone.querySelector("#content").replaceWith(...section.childNodes);
+
+    if (section.hasAttribute("close")) {
+      clone.querySelector("details").removeAttribute("open");
+    }
+    
+    section.replaceWith(clone);
+  }
+
+  const tagTaxonTable = {
+    "exegesis": "Exegesis",
+    "definition": "Definition",
+    "proposition": "Proposition",
+    "remark": "Remark",
+    "conjecture": "Conjecture",
+    "postulate": "Postulate",
+    "claim": "Claim",
+    "observation": "Observation",
+    "fact": "Fact",
+    "hypothesis": "Hypothesis",
+    "axiom": "Axiom",
+    "lemma": "Lemma",
+    "theorem": "Theorem",
+    "corollary": "Corollary",
+    "example": "Example", 
+    "proof": "Proof",
+  };
+
+  document.addEventListener("DOMContentLoaded", () => {
+    const template = document.getElementById("inline-section");
+
+    [...document.getElementsByTagName("block")].forEach(section => inlineSection(template, section));
+
+    Object.entries(tagTaxonTable).forEach(([tag, taxon]) => {
+      [...document.getElementsByTagName(tag)].forEach(section => inlineSection(template, section, taxon));
+    });
+  });
+</script><script>
+  function toggleDetailsOpen() {
+    const details = document.querySelector("#toc>div>details");
+    if (!details) return;
+
+    if (window.matchMedia("(max-width: 1000px)").matches) {
+      details.removeAttribute("open");
+    } else {
+      details.setAttribute("open", "");
+    }
+  }
+
+  document.addEventListener("DOMContentLoaded", toggleDetailsOpen);
+  window.addEventListener("resize", toggleDetailsOpen);
+</script><style>
+  theme-option {
+    display: inline-block;
+  }
+
+  theme-option>input {
+    display: none;
+  }
+
+  theme-option>label {
+    color: var(--slug-color);
+  }
+
+  theme-option>label:hover {
+    background-color: var(--hover-color-link);
+  }
+
+  theme-option:has(input:checked)>label {
+    color: var(--link-color);
+  }
+
+  theme-option>label::before {
+    content: "[";
+    color: rgba(0, 0, 0, 0);
+  }
+
+  theme-option>label::after {
+    content: "]";
+    color: rgba(0, 0, 0, 0);
+  }
+
+  theme-option:has(input:checked)>label::before {
+    color: var(--link-color);
+  }
+
+  theme-option:has(input:checked)>label::after {
+    color: var(--link-color);
+  }
+</style>
+
+<template id="theme-option-template">
+  <input type="radio" name="theme" />
+  <label></label>
+</template>
+
+<script>
+  const THEME_KEY = `kodama-theme`;
+
+  function storeSelectedTheme(name) {
+    localStorage.setItem(THEME_KEY, name);
+  }
+
+  function getCurrentTheme() {
+    return localStorage.getItem(THEME_KEY) || window.primaryTheme;
+  }
+
+  function selectTheme(themeName) {
+    storeSelectedTheme(themeName);
+    requestAnimationFrame(applyDynamicColorInvert);
+  }
+
+  function applyFavorTheme() {
+    const favoredTheme = getCurrentTheme();
+    if (favoredTheme) {
+      const selector = `input[type='radio'][id='${favoredTheme}']`;
+      const favoredOption = window.themeOptions.querySelector(selector);
+
+      if (favoredOption) {
+        favoredOption.checked = true;
+      } else if (window.primaryOption) {
+        // Fallback to primary theme, if the favored theme is not found
+        // e.g., when the theme options have changed, and the stored theme is no longer available.
+        window.primaryOption.checked = true;
+      }
+    }
+    applyDynamicColorInvert();
+  }
+
+  document.addEventListener("DOMContentLoaded", function () {
+    window.themeOptions = document.getElementById("theme-options");
+    const templateContent = document.getElementById("theme-option-template").content;
+
+    customElements.define(
+      "theme-option",
+      class extends HTMLElement {
+        constructor() {
+          super();
+
+          const node = templateContent.cloneNode(true);
+          const themeName = this.getAttribute("name");
+
+          const input = node.querySelector("input");
+          input.setAttribute("id", themeName);
+          input.setAttribute("value", themeName);
+
+          const label = node.querySelector("label");
+          label.setAttribute("for", themeName);
+          label.addEventListener("click", () => selectTheme(themeName));
+
+          while (this.firstChild) {
+            label.appendChild(this.firstChild);
+          }
+          this.appendChild(node);
+        }
+      },
+    );
+
+    window.primaryOption = window.themeOptions.querySelector("input[type='radio']");
+    window.primaryTheme = primaryOption?.value;
+
+    applyFavorTheme();
+  });
+</script>
+
+<script>
+  const clamp = (value) => Math.max(0, Math.min(255, value));
+
+  const multiply = ([r, g, b], matrix) => {
+    const nr = clamp(r * matrix[0] + g * matrix[1] + b * matrix[2]);
+    const ng = clamp(r * matrix[3] + g * matrix[4] + b * matrix[5]);
+    const nb = clamp(r * matrix[6] + g * matrix[7] + b * matrix[8]);
+    return [nr, ng, nb];
+  };
+
+  const hueRotate = ([r, g, b], angle = 0) => {
+    const rad = (angle / 180) * Math.PI;
+    const sin = Math.sin(rad);
+    const cos = Math.cos(rad);
+    const matrix = [
+      0.213 + cos * 0.787 - sin * 0.213,
+      0.715 - cos * 0.715 - sin * 0.715,
+      0.072 - cos * 0.072 + sin * 0.928,
+      0.213 - cos * 0.213 + sin * 0.143,
+      0.715 + cos * 0.285 + sin * 0.140,
+      0.072 - cos * 0.072 - sin * 0.283,
+      0.213 - cos * 0.213 - sin * 0.787,
+      0.715 - cos * 0.715 + sin * 0.715,
+      0.072 + cos * 0.928 + sin * 0.072,
+    ];
+    return multiply([r, g, b], matrix);
+  };
+
+  const grayscale = ([r, g, b], value = 1) => {
+    const matrix = [
+      0.2126 + 0.7874 * (1 - value),
+      0.7152 - 0.7152 * (1 - value),
+      0.0722 - 0.0722 * (1 - value),
+      0.2126 - 0.2126 * (1 - value),
+      0.7152 + 0.2848 * (1 - value),
+      0.0722 - 0.0722 * (1 - value),
+      0.2126 - 0.2126 * (1 - value),
+      0.7152 - 0.7152 * (1 - value),
+      0.0722 + 0.9278 * (1 - value),
+    ];
+    return multiply([r, g, b], matrix);
+  };
+
+  const sepia = ([r, g, b], value = 1) => {
+    const matrix = [
+      0.393 + 0.607 * (1 - value),
+      0.769 - 0.769 * (1 - value),
+      0.189 - 0.189 * (1 - value),
+      0.349 - 0.349 * (1 - value),
+      0.686 + 0.314 * (1 - value),
+      0.168 - 0.168 * (1 - value),
+      0.272 - 0.272 * (1 - value),
+      0.534 - 0.534 * (1 - value),
+      0.131 + 0.869 * (1 - value),
+    ];
+    return multiply([r, g, b], matrix);
+  };
+
+  const saturate = ([r, g, b], value = 1) => {
+    const matrix = [
+      0.213 + 0.787 * value,
+      0.715 - 0.715 * value,
+      0.072 - 0.072 * value,
+      0.213 - 0.213 * value,
+      0.715 + 0.285 * value,
+      0.072 - 0.072 * value,
+      0.213 - 0.213 * value,
+      0.715 - 0.715 * value,
+      0.072 + 0.928 * value,
+    ];
+    return multiply([r, g, b], matrix);
+  };
+
+  const linear = ([r, g, b], slope = 1, intercept = 0) => {
+    const scale = 255;
+    return [
+      clamp(r * slope + intercept * scale),
+      clamp(g * slope + intercept * scale),
+      clamp(b * slope + intercept * scale),
+    ];
+  };
+
+  const brightness = (rgb, value = 1) => linear(rgb, value);
+  const contrast = (rgb, value = 1) => linear(rgb, value, -0.5 * value + 0.5);
+
+  const invert = ([r, g, b], value = 1) => {
+    const nr = (value + r / 255 * (1 - 2 * value)) * 255;
+    const ng = (value + g / 255 * (1 - 2 * value)) * 255;
+    const nb = (value + b / 255 * (1 - 2 * value)) * 255;
+    return [clamp(nr), clamp(ng), clamp(nb)];
+  };
+
+  // Code taken from https://stackoverflow.com/a/9493060/2688027, licensed under CC BY-SA.
+  const rgbToHsl = (r, g, b) => {
+    r /= 255; g /= 255; b /= 255;
+    const max = Math.max(r, g, b);
+    const min = Math.min(r, g, b);
+    let h, s, l = (max + min) / 2;
+    if (max === min) {
+      h = s = 0;
+    } else {
+      const d = max - min;
+      s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
+      switch (max) {
+        case r: h = (g - b) / d + (g < b ? 6 : 0); break;
+        case g: h = (b - r) / d + 2; break;
+        case b: h = (r - g) / d + 4; break;
+      }
+      h /= 6;
+    }
+    return { h: h * 100, s: s * 100, l: l * 100 };
+  };
+
+  const applyFilters = (rgb, [inv, sep, sat, hue, bri, con]) => {
+    let color = [...rgb];
+    color = invert(color, inv / 100);
+    color = sepia(color, sep / 100);
+    color = saturate(color, sat / 100);
+    color = hueRotate(color, hue * 3.6);
+    color = brightness(color, bri / 100);
+    color = contrast(color, con / 100);
+    return color;
+  };
+
+  const lossFn = (targetRgb, filters) => {
+    const resultRgb = applyFilters([0, 0, 0], filters);
+    const targetHsl = rgbToHsl(...targetRgb);
+    const resultHsl = rgbToHsl(...resultRgb);
+    return (
+      Math.abs(resultRgb[0] - targetRgb[0]) +
+      Math.abs(resultRgb[1] - targetRgb[1]) +
+      Math.abs(resultRgb[2] - targetRgb[2]) +
+      Math.abs(resultHsl.h - targetHsl.h) +
+      Math.abs(resultHsl.s - targetHsl.s) +
+      Math.abs(resultHsl.l - targetHsl.l)
+    );
+  };
+
+  const fix = (value, idx) => {
+    let max = 100;
+    if (idx === 2) max = 7500;                  // saturate
+    else if (idx === 4 || idx === 5) max = 200; // brightness, contrast
+    if (idx === 3) { // hue-rotate
+      if (value > max) return value % max;
+      if (value < 0) return max + (value % max);
+      return value;
+    }
+    return Math.max(0, Math.min(max, value));
+  };
+
+  const spsa = (targetRgb, A, a, c, initial, iters) => {
+    const alpha = 1;
+    const gamma = 1 / 6;
+    let values = [...initial];
+    let best = [...values];
+    let bestLoss = Infinity;
+
+    for (let k = 0; k < iters; k++) {
+      const ck = c / Math.pow(k + 1, gamma);
+      const deltas = Array(6).fill().map(() => (Math.random() > 0.5 ? 1 : -1));
+      const highArgs = values.map((v, i) => v + ck * deltas[i]);
+      const lowArgs = values.map((v, i) => v - ck * deltas[i]);
+      const lossDiff = lossFn(targetRgb, highArgs) - lossFn(targetRgb, lowArgs);
+
+      values = values.map((v, i) => {
+        const g = (lossDiff / (2 * ck)) * deltas[i];
+        const ak = a[i] / Math.pow(A + k + 1, alpha);
+        return fix(v - ak * g, i);
+      });
+
+      const loss = lossFn(targetRgb, values);
+      if (loss < bestLoss) {
+        best = [...values];
+        bestLoss = loss;
+      }
+    }
+    return { values: best, loss: bestLoss };
+  };
+
+  // Threshold for acceptable color loss. This value determines when the SPSA algorithm stops early.
+  // A loss below this value is considered visually indistinguishable for most use cases.
+  // The value 25 was determined empirically to balance performance and color accuracy.
+  const ACCEPTABLE_COLOR_LOSS = 25;
+
+  const solveWide = (targetRgb) => {
+    const A = 5;
+    const c = 15;
+    const a = [60, 180, 18000, 600, 1.2, 1.2];
+    let best = { loss: Infinity, values: null };
+    for (let i = 0; best.loss > ACCEPTABLE_COLOR_LOSS && i < 3; i++) {
+      const initial = [50, 20, 3750, 50, 100, 100];
+      const result = spsa(targetRgb, A, a, c, initial, 1000);
+      if (result.loss < best.loss) best = result;
+    }
+    return best;
+  };
+
+  const solveNarrow = (targetRgb, wideResult) => {
+    const A = wideResult.loss;
+    const c = 2;
+    const A1 = A + 1;
+    const a = [0.25 * A1, 0.25 * A1, A1, 0.25 * A1, 0.2 * A1, 0.2 * A1];
+    return spsa(targetRgb, A, a, c, wideResult.values, 500);
+  };
+
+  const cssFilterString = (filters) => {
+    const [inv, sep, sat, hue, bri, con] = filters.map(Math.round);
+    const hueDeg = Math.round(hue * 3.6);
+    return `filter: invert(${inv}%) sepia(${sep}%) saturate(${sat}%) hue-rotate(${hueDeg}deg) brightness(${bri}%) contrast(${con}%);`;
+  };
+
+  const solveColor = (targetRgb) => {
+    const wide = solveWide(targetRgb);
+    const narrow = solveNarrow(targetRgb, wide);
+    return {
+      values: narrow.values,
+      loss: narrow.loss,
+      filter: cssFilterString(narrow.values),
+    };
+  };
+
+  // Reuse a single canvas / context to avoid memory leaks
+  const colorParseCanvas = document.createElement('canvas');
+  colorParseCanvas.width = 1;
+  colorParseCanvas.height = 1;
+  const colorParseContext = colorParseCanvas.getContext('2d');
+
+  const toRGBArray = (cssColor) => {
+    colorParseContext.fillStyle = cssColor;
+    colorParseContext.fillRect(0, 0, 1, 1);
+
+    // The `getImageData().data` returns a Uint8ClampedArray with 4 values per pixel (RGBA). 
+    // also see: https://developer.mozilla.org/zh-CN/docs/Web/API/ImageData/data
+    const rgba = colorParseContext.getImageData(0, 0, 1, 1).data;
+    return Array.from(rgba.slice(0, 3));
+  };
+
+  const DYNAMIC_STYLE_ID = 'dynamic-color-invert-style';
+  const SOLVED_COLOR_KEY = "solved-";
+
+  function memorizedSolvedFilter(color) {
+    const colorKey = SOLVED_COLOR_KEY + color;
+    const storedFilterOption = localStorage.getItem(colorKey);
+    if (storedFilterOption) {
+      return storedFilterOption;
+    } else {
+      const filter = solveColor(color).filter;
+      localStorage.setItem(colorKey, filter);
+      return filter;
+    }
+  }
+
+  function applyDynamicColorInvert() {
+    const textColor = getComputedStyle(document.body).getPropertyValue('--text-color');
+    if (textColor && textColor.length > 0) {
+      const rgb = toRGBArray(textColor);
+      const filter = memorizedSolvedFilter(rgb);
+
+      const existingStyle = document.getElementById(DYNAMIC_STYLE_ID);
+      if (existingStyle) {
+        existingStyle.textContent = `.color-invert {${filter}}`;
+      } else {
+        const style = document.createElement('style');
+        style.id = DYNAMIC_STYLE_ID;
+        style.textContent = `.color-invert {${filter}}`;
+        document.head.appendChild(style);
+      }
+    }
+  }
+</script><script>
+  (() => {
+    const url = "/kodama.json";
+    const interval = 1000; // 1 second
+
+    let lastModified = null;
+
+    async function check() {
+      try {
+        const res = await fetch(url + "?t=" + Date.now(), {
+          method: "HEAD",
+          cache: "no-store",
+        });
+
+        const lm = res.headers.get("last-modified");
+
+        if (lastModified && lm && lm !== lastModified) {
+          location.reload();
+          return;
+        }
+
+        lastModified = lm || lastModified;
+      } catch (e) {
+        // Ignore
+        console.warn("Reload check failed:", e);
+      }
+
+      setTimeout(check, interval);
+    }
+
+    check();
+  })();
+</script><!-- Also see: https://katex.org/docs/autorender -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.25/dist/katex.min.css" integrity="sha384-WcoG4HRXMzYzfCgiyfrySxx90XSl2rxY5mnVY5TwtWE6KLrArNKn0T/mOgNL0Mmi" crossorigin="anonymous">
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.25/dist/katex.min.js" integrity="sha384-J+9dG2KMoiR9hqcFao0IBLwxt6zpcyN68IgwzsCSkbreXUjmNVRhPFTssqdSGjwQ" crossorigin="anonymous"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.25/dist/contrib/auto-render.min.js" integrity="sha384-hCXGrW6PitJEwbkoStFjeJxv+fSOOQKOPbJxSfM6G5sWZjAyWhXiTIIAmQqnlLlh" crossorigin="anonymous"></script>
+<!-- Also see: https://github.com/KaTeX/KaTeX/tree/main/contrib/copy-tex -->
+<script src="https://cdn.jsdelivr.net/npm/katex@0.16.25/dist/contrib/copy-tex.min.js" integrity="sha384-HORx6nWi8j5/mYA+y57/9/CZc5z8HnEw4WUZWy5yOn9ToKBv1l58vJaufFAn9Zzi" crossorigin="anonymous"></script>
+
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    renderMathInElement(document.body, {
+      delimiters: [
+        { left: "$$", right: "$$", display: true },
+        { left: "$", right: "$", display: false },
+        { left: "\\(", right: "\\)", display: false },
+        { left: "\\[", right: "\\]", display: true },
+      ],
+      trust: true,
+      strict: false,
+      throwOnError: false,
+      minRuleThickness: 0.05,
+    });
+  });
+</script>
+<link rel="stylesheet" href="/main.css"><style>
+@media only screen and (min-width: 1000px) {
+  #grid-wrapper { grid-template-columns: var(--article-max-width) var(--toc-max-width); }
+  nav#toc { max-width: max-content; }
+}
+</style></head><body><header class="header"><nav class="nav"><div class="logo"><span class="cursor-pointer" onclick="window.location.href='/index.html'" title="单纯百科 Simplopedia">« 单纯百科 Simplopedia</span></div></nav></header><div id="grid-wrapper" style="grid-template-areas: 'article toc';" data-base-url="./"><nav id="toc" class="sticky-nav mobile-sticky-nav"><div id="theme-options"><style>
+  body:has(input[value="furina"]:checked) {
+    --article-max-width: 110ex; /* default: 90ex */
+
+    --color-Furina-deep-navy: #253085;
+    --color-Furina-royal-blue: #465BCF;
+    --color-Furina-aqua-cyan: #6AC6E8;
+    --color-Furina-frost-white: #FAFBFC;
+    --color-Furina-misty-blue: #C4D7ED;
+    --color-Furina-vivid-sapphire: #5670E9;
+    --color-Furina-luminous-hydro: #70DBFF;
+    --color-Furina-bright-periwinkle: #8DA4F1;
+    --color-Furina-vintage-gold: #BD9368;
+    --color-Furina-vintage-gold-light: #DDB368;
+    --color-Furina-vintage-gold-ultra-light: #FDF388;
+
+    --background-color: var(--color-Furina-frost-white);
+    --link-color: var(--color-Furina-vivid-sapphire);
+    --slug-color: var(--color-Furina-aqua-cyan);
+    --logo-color: var(--color-Furina-deep-navy);
+
+    --block-background-color: #FFFFFF;
+    --shadow-color: rgba(27, 63, 143, 0.06);
+    --radius: 5px;
+    --margin-left: 14px;
+
+    --hover-color-block: var(--block-background-color);
+    --logo-hover-color: #88d;
+    --span-tag-color: #88d;
+    --article-tag-color: #88d;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    body:has(input[value="furina"]:checked) {
+      --color-Furina-deep-navy: #B5C0F5;
+      --color-Furina-royal-blue: #D6EBFF;
+
+      --background-color: #2f2f2f;
+      --block-background-color: #3a3a3a;
+    }
+  }
+
+  .block {
+    /*2026-3-16 21:10 新增*/
+    padding: 15px;
+    margin-top: 6px;
+    margin-bottom: 6px;
+
+    border-radius: var(--radius);
+    background-color: var(--block-background-color);
+    box-shadow: 0 2px 12px var(--shadow-color);
+  }
+
+  .footnote-definition {
+    margin-left: var(--margin-left);
+  }
+
+  h5,
+  h6,
+  p {
+    margin: 5px;
+  }
+
+  tr {
+    border-bottom: 1px solid var(--color-Furina-bright-periwinkle);
+  }
+
+  /* 可选：去除表头下方的重复横线（如果表头需要特殊样式） */
+  thead tr {
+    border-bottom: 2px solid var(--color-Furina-deep-navy);
+  }
+
+  /* 去除最后一行的边框 */
+  tbody tr:last-child {
+    border-bottom: none;
+  }
+
+  .footnote-definition>p {
+    display: inline;
+    margin-left: 0;
+    color: var(--color-Furina-bright-periwinkle);
+    font-size: small;
+  }
+
+  article > section > details > summary > header > h1 {
+    font-weight: 600;
+    font-size: 1.75rem !important;
+  }
+
+  h2 {
+    font-weight: 500;
+    font-size: 1.5rem !important;
+    color: var(--color-Furina-deep-navy);
+    margin-bottom: 10px;
+    border-bottom: 1px solid #88d;
+    padding-bottom: 1px;
+    /* 增加底部内边距让横线和文字有间距 */
+  }
+
+  h2::before {
+    content: "\2726";
+    /* ✦ 的Unicode转义码 */
+    display: inline-block;
+    margin-right: 0.3em;
+    /*color: var(--color-Furina-vintage-gold-light);*/
+    /* 替换 color 属性，改为以下背景和裁剪属性 */
+    background: linear-gradient(150deg,
+        var(--color-Furina-vintage-gold-ultra-light) 30%,
+        var(--color-Furina-vintage-gold-light) 60%,
+        var(--color-Furina-vintage-gold) 90%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    /* 将文字颜色设为透明以显示背景 */
+    /* 组合径向渐变（中心高光）和线性渐变（基础色调） */
+    /*background: radial-gradient(
+      ellipse at center,
+      var(--color-Furina-vintage-gold-ultra-light) 20%,
+      transparent 70%
+    ),
+    linear-gradient(
+      to bottom,
+      var(--color-Furina-vintage-gold-light),
+      var(--color-Furina-vintage-gold)
+    );
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent; */
+    filter: drop-shadow(0px 1px 1px rgba(184, 150, 131, 0.5));
+    /* 可选：增加与主色呼应的柔和投影 */
+    font-weight: normal;
+  }
+
+
+  h3 {
+    font-weight: 700;
+    color: var(--color-Furina-royal-blue);
+    margin-bottom: 5px;
+  }
+
+  h3::before {
+    content: "\2726";
+    /* ✦ 的Unicode转义码 */
+    display: inline-block;
+    margin-left: 0.06em;
+    margin-right: 0.36em;
+    /*color: var(--color-Furina-vintage-gold-ultra-light);*/
+    background: linear-gradient(150deg,
+        var(--color-Furina-vintage-gold-ultra-light) 20%,
+        var(--color-Furina-vintage-gold-light) 90%,
+        var(--color-Furina-vintage-gold) 95%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    font-weight: normal;
+  }
+
+  h4 {
+    text-indent: var(--marginleft);
+    font-weight: 700;
+    color: #696cd9;
+    margin-bottom: 0;
+  }
+
+  h5 {
+    text-indent: var(--marginleft);
+    font-weight: 700;
+    color: #8a8ff4;
+    margin-bottom: 0;
+  }
+
+  h6 {
+    text-indent: var(--marginleft);
+    font-weight: 700;
+    color: #aaaff4;
+    margin-bottom: 0;
+  }
+
+  code, pre, .mono {
+    font-family: "Liberation Mono", "Courier New", monospace;
+    font-size: 0.9em; /* 可选微调尺寸 */
+  }
+
+  @media only screen and (max-width: 1000px) {
+    #grid-wrapper>nav {
+      display: none !important;
+    }
+  }
+
+  #toc,
+  #toc .block {
+    background: none !important;
+    box-shadow: none !important;
+  }
+
+  ul {
+    margin: 5px;
+    margin-left: calc(5px + 2em);
+    padding-left: 0;
+    list-style-type: none;
+  }
+
+  ul li {
+    margin-bottom: 5px;
+    position: relative;
+    padding-left: 0;
+    /*color: var(--text-secondary);*/
+  }
+
+  ul li::before {
+    content: '✦';
+    position: absolute;
+    left : -1em;
+    /*color: var(--color-Furina-vintage-gold-ultra-light);*/
+    font-size: 0.9em;
+  }
+
+  .metadata {
+    color: var(--article-tag-color);
+  }
+
+  .metadata ul {
+    margin : 0;
+  }
+
+  .metadata li::before {
+    content: none;
+  }
+
+  .music-player button {
+    text-decoration: none;
+  }
+
+  .music-player button:hover {
+    text-decoration: underline;
+    text-decoration-color: var(--color-Furina-vintage-gold-light);
+    /* 金色 */
+    text-underline-offset: 6px;
+    /* 调整下划线与文字距离 */
+    text-decoration-thickness: 1px;
+    /* 线条粗细 */
+  }
+</style>
+
+<theme-option name="furina" style="display: none;">furina</theme-option></div></nav>
+
+<article><section class="block" data-taxon=""><details open><summary id="意象"><header><h1><span class="taxon"></span>意象 <a class="slug" href="/意象.html">[意象]</a><a class="edit" href="vscode://file/E:/Simplopedia_source/trees/%E6%84%8F%E8%B1%A1.md">[edit]</a></h1><div class="metadata"><ul><li class="meta-item">百科</li><li class="meta-item"><span class="link local"><a href="/SimplicialCat.html" title="单纯猫 [SimplicialCat]">SimplicialCat</a></span></li></ul></div></header></summary>
+<h2>观念</h2>
+<h3>作为集合范畴的推广</h3>
+<p>意象 (topos) 是一种具有类似集合范畴 $\mathsf{Set}$ 的性质的范畴; 这些性质使得意象的<span class="link local"><a href="/意象的内语言.html" title="意象的内语言 [意象的内语言]">内语言</a></span>能够支持集合的许多操作, 如构造两个集合 $X,Y$ 的无交并 $X + Y$, 乘积 $X\times Y$, 映射的集合 $Y^X$ 等等.</p>
+<p>不过需要注意的是, 意象的<span class="link local"><a href="/意象的内语言.html" title="意象的内语言 [意象的内语言]">内语言</a></span>所支持的逻辑是<span class="link local"><a href="/直觉主义逻辑.html" title="直觉主义逻辑 [直觉主义逻辑]">直觉主义逻辑</a></span>, 而不一定是经典逻辑 (见 <span class="link local"><a href="/Boole意象.html" title="“Boole 意象” [Boole意象]">Boole 意象</a></span>), 其中排中律和选择公理可能不成立. 例如拓扑空间上的层意象一般不是 Boole 意象, 原因来自于开集的补集不一定是开集.</p>
+<blockquote>
+<p>没有人能将我们驱逐出 Contor 为我们创造的 (集合论的) 天堂. —— David Hilbert (1926)</p>
+</blockquote>
+<blockquote>
+<p>而意象理论告诉我们, 在集合论的天堂之外还有无穷无尽的世界, 而集合的世界只是这片无穷无尽的森林中的第一棵树.</p>
+</blockquote>
+<h3>作为几何对象</h3>
+<blockquote>
+<p>L’objet de la Topologie est l’étude des topos (et non des seuls espaces topologiques).</p>
+<p>拓扑学的目标是研究意象, 而不仅是拓扑空间.</p>
+<p>—— Grothendieck, <span class="link local"><a href="/SGA4.html" title="Théorie des topos et cohomologie étale des schémas [SGA4]">SGA 4</a></span></p>
+</blockquote>
+<h3>关于译名 “意象”</h3>
+<p><span class="link local"><a href="/关于译名-意象.html" title="关于译名 “意象” [关于译名-意象]">关于译名“意象“</a></span></p>
+<h2>定义</h2>
+<h3>Grothendieck 意象</h3>
+<p><span class="link local"><a href="/SGA4.html" title="Théorie des topos et cohomologie étale des schémas [SGA4]">SGA 4</a></span> 最早引入了 “意象 (topos)” 这一概念, 后来为了区分另一个稍有不同的概念, 称之为 <strong>Grothendieck 意象</strong>.</p>
+<p><strong>定义</strong>. <strong>Grothendieck 意象</strong>是指某个<span class="link local"><a href="/景.html" title="景 [景]">景</a></span>上的<span class="link local"><a href="/景上的层.html" title="景上的层 [景上的层]">层</a></span>的范畴.</p>
+<p>这一定义体现了意象作为几何对象的观念. 通常几何对象上具有 “开集” 与 “覆盖” 的概念, 形成<span class="link local"><a href="/景.html" title="景 [景]">景</a></span>的结构; 那么这个景上的<span class="link local"><a href="/景上的层.html" title="景上的层 [景上的层]">层</a></span>的范畴可以视为该几何对象在意象理论中的化身.</p>
+<p><strong>定义</strong>. Grothendieck 意象是某个<span class="link local"><a href="/预层意象.html" title="预层意象 [预层意象]">预层范畴</a></span>的<span class="link local"><a href="/正合局部化.html" title="正合局部化 [正合局部化]">正合局部化</a></span>.</p>
+<h3>Giraud 公理</h3>
+<p>据 <span class="link local"><a href="/SGA4.html" title="Théorie des topos et cohomologie étale des schémas [SGA4]">SGA 4</a></span> 记载, Grothendieck 的学生 Giraud 惊人地给出了 Grothendieck 意象的纯范畴论刻画, 后来称为 <span class="link local"><a href="/Giraud公理.html" title="Giraud 公理 [Giraud公理]">Giraud 公理</a></span>. 这一定义说明意象还具有一种独立于几何对象的观点.</p>
+<p><strong>定义</strong>. 称范畴 $\mathcal C$ 满足 <strong>Giraud 公理</strong>是说如下条件成立:</p>
+<ul>
+<li>$\mathcal C$ 为<span class="link local"><a href="/可表现范畴.html" title="可表现范畴 [可表现范畴]">可表现范畴</a></span>;</li>
+<li>$\mathcal C$ 中的<span class="link local"><a href="/拉回.html" title="拉回 (范畴论) [拉回]">拉回</a></span>保持<span class="link local"><a href="/余极限.html" title="余极限 [余极限]">余极限</a></span>;</li>
+<li>$\mathcal C$ 中的<span class="link local"><a href="/和(范畴论).html" title="和 (范畴论) [和(范畴论)]">和</a></span>无交 (即 $X + Y$ 的子对象 $X$ 与 $Y$ 的交为<span class="link local"><a href="/始对象.html" title="始对象 [始对象]">始对象</a></span> $0$);</li>
+<li>$\mathcal C$ 中的<span class="link local"><a href="/满射(范畴论).html" title="满射 (范畴论) [满射(范畴论)]">满射</a></span>均为<span class="link local"><a href="/有效满射.html" title="有效满射 [有效满射]">有效满射</a></span>.</li>
+</ul>
+<h3>初等意象</h3>
+<p>逻辑学家从<span class="link local"><a href="/意象的内语言.html" title="意象的内语言 [意象的内语言]">内语言</a></span>的视角出发考虑了<strong>初等意象</strong>的概念. Grothendieck 意象都是初等意象, 但反之不然.</p>
+<p><strong>定义</strong>. <strong>初等意象</strong> (elementary topos) 是满足如下条件的范畴 $\mathcal C$:</p>
+<ul>
+<li>$\mathcal C$ 中存在有限极限;</li>
+<li>$\mathcal C$ 是<span class="link local"><a href="/积闭范畴.html" title="积闭范畴 [积闭范畴]">积闭范畴</a></span>;</li>
+<li>$\mathcal C$ 中存在<span class="link local"><a href="/子对象分类子.html" title="子对象分类子 [子对象分类子]">子对象分类子</a></span> $\Omega$.</li>
+</ul>
+<p>初等意象的概念与 Grothendieck 意象最显著的区别在于去掉了<span class="link local"><a href="/可表现范畴.html" title="可表现范畴 [可表现范畴]">可表现范畴</a></span>的条件. 例如有限集的范畴 $\mathsf{Fin}$ 是初等意象, 而不是可表现范畴 (从而不可能是 Grothendieck 意象).</p>
+<p>不过, 一般人们还是讨论<span class="link local"><a href="/可表现范畴.html" title="可表现范畴 [可表现范畴]">可表现范畴</a></span>与 Grothendieck 意象. 所以在后文 (以及<span class="link local"><a href="/单纯百科.html" title="单纯百科 [单纯百科]">单纯百科</a></span>的其它页面) 中我们用 “意象” 来代指 Grothendieck 意象.</p>
+<h3>下降观点</h3>
+<p>参考 <span class="link local"><a href="/CnossenHTT.html" title="Notes on Higher Topos Theory [CnossenHTT]">Cnossen</a></span>.</p>
+<p>意象的范畴论性质还可以更加简洁地概括为余极限上的<span class="link local"><a href="/俯意象.html" title="俯意象 [俯意象]">俯意象</a></span>的性质, 称为沿余极限的<span class="link local"><a href="/下降.html" title="下降 [下降]">下降</a></span>. 具体的定义如下.</p>
+<p><strong>定义</strong>. <strong>意象</strong>是满足如下条件的<span class="link local"><a href="/可表现范畴.html" title="可表现范畴 [可表现范畴]">可表现范畴</a></span> $\mathcal C$: <span class="link local"><a href="/俯意象.html" title="俯意象 [俯意象]">俯意象</a></span>函子
+$$
+    \mathcal C^{\mathrm{op}} \to \mathsf{Cat},\, X\mapsto\mathcal C_{/X}
+$$
+保持极限. 换言之, 对于 $\mathcal C$ 中的余极限 $X=\operatorname{colim}_i X_i$, 有
+$$
+\mathcal C_{/X} \simeq \operatorname{lim}_i \mathcal C_{/X_i}.
+$$</p>
+<p><strong>注 1</strong>. 上述定义中俯范畴的极限有如下计算方式: 对于 $X_\bullet \colon I\to\mathcal{C}$,
+$$
+\operatorname{lim}_i \mathcal{C}_{/X_i} \simeq \mathsf{Fun}^{\mathrm{Cart}}(I,\mathcal{C})_{/X_\bullet},
+$$
+其中 $\mathsf{Fun}^{\mathrm{Cart}}$ 是函子与 “拉回变换” (自然性所需的方块均为拉回方块的自然变换) 构成的范畴.</p>
+<p><strong>注 2</strong>. 可以具体写下两个方向的函子; 在具有拉回和余极限的范畴中这两个函子构成一对伴随; 其中</p>
+<ul>
+<li>左伴随部分为 $\operatorname{colim} \colon \mathsf{Fun}^{\mathrm{Cart}}(I,\mathcal{C})_{/X_\bullet}\simeq \operatorname{lim}_i \mathcal C_{/X_i}\to \mathcal{C}_{/X}$,
+$$
+(Y_\bullet\to X_\bullet)\mapsto (\operatorname{colim}_i Y_i \to \operatorname{colim}_i X_i).
+$$</li>
+<li>右伴随部分 $\mathcal{C}_{/X} \to \operatorname{lim}_i \mathcal C_{/X_i}$ 是沿着每个 $X_i\to X$ <span class="link local"><a href="/基变换.html" title="基变换 [基变换]">基变换</a></span>.</li>
+</ul>
+<p>我们观察伴随的单位和余单位.</p>
+<ul>
+<li>单位: 对拉回变换 $Y_\bullet \to X_\bullet$, 对每个 $j\in I$, 单位给出同构
+$$
+  Y_j \to (\operatorname{colim}_i Y_i)\times_{\operatorname{colim}_i X_i} X_j.
+$$</li>
+<li>余单位: 对 $Y\to X$, 记 $Y_i$ 为其沿 $X_i\to X$ 的拉回, 余单位给出同构
+$$
+    \operatorname{colim}_i(Y_i) \simeq Y.
+$$
+换一种观点看待这个同构, 即沿 $Y\to X$ 的<span class="link local"><a href="/拉回.html" title="拉回 (范畴论) [拉回]">拉回</a></span>保持<span class="link local"><a href="/余极限.html" title="余极限 [余极限]">余极限</a></span>.</li>
+</ul>
+<p><strong>例</strong>.</p>
+<ul>
+<li>$\mathcal C_{/0} \simeq *$;</li>
+<li>$\mathcal C_{/(X+Y)} \simeq \mathcal C_{/X} \times \mathcal C_{/Y}$. 这个性质又叫<span class="link local"><a href="/可扩展性.html" title="可扩展性 [可扩展性]">可扩展性</a></span>.</li>
+<li>($\infty$-范畴语境下) $\mathcal{C}_{/\mathbf{B}G}\simeq\operatorname{lim}_{[n]\in\Delta}\mathcal{C}_{/G^n}$. 见<span class="link local"><a href="/群作用.html" title="群作用 [群作用]">群作用</a></span>.</li>
+<li>($\infty$-范畴语境下) 对于<span class="link local"><a href="/生象.html" title="生象, ∞-群胚 [生象]">生象</a></span> $A$, $\mathcal{C}_{/\operatorname{colim}_A *} \simeq \operatorname{lim}_A \mathcal{C} \simeq \mathsf{Fun}(A,\mathcal{C})$.</li>
+</ul>
+<h2>性质</h2>
+<h3>指数对象与幂对象</h3>
+<p>意象中的两个对象 $X,Y$ 之间可构造<strong>指数对象</strong> $Y^X$ 与<strong>赋值映射</strong> $\operatorname{ev}\colon Y^X\times X \to Y$, 满足伴随
+$$
+\operatorname{Hom}(Z,Y^X) \simeq \operatorname{Hom}(Z\times X,Y).
+$$</p>
+<p>对象 $X$ 的幂对象 $PX = \Omega^X$ 是幂集的类比, 满足 $\operatorname{Sub}(X\times Y)\simeq \operatorname{Hom}(Y,PX)$, 换言之, $PX$ 是 $\operatorname{Sub}(X\times -)$ 的表示对象.</p>
+<h2>例</h2>
+<p>$\mathsf {Set}^{\mathbb N}$, “随时间变化的集合”;</p>
+<p>(??) 任何一个 Bool 代数, 其中的乘积是 “且” $X\wedge Y$, 指数 $Y^X$ 是 “蕴含” $X\Rightarrow Y$, 赋值映射是 “推理” $(X\Rightarrow Y)\wedge X \leq Y$;</p>
+<p>$\mathsf {FinOrd}$, 有限基数的范畴, 其中指数是通常的指数;</p>
+<p><span class="link local"><a href="/层意象.html" title="层意象 [层意象]">层意象</a></span> $\operatorname{Sh}(X)$, “由 $X$ 连续参数化的一族集合”;</p>
+<p><span class="link local"><a href="/预层意象.html" title="预层意象 [预层意象]">预层意象</a></span> $\mathsf {Set}^{C^{\mathrm{op}}}$, “由小范畴 $C$ 参数化的集合”.</p>
+<p><span class="link local"><a href="/位象.html" title="位象 [位象]">位象</a></span>, 又称 $0$-意象.</p>
+</details></section><footer><section class="block link-list" id="backlinks"><details open><summary><header><h1>关联页面</h1></header></summary><section class="block" data-taxon=""><details ><summary id="Boole意象"><header><h1><span class="taxon"></span>“Boole 意象” <a class="slug" href="/Boole意象.html">[Boole意象]</a><a class="edit" href="vscode://file/E:/Simplopedia_source/trees/Boole%E6%84%8F%E8%B1%A1.md">[edit]</a></h1><div class="metadata"><ul><li class="meta-item">百科</li><li class="meta-item"><span class="link local"><a href="/SimplicialCat.html" title="单纯猫 [SimplicialCat]">SimplicialCat</a></span></li></ul></div></header></summary>
+<h2>定义</h2>
+<p>若<span class="link local"><a href="/意象.html" title="意象 [意象]">意象</a></span> $\mathcal E$ 中的内蕴 <span class="link local"><a href="/Heyting代数.html" title="Heyting 代数 [Heyting代数]">Heyting 代数</a></span> $\Omega$ (即<span class="link local"><a href="/子对象分类子.html" title="子对象分类子 [子对象分类子]">子对象分类子</a></span>) 实为内蕴 Bool 代数, 则称其为 Bool 意象.</p>
+<p><strong>命题</strong>. 对于意象 $\mathcal E$, 下列条件等价.</p>
+<ul>
+<li>$\mathcal E$ 为 Bool 意象;</li>
+<li><span class="link local"><a href="/否定.html" title="“否定” [否定]">否定</a></span>算子 $\neg\colon \Omega\to\Omega$ 满足 $\neg\neg = \operatorname{id}$;</li>
+<li>对任意对象 $E\in\mathcal E$, <span class="link local"><a href="/Heyting代数.html" title="Heyting 代数 [Heyting代数]">Heyting 代数</a></span> $\operatorname{Sub}(E)$ 实为 <span class="link local"><a href="/Boole代数.html" title="Boole 代数 [Boole代数]">Boole 代数</a></span>;</li>
+<li>对任意子对象 $S\rightarrowtail E$, 有 $\neg S \vee S = E$;</li>
+<li>态射 $\text{true}\colon 1\to\Omega$ 和 $\text{false}=\neg\circ \text{true}$ 给出同构 $1+1\simeq \Omega$.</li>
+</ul>
+</details></section><section class="block" data-taxon=""><details ><summary id="Eilenberg–MacLane空间"><header><h1><span class="taxon"></span>Eilenberg–MacLane 对象 <a class="slug" href="/Eilenberg–MacLane空间.html">[Eilenberg–MacLane空间]</a><a class="edit" href="vscode://file/E:/Simplopedia_source/trees/Eilenberg%E2%80%93MacLane%E7%A9%BA%E9%97%B4.md">[edit]</a></h1><div class="metadata"><ul><li class="meta-item">百科</li><li class="meta-item"><span class="link local"><a href="/SimplicialCat.html" title="单纯猫 [SimplicialCat]">SimplicialCat</a></span></li></ul></div></header></summary>
+<h2>定义</h2>
+<p>对正整数 $n$ 与群 $G$ (当 $n&gt;1$ 时要求为 Abel 群), Eilenberg–MacLane 空间 $K(G,n)$ 是同伦等价意义下唯一以 $G$ 为 $n$ 阶<span class="link local"><a href="/同伦群.html" title="同伦群 [同伦群]">同伦群</a></span>的 $n$-<span class="link local"><a href="/截断性.html" title="截断性 [截断性]">截断</a></span> $(n-1)$-<span class="link local"><a href="/连通性.html" title="连通性 [连通性]">连通</a></span>空间.</p>
+<p><strong>定义</strong>. 在 <span class="link local"><a href="/意象.html" title="意象 [意象]">$\infty$-意象</a></span> $\mathcal C$ 中, 定义 $n$ 阶 <strong>Eilenberg–MacLane 对象</strong>是指<strong>带点</strong> $n$-<span class="link local"><a href="/截断性.html" title="截断性 [截断性]">截断</a></span> $(n-1)$-<span class="link local"><a href="/连通性.html" title="连通性 [连通性]">连通</a></span>对象. 记 $n$ 阶 Eilenberg–MacLane 对象的范畴为 $\mathsf{EM}_n(\mathcal C) = \mathcal C_{*/}^{\geq n,\leq n}$.</p>
+<p>Eilenberg–MacLane 对象 $(X,*)$ 被它的 $n$ 阶同伦群 $\pi_n(X,*)$ 唯一决定. 证明见后文.</p>
+<p><strong>注</strong>. Eilenberg–MacLane 对象的定义中<strong>带点</strong>条件很重要. 不带点的 $n$-<span class="link local"><a href="/截断性.html" title="截断性 [截断性]">截断</a></span> $(n-1)$-<span class="link local"><a href="/连通性.html" title="连通性 [连通性]">连通</a></span>对象称为 $n$-<span class="link local"><a href="/束.html" title="束 [束]">束</a></span> (gerbe).</p>
+<h2>性质</h2>
+<p><strong>命题</strong> (<span class="link local"><a href="/LurieHTT.html" title="Higher Topos Theory [LurieHTT]">HTT 7.2.2.12</a></span>).
+设 $\mathcal C$ 为 <span class="link local"><a href="/∞-意象.html" title="∞-意象 [∞-意象]">$\infty$-意象</a></span>, 考虑 $n$ 阶<span class="link local"><a href="/同伦群.html" title="同伦群 [同伦群]">同伦群</a></span>函子
+$$
+\pi_n = \tau_{\leq 0}\circ \Omega^n \colon \mathcal C_{*/} \to (\mathcal C_{*/})_{\leq 0}.
+$$
+那么</p>
+<ul>
+<li>对 $n=0$, $\pi_0$ 给出了等价 $\mathsf{EM}_0(\mathcal C)\simeq \mathcal C_{*/}^{\leq 0}$;</li>
+<li>对 $n=1$, $\pi_1$ 给出了等价 $\mathsf{EM}_1(\mathcal C)\simeq \mathsf{Grp}(\mathcal C_{\leq 0})$;</li>
+<li>对 $n\geq 2$, $\pi_n$ 给出了等价 $\mathsf{EM}_n(\mathcal C)\simeq \mathsf{Ab}(\mathcal C_{\leq 0})$.</li>
+</ul>
+<p>换言之, 在等价
+$$
+\Omega^n \colon \mathcal C_{*/}^{\geq n} \simeq \mathsf{Grp}_{\mathbb E_n}(\mathcal C)
+$$
+中, 两边的子范畴 $\mathsf{EM}_n(\mathcal C)$ 与 $\mathsf{Grp}_{\mathbb E_n}(\mathcal C_{\leq 0})$ 相对应.</p>
+<p>记上述等价的逆为 $K(-,n)$.</p>
+<p><strong>推论</strong>. Eilenberg–MacLane 对象 $K(A,n)$ 是 $A$ 的 $n$ 阶<span class="link local"><a href="/逆环路空间.html" title="逆环路空间 [逆环路空间]">逆环路空间</a></span> $\mathbf{B}^n A$.</p>
+<h2>例</h2>
+<h3>一维 CW 复形</h3>
+<p>一维 CW 复形是 $K(G,1)$, 其中 $G$ 为其基本群.</p>
+<h3>射影空间</h3>
+<ul>
+<li>$\mathbb{R}P^\infty$ 是 $K(\mathbb{Z}_2,1)$.</li>
+<li>$\mathbb{C}P^\infty$ 是 $K(\mathbb{Z},2)$.</li>
+</ul>
+</details></section><section class="block" data-taxon=""><details ><summary id="Galois主丛"><header><h1><span class="taxon"></span>Galois 主丛 <a class="slug" href="/Galois主丛.html">[Galois主丛]</a><a class="edit" href="vscode://file/E:/Simplopedia_source/trees/Galois%E4%B8%BB%E4%B8%9B.md">[edit]</a></h1><div class="metadata"><ul><li class="meta-item">百科</li><li class="meta-item"><span class="link local"><a href="/SimplicialCat.html" title="单纯猫 [SimplicialCat]">SimplicialCat</a></span></li></ul></div></header></summary>
+<h2>定义</h2>
+<p>固定<span class="link local"><a href="/意象.html" title="意象 [意象]">意象</a></span> $\mathcal X$ 上的一个<span class="link local"><a href="/群.html" title="群 [群]">群</a></span> $G$. 关于 $G$ 的 <strong>Galois 主丛</strong>是满足如下等价条件的 $G$-<span class="link local"><a href="/主丛.html" title="主齐性空间, 主丛 [主丛]">主丛</a></span> $P$:</p>
+<ul>
+<li>群同态 $G\to \operatorname{Aut}(P)$ 为同构.</li>
+<li>$G$-<span class="link local"><a href="/群作用.html" title="群作用 [群作用]">作用</a></span>函子 $\mathbf{B}G \to \mathcal X$ 为全忠实函子.</li>
+</ul>
+<h2>例</h2>
+<h3>Galois 覆叠</h3>
+</details></section><section class="block" data-taxon=""><details ><summary id="Gestalt"><header><h1><span class="taxon"></span>Gestalt <a class="slug" href="/Gestalt.html">[Gestalt]</a><a class="edit" href="vscode://file/E:/Simplopedia_source/trees/Gestalt.md">[edit]</a></h1><div class="metadata"><ul><li class="meta-item">百科</li><li class="meta-item"><span class="link local"><a href="/SimplicialCat.html" title="单纯猫 [SimplicialCat]">SimplicialCat</a></span></li></ul></div></header></summary>
+<p>Gestalt (复数 Gestalten, 在心理学上的译名为 “格式塔”) 是 <span class="link local"><a href="/ScholzeStefanichGestalten.html" title="Geometry and Higher Category Theory [ScholzeStefanichGestalten]">Scholze–Stefanich</a></span> 提出的一种几何概念, 旨在恢复完全的<span class="link local"><a href="/代数-几何对偶.html" title="代数–几何对偶 [代数-几何对偶]">代数–几何对偶</a></span>: 通过考虑几何对象上的 “线性 $(\infty,n)$-范畴” 取值的层, 即<span class="link local"><a href="/高阶拟凝聚层.html" title="高阶拟凝聚层 [高阶拟凝聚层]">高阶拟凝聚层</a></span>, 使得任何几何对象都具有代数的对应物, 而不再需要对 “仿射” 几何对象进行粘合操作.</p>
+<blockquote>
+<p>The language of Gestalten translates difficult algebra of higher categories into more intuitively manageable geometry, in the same way that the language of schemes translates difficult commutative algebra into more intuitively manageable geometry.</p>
+<p>— Peter Scholze, <span class="link local"><a href="/ScholzeBourbakiGL.html" title="Geometric Langlands, after Gaitsgory, Raskin, … [ScholzeBourbakiGL]">2026 年 3 月 Bourbaki 演讲</a></span></p>
+</blockquote>
+<h2>观念</h2>
+<ol>
+<li>代数几何中的几乎所有几何对象都来自于仿射概形之类的基本对象的 “粘合”. 做这件事的一般框架是<span class="link local"><a href="/景.html" title="景 [景]">景</a></span>和<span class="link local"><a href="/意象.html" title="意象 [意象]">意象</a></span>的理论. 给仿射概形的范畴配备适当的覆盖结构, 然后取其上的层, 这就相当于取仿射概形的 (形式上的) 余极限, 得到一个包含许多几何对象的<span class="link local"><a href="/意象.html" title="意象 [意象]">意象</a></span>.
+而后<span class="link local"><a href="/模空间.html" title="模空间 [模空间]">模空间</a></span>的研究让人们自然地考虑群胚取值的层, 又称<span class="link local"><a href="/叠.html" title="叠 [叠]">叠</a></span>. 群胚取值的层是带有同伦信息的几何对象, 构成一个 <span class="link local"><a href="/∞-意象.html" title="∞-意象 [∞-意象]">∞-意象</a></span>.</li>
+<li>在<span class="link local"><a href="/代数-几何对偶.html" title="代数–几何对偶 [代数-几何对偶]">代数–几何对偶</a></span>中, 通常不是所有几何对象都有完美的代数侧对偶. 例如在概形中, 只有仿射概形能被其上的整体函数环完全决定. 不仿射的概形如 $\mathbb P^1_k$ ($k$ 为域), 其上没有足够多的整体函数, 以至于仅看整体函数我们无法将它和一个点区分开.</li>
+<li>在有非平凡高阶同伦信息的几何对象 (例如群概形 $G$ 的<span class="link local"><a href="/分类空间.html" title="分类空间 [分类空间]">分类空间</a></span> $* / G$) 上, 整体函数更加不可能提供全部的信息. 但 <span class="link local"><a href="/淡中对偶.html" title="淡中对偶 [淡中对偶]">Tannaka</a></span> 指出此时<span class="link local"><a href="/拟凝聚层.html" title="拟凝聚层 [拟凝聚层]">拟凝聚层</a></span>的范畴 $\mathsf{QCoh}(X)$, 直观上即 “线性空间值的整体函数”, 连带着其上的<span class="link local"><a href="/对称幺半范畴.html" title="对称幺半范畴 [对称幺半范畴]">对称幺半</a></span>结构, 能够忠实地记录这个几何对象. 这里<span class="link local"><a href="/对称幺半范畴.html" title="对称幺半范畴 [对称幺半范畴]">对称幺半范畴</a></span>作为一种代数对象, 可视为环的推广.</li>
+<li>事实上, $\mathsf{QCoh}$ 能忠实记录的几何对象就已经包括了所有的 (qcqs) 概形.
+不仅如此, 一些叠 (对角线仿射的 qcqs <span class="link local"><a href="/代数叠.html" title="代数叠 [代数叠]">Artin 叠</a></span>) 也能被其拟凝聚层范畴忠实记录, 人们称之为 $1$-仿射 ($1$-affine) 叠.</li>
+<li>将 Abel 范畴升级为<span class="link local"><a href="/导出范畴.html" title="导出范畴 [导出范畴]">导出范畴</a></span>, 我们考虑的代数对象变成了<span class="link local"><a href="/可表现范畴.html" title="可表现范畴 [可表现范畴]">可表现</a></span><span class="link local"><a href="/对称幺半∞-范畴.html" title="对称幺半 ∞-范畴 [对称幺半∞-范畴]">对称幺半</a></span><span class="link local"><a href="/稳定无穷范畴.html" title="稳定范畴 [稳定无穷范畴]">稳定 ∞-范畴</a></span>. 通过取导出范畴 $D \colon \mathsf{CAlg}(\mathsf{Sp})\hookrightarrow\mathsf{CAlg}(\mathsf{Pr}_{\mathrm{st}}^{\mathrm{L}})$, 环 (包括环谱) 忠实地嵌入这种代数对象.</li>
+<li>但仍旧有几何对象无法被拟凝聚层的 (导出) 范畴记录. 例如 $\mathbf{B}^2\mathbb G_m$ (与 <span class="link local"><a href="/Brauer群.html" title="Brauer 群 [Brauer群]">Brauer 群</a></span>有关) 上就没有足够的拟凝聚层, 以至于仅看拟凝聚层无法将它和一个点区分开. 而 $\mathbf{B}^2\mathbb G_m$ 上能够记录其全部几何信息的是一个 “范畴值” 的拟凝聚层, 事实上是万有的 “范畴值线丛” (正如 $\mathbf{B}\mathbb G_m$ 上有万有线丛一样).</li>
+<li>为了记录所有几何对象, 我们需要不断地走向范畴层级更高的代数对象, 即<span class="link local"><a href="/高阶拟凝聚层.html" title="高阶拟凝聚层 [高阶拟凝聚层]">高阶拟凝聚层</a></span>. 这就是 Gestalt 的起源.</li>
+</ol>
+<h2>定义</h2>
+<p>Gestalt 的定义是基于一个称为 <strong>Stefanich 环</strong>的代数对象.</p>
+<p>一个 Stefanich 环 $A$ 是如下资料:</p>
+<ul>
+<li>一个越来越高阶的<span class="link local"><a href="/可表现范畴.html" title="可表现范畴 [可表现范畴]">可表现范畴</a></span>的<span class="link local"><a href="/交换代数.html" title="交换代数 [交换代数]">交换代数</a></span>的塔
+$$
+      (A_0,A_1,A_2,\cdots),A_n\in \mathsf{CAlg}(n\mathsf{Pr}),
+$$</li>
+<li>每个部分 $A_n$ 等价于高一阶的部分 $A_{n+1}$ 的 “环路空间”:
+$$
+      A_n \simeq \operatorname{End}_{A_{n+1}}(1) \in \mathsf{CAlg}(n\mathsf{Pr}).
+$$</li>
+</ul>
+<p>换言之, Stefanich 环构成的 $(\infty,1)$-范畴为
+$$
+\mathsf{StRing} = \operatorname{lim}_{\operatorname{End}_{-}(1)} \mathsf{CAlg}(n\mathsf{Pr}).
+$$
+(忽略这些范畴的高阶不可逆态射, 仅考虑其 $(\infty ,1)$-范畴结构.)</p>
+<p><strong>注</strong>. 由定义中的第二个条件, Stefanich 环 $A=(A_0,A_1,A_2,\cdots)$ 的每个部分 $A_n$ 的交换代数结构实际上被高一阶的部分 $A_{n+1}$ 决定了. 进一步, 我们可以在定义中仅要求 $A_n\in n\mathsf{Pr}$, 且有等价 $A_n \simeq \operatorname{End}_{A_{n+1}}(*)$ ($A_n$ 的基点为恒等). 这样 (由 <span class="link local"><a href="/Eckmann--Hilton论证.html" title="Eckmann–Hilton 论证 [Eckmann--Hilton论证]">Eckmann–Hilton论证</a></span>) 交换代数的结构就来自于一连串等价
+$$
+A_n = \operatorname{End}_{A_{n+1}}(*) = \operatorname{End}_{\operatorname{End}_{A_{n+2}}(*)}(*) = \cdots.
+$$</p>
+<p><strong>定义</strong>. Gestalt 为 Stefanich 环的对偶: $\mathsf{Gest} = \mathsf{StRing}^{\mathrm{op}}$.</p>
+<h2>性质</h2>
+<p><strong>定理</strong> (<span class="link local"><a href="/ScholzeStefanichGestalten.html" title="Geometry and Higher Category Theory [ScholzeStefanichGestalten]">Scholze–Stefanich</a></span>). (在实用的意义上,) $\mathsf{Gest}$ 是一个 <span class="link local"><a href="/∞-意象.html" title="∞-意象 [∞-意象]">$\infty$-意象</a></span>.</p>
+<h2>例</h2>
+<p>普通的交换环 $A$ 给出一个 Stefanich 环
+$$
+(A,\mathsf{Mod}(A),1\mathsf{Pr}_A,2\mathsf{Pr}_A,\cdots).
+$$</p>
+<p>对于仿射概形范畴上适当的 Grothendieck 拓扑, 该构造即延拓至适当的叠.</p>
+<h3>映射空间</h3>
+<p>“Betti 局部系统的叠” $\mathrm{LocSys}_G$ 可表示为 Gestalt 的映射空间
+$$
+\mathrm{LocSys}^{\text{Betti}}_G \simeq \operatorname{Map}(*/\pi_1, */G) = \operatorname{Hom}(\pi_1,G)/G.
+$$
+其中 $*/G$ 为<span class="link local"><a href="/逆环路空间.html" title="逆环路空间 [逆环路空间]">逆环路空间</a></span>, $G$-作用为<span class="link local"><a href="/共轭作用.html" title="共轭作用 [共轭作用]">共轭作用</a></span>.</p>
+</details></section><section class="block" data-taxon=""><details ><summary id="Giraud公理"><header><h1><span class="taxon"></span>Giraud 公理 <a class="slug" href="/Giraud公理.html">[Giraud公理]</a><a class="edit" href="vscode://file/E:/Simplopedia_source/trees/Giraud%E5%85%AC%E7%90%86.md">[edit]</a></h1><div class="metadata"><ul><li class="meta-item">百科</li><li class="meta-item"><span class="link local"><a href="/SimplicialCat.html" title="单纯猫 [SimplicialCat]">SimplicialCat</a></span></li></ul></div></header></summary>
+<h2>观念</h2>
+<p>据 <span class="link local"><a href="/SGA4.html" title="Théorie des topos et cohomologie étale des schémas [SGA4]">SGA 4</a></span> 记载, Grothendieck 的学生 Giraud 惊人地给出了 <span class="link local"><a href="/意象.html" title="意象 [意象]">Grothendieck 意象</a></span>的纯范畴论刻画, 后来称为 <strong>Giraud 公理</strong>. 这说明意象还具有一种独立于几何对象的观点.</p>
+<h2>陈述</h2>
+<p>称 $\infty$-范畴 $\mathcal C$ 满足 <strong>Giraud 公理</strong>是说如下条件成立:</p>
+<ul>
+<li>$\mathcal C$ 为<span class="link local"><a href="/可表现范畴.html" title="可表现范畴 [可表现范畴]">可表现范畴</a></span>;</li>
+<li>$\mathcal C$ 中的<span class="link local"><a href="/拉回.html" title="拉回 (范畴论) [拉回]">拉回</a></span>保持<span class="link local"><a href="/余极限.html" title="余极限 [余极限]">余极限</a></span>;</li>
+<li>$\mathcal C$ 中的<span class="link local"><a href="/和(范畴论).html" title="和 (范畴论) [和(范畴论)]">和</a></span>无交 (即 $X + Y$ 的子对象 $X$ 与 $Y$ 的交为<span class="link local"><a href="/始对象.html" title="始对象 [始对象]">始对象</a></span> $0$);</li>
+<li>$\mathcal C$ 中的<span class="link local"><a href="/群胚对象.html" title="群胚对象 (∞-范畴论) [群胚对象]">群胚对象</a></span>均有效, 即等价于商映射的 <span class="link local"><a href="/Čech脉.html" title="Čech 脉 [Čech脉]">Čech 脉</a></span>.</li>
+</ul>
+</details></section><section class="block" data-taxon=""><details ><summary id="Grothendieck拓扑"><header><h1><span class="taxon"></span>Grothendieck 拓扑 <a class="slug" href="/Grothendieck拓扑.html">[Grothendieck拓扑]</a><a class="edit" href="vscode://file/E:/Simplopedia_source/trees/Grothendieck%E6%8B%93%E6%89%91.md">[edit]</a></h1><div class="metadata"><ul><li class="meta-item">百科</li><li class="meta-item"><span class="link local"><a href="/SimplicialCat.html" title="单纯猫 [SimplicialCat]">SimplicialCat</a></span></li></ul></div></header></summary>
+<h2>观念</h2>
+<p>Grothendieck 拓扑, 又名<strong>覆盖结构</strong> (coverage), 是指定一个范畴上何时一族态射构成 “覆盖” 的方法. 如果说<span class="link local"><a href="/景.html" title="景 [景]">景</a></span>是<span class="link local"><a href="/意象.html" title="意象 [意象]">意象</a></span>的 “生成元–关系” <span class="link local"><a href="/数学对象的表现.html" title="数学对象的表现 [数学对象的表现]">表现</a></span>, 那么覆盖的作用相当于其中的 “关系”.</p>
+<h2>定义</h2>
+<h3>使用范畴上的筛</h3>
+<p>小范畴 $C$ 上的 <strong>Grothendieck 拓扑</strong>是对每个对象 $c\in C$ 指定一族<span class="link local"><a href="/筛.html" title="“筛” [筛]">筛</a></span>, 称作<strong>覆盖筛</strong> (covering sieve), 满足如下条件.</p>
+<ul>
+<li>最大筛 $\{f: d \to c, d\in C\}$ 是覆盖筛;</li>
+<li>(稳定性) 若 $S$ 是 $c$ 的覆盖筛, 则对任意 $h\colon d\to c$, $h^*(S)$ 是 $d$ 的覆盖筛;</li>
+<li>(传递性) 若 $S$ 是 $c$ 的覆盖筛, $R$ 是 $c$ 上另一个筛, 使得对任意 $h\colon d\to c$, $h^*(R)$ 都是覆盖筛, 则 $R$ 也是覆盖筛.</li>
+</ul>
+<p>特别地, 包含一个覆盖筛的筛也是覆盖筛.</p>
+<h3>使用意象中的态射族</h3>
+<p>参考 <span class="link local"><a href="/ABFJ.html" title="Left-exact localizations of ∞-topoi [ABFJ]">ABFJ-II</a></span>.</p>
+<p><strong>定义</strong>. <span class="link local"><a href="/意象.html" title="意象 [意象]">意象</a></span> $\mathcal{C}$ 中的 <strong>Grothendieck 拓扑</strong>是满足如下条件的态射族 $\tau$:</p>
+<ul>
+<li>$\tau$ 关于<span class="link local"><a href="/基变换.html" title="基变换 [基变换]">基变换</a></span>封闭;</li>
+<li>$\tau$ 可被沿<span class="link local"><a href="/意象中的满射.html" title="意象中的满射 [意象中的满射]">满射</a></span>的<span class="link local"><a href="/基变换.html" title="基变换 [基变换]">基变换</a></span>探测; 具体地, 对态射 $f$ 与满射 $g$, 若 $f$ 沿 $g$ 的拉回属于 $\tau$, 则 $f$ 属于 $\tau$;</li>
+<li>$\tau$ 关于复合封闭;</li>
+<li>若 $fg$ 属于 $\tau$, 则 $f$ 属于 $\tau$.</li>
+</ul>
+<h2>性质</h2>
+<ul>
+<li><span class="link local"><a href="/次典范拓扑.html" title="次典范拓扑 [次典范拓扑]">次典范拓扑</a></span></li>
+</ul>
+</details></section><section class="block" data-taxon=""><details ><summary id="LCCC"><header><h1><span class="taxon"></span>局部积闭范畴 <a class="slug" href="/LCCC.html">[LCCC]</a><a class="edit" href="vscode://file/E:/Simplopedia_source/trees/LCCC.md">[edit]</a></h1><div class="metadata"><ul><li class="meta-item">百科</li><li class="meta-item"><span class="link local"><a href="/SimplicialCat.html" title="单纯猫 [SimplicialCat]">SimplicialCat</a></span></li></ul></div></header></summary>
+<h2>观念</h2>
+<p>局部积闭范畴是<span class="link local"><a href="/依值类型论.html" title="依值类型论 [依值类型论]">依值类型论</a></span>的<span class="link local"><a href="/范畴语义.html" title="范畴语义 [范畴语义]">语义</a></span>.</p>
+<h2>定义</h2>
+<p><strong>局部积闭范畴</strong> (locally Cartesian closed category, LCCC) $\mathcal C$ 是满足所有<span class="link local"><a href="/俯范畴.html" title="俯范畴 [俯范畴]">俯范畴</a></span> $\mathcal C_{/X}$ 均为<span class="link local"><a href="/积闭范畴.html" title="积闭范畴 [积闭范畴]">积闭范畴</a></span>的范畴. 通常我们要求 $\mathcal C$ 有<span class="link local"><a href="/终对象.html" title="终对象 [终对象]">终对象</a></span> $1$, 从而 $\mathcal C \simeq\mathcal C_{/1}$ 本身也是<span class="link local"><a href="/积闭范畴.html" title="积闭范畴 [积闭范畴]">积闭范畴</a></span>.</p>
+<h2>性质</h2>
+<h3>依值积</h3>
+<p>对于局部积闭范畴 $\mathcal C$ 中的态射 $f\colon X\to Y$, 俯范畴的拉回 $f^* \colon \mathcal C_{/Y} \to \mathcal C_{X}$ 同时有左伴随 $\Sigma_f$ 与右伴随 $\Pi_f$, 它们分别是<span class="link local"><a href="/依值和.html" title="依值和 [依值和]">依值和</a></span>与<span class="link local"><a href="/依值积.html" title="依值积 [依值积]">依值积</a></span>的<span class="link local"><a href="/语法–语义对偶.html" title="语法–语义对偶 [语法–语义对偶]">语义</a></span>.</p>
+<h2>例</h2>
+<p><span class="link local"><a href="/意象.html" title="意象 [意象]">意象</a></span>是局部积闭范畴.</p>
+</details></section><section class="block" data-taxon=""><details ><summary id="Morita等价(观念)"><header><h1><span class="taxon"></span>Morita 等价 <a class="slug" href="/Morita等价(观念).html">[Morita等价(观念)]</a><a class="edit" href="vscode://file/E:/Simplopedia_source/trees/Morita%E7%AD%89%E4%BB%B7(%E8%A7%82%E5%BF%B5).md">[edit]</a></h1><div class="metadata"><ul><li class="meta-item">观念</li><li class="meta-item"><span class="link local"><a href="/SimplicialCat.html" title="单纯猫 [SimplicialCat]">SimplicialCat</a></span></li></ul></div></header></summary>
+<p>本页介绍广义的 Morita 等价观念. 关于环的 Morita 等价, 见 <span class="link local"><a href="/Morita等价.html" title="Morita 等价 [Morita等价]">Morita 等价</a></span>.</p>
+<p><span class="link local"><a href="/语法–语义对偶.html" title="语法–语义对偶 [语法–语义对偶]">语法</a></span>对象的 Morita 等价是它们的语义之间的等价.</p>
+<h2>例</h2>
+<ul>
+<li>环之间的 Morita 等价是它们的<span class="link local"><a href="/结合代数上的模.html" title="结合代数上的模 [结合代数上的模]">模范畴</a></span>之间的等价. (这是 <span class="link local"><a href="/Morita等价.html" title="Morita 等价 [Morita等价]">Morita 等价</a></span>的原义.)</li>
+<li>范畴之间的 Morita 等价是它们的<span class="link local"><a href="/预层意象.html" title="预层意象 [预层意象]">预层范畴</a></span>之间的等价.</li>
+<li><span class="link local"><a href="/景.html" title="景 [景]">景</a></span>之间的 Morita 等价是它们<span class="link local"><a href="/数学对象的表现.html" title="数学对象的表现 [数学对象的表现]">表现</a></span>的<span class="link local"><a href="/意象.html" title="意象 [意象]">意象</a></span>之间的等价.</li>
+</ul>
+</details></section><section class="block" data-taxon=""><details ><summary id="red-chamber-topos"><header><h1><span class="taxon"></span>红楼梦的一种 Morita 等价解读 <a class="slug" href="/red-chamber-topos.html">[red-chamber-topos]</a><a class="edit" href="vscode://file/E:/Simplopedia_source/trees/red-chamber-topos.md">[edit]</a></h1><div class="metadata"><ul><li class="meta-item"><span class="link local"><a href="/nonmath.html" title="非数学 [nonmath]">非数学</a></span></li><li class="meta-item"><span class="link local"><a href="/SimplicialCat.html" title="单纯猫 [SimplicialCat]">SimplicialCat</a></span></li></ul></div></header></summary>
+<p>如下文字转自<span class="link external"><a href="https://marco-yuze-zheng.blogspot.com/" title="郑宇泽 [https://marco-yuze-zheng.blogspot.com/]">郑宇泽</a></span>的朋友圈:</p>
+<p>我在想《红楼梦》是否体现出了一种 <span class="link local"><a href="/Morita等价(观念).html" title="Morita 等价 [Morita等价(观念)]">Morita 等价</a></span>。 这里的依据来自红楼梦第一回的句子：</p>
+<p>“施主，你把这有命无运，累及爹娘之物，抱在怀内作甚？”【甲戌眉批：八个字屈死多少英雄？屈死多少忠臣孝子？屈死多少仁人志士？屈死多少词客骚人？今又被作者将此一把眼泪洒与闺阁之中，见得裙钗尚遭逢此数，况天下之男子乎？看他所写开卷之第一个女子便用此二语以定终身，则知托言寓意之旨，谁谓独寄兴于一“情”字耶！武侯之三分，武穆之二帝，二贤之恨，及今不尽，况今之草芥乎？家国君父事有大小之殊，其理其运其数则略无差异。知运知数者则必谅而后叹也。</p>
+<p>我想这里或许用 Olivia Caramello 的 Topos as Bridge 理论作类比是合适的。
+闺阁草木是一个<span class="link local"><a href="/景.html" title="景 [景]">景</a></span>（Site） 对象是女儿、诗社、草木；态射是眼泪、流言、葬花。这里的<span class="link local"><a href="/Grothendieck拓扑.html" title="Grothendieck 拓扑 [Grothendieck拓扑]">格罗滕迪克拓扑</a></span>（Grothendieck topology）是家族伦理、嫡庶尊卑与随分从时的世俗规训。家国兴亡是另一个<span class="link local"><a href="/景.html" title="景 [景]">景</a></span>（Site），对象是君臣、流寇、城池；态射是党争、构陷、杀戮。这里的格罗滕迪克拓扑是封建王权的倾轧、文人的气节与王朝的更迭。不过脂砚斋告诉我们 “家国君父事有大小之殊，其理其运其数则略无差异。知运知数者则必谅而后叹也。” 红楼梦里闺阁草木和家国兴亡这两个景上的<span class="link local"><a href="/层.html" title="拓扑空间上的层 [层]">层</a></span>范畴构成的<span class="link local"><a href="/意象.html" title="意象 [意象]">意象</a></span>，或者说悲剧的结构都是英雄屈死。</p>
+<p>闺阁女儿的英雄屈死贯穿了整本红楼梦。千红一哭万艳同悲，判词判曲，香菱的有命无运累及爹娘，王熙凤所谓脂粉堆里的英雄，葬花吟里，“天尽头，何处有香丘？未若锦囊收艳骨，一抷净土掩风流！质本洁来还洁去，强于污淖陷渠沟。”第七十八回老学士闲征姽婳词　痴公子杜撰芙蓉诔里林四娘这里，芙蓉女儿诔里宝玉把晴雯的屈死和贾谊，鲧并列。“高标见嫉，闺帏恨比长沙；直烈遭危，巾帼惨于羽野。”我甚至觉得晴雯之死有些像岳武穆屈死风波亭…而林四娘更是从闺阁女子转变为了姽婳将军。</p>
+<p>在英雄屈死这一<span class="link local"><a href="/意象.html" title="意象 [意象]">意象</a></span>作为 bridge 的意义下，林妹妹在潇湘馆风刀霜剑下的挣扎，不仅是女子在闺阁中的自怜。当她的叹出质本洁来还洁去 强于污淖陷渠沟的时候，借由英雄屈死这座桥梁，她的眼泪在 <span class="link local"><a href="/Morita等价(观念).html" title="Morita 等价 [Morita等价(观念)]">Morita 等价</a></span>的意义下与历史长河中所有不肯降志辱身的忠臣烈士、所有在文明黄昏中抱残守缺的遗民，发出了同频的悲鸣。（如屈原的“宁赴湘流，葬于江鱼之腹中”）</p>
+<p>闺阁中的风刀霜剑和家国中的英雄屈死都在强调一种系统性的，无处不在的，看不见的对英雄的抹杀。这一悲剧的结构贯穿了风月宝鉴的正反两面…或许贯穿了更多。当我们批判学校教育的时候，当李归农谈论起自己的回忆的时候，当我们谈论2e人群<sup class="footnote-reference" id="red-chamber-topos_1-back"><a href="#red-chamber-topos_1">1</a></sup>面临的困境的时候，我们何尝不是在谈论英雄屈死？ 更上一层，神州陆沉何尝不是一个伟大文明的英雄屈死？只是红楼梦又将一把眼泪洒于闺阁之中…</p>
+<div class="footnote-definition" id="red-chamber-topos_1">
+  <sup class="footnote-definition-label"><a href="#red-chamber-topos_1-back">1</a></sup>
+<p><strong>2e</strong> (twice-exceptional) 人群, 指兼具天赋或高潜能与某种学习、发展或神经发育障碍的双重特殊群体。</p>
+</div>
+</details></section><section class="block" data-taxon=""><details ><summary id="synthetic"><header><h1><span class="taxon"></span>综合数学是抽象代数的范畴化 <a class="slug" href="/synthetic.html">[synthetic]</a><a class="edit" href="vscode://file/E:/Simplopedia_source/trees/synthetic.md">[edit]</a></h1><div class="metadata"><ul><li class="meta-item"><span class="link local"><a href="/nonmath.html" title="非数学 [nonmath]">非数学</a></span></li><li class="meta-item"><span class="link local"><a href="/SimplicialCat.html" title="单纯猫 [SimplicialCat]">SimplicialCat</a></span></li></ul></div></header></summary>
+<p>2026-02-13</p>
+<hr />
+<p><strong>碎碎念</strong>. 这篇文章是关于数学的, 但实在太难说它本身是数学, 姑且贴上个 “非数学” 的标签, 以免受人诟病——即便身负数学严格性的重担的人, 当然也是有资格写 “非数学” 散文的. 我写这篇文章的主要目的是为<span class="link local"><a href="/综合数学.html" title="综合数学 [综合数学]">综合数学</a></span> “正名”. 但它并未被 “打倒” (实则是并未被关注), 故谈不上真正的正名; 它只是在我个人的经历中, 在登上大雅之堂的途中受到了一点阻碍, 并且消磨了我对它的热情; 而随着阅历更加丰富, 我在对几篇笔记的偶然反刍之下, 对它产生了新的见解, 不得不记录下来, 好给过去与未来的自己一个交代. 但我写这篇文章的理由未必是读者读这篇文章的理由; 站在读者的立场, 这些事情就不必赘述了.</p>
+<hr />
+<p>我打算不以综合数学的玄而又玄的讨论来开启这篇文章, 而是谈论些众所周知的事情. ——我们来谈论<strong>抽象代数</strong>的起源. 我们的目的不是复原历史的脉络, 而是从现代人的视角来反思抽象代数这个学科存在的理由, 然后对这个理由作一种合理的演绎 (如文章的题目所示, 这种演绎叫做<span class="link local"><a href="/范畴化.html" title="范畴化 [范畴化]">范畴化</a></span>), 来得到<span class="link local"><a href="/综合数学.html" title="综合数学 [综合数学]">综合数学</a></span>这门学科存在的理由, 这便是我想要记录的新的见解.</p>
+<p>所谓代数最初即是在数的运算中, 用符号来代替数的做法. 它最初仅仅是一个从特殊到一般的过程——我们发现
+$$
+(3+5)^2 = 3^2 + 2\cdot 3\cdot 5 + 5^2,
+$$
+$$
+(4+6)^2 = 4^2 + 2\cdot 4\cdot 6 + 6^2,
+$$
+于是我们用符号代替一些具体的元素, 写成如下形状的公式,
+$$
+(a+b)^2 = a^2 + 2ab + b^2,
+$$
+来表达对任何数普遍成立的规律.</p>
+<p>然而随着数学的成熟, 一个细微的观念转变发生了——它是如此细微, 以至于学习现代数学多年的读者们可能都忘了这是一场变革: 用来表示 “一般元素” 的符号 $a,b$, 可以不再表示任何一个具体的元素, 而是变成了完全抽象的, 但仍旧遵循同样规律的东西. 我们开始操作带有这些抽象符号 $a,b$ 的等式, 而不在乎符号之下的内涵, 或者说真正的内涵已经不在那里了: 我们从对具体元素的研究转向了对规律本身的研究.</p>
+<p>于是, “<span class="link local"><a href="/结合代数.html" title="结合代数 [结合代数]">代数</a></span>” 的概念产生了. 一个代数是一些元素的集合, 元素之间可作加法, 乘法等运算, 满足交换律, 结合律, 分配律等性质. 如果仅研究这些运算的规律, 而不依赖于参与运算的元素具体的构造, 那么我们作出的论证就适用于任何一个代数. (若读者有微分几何的相关经验: 这就像是微分几何中若不使用坐标进行计算, 那么计算的结果就适用于任何坐标.) 放弃对一个锚定的具体事物的追求, 反而换来了特殊化到所有具体事物的机会.</p>
+<p>学习现代数学多年的读者们, 可能难以体会 “代数” 这样的概念对一个仅学过实数的运算的人有多么陌生.
+困难并不在于人的智力不能理解代数的定义, 而在于他们长久以来的信念的动摇: 原来我所认识的这个数的系统不是唯一存在的, 唯一合理的数的系统; 事实恰恰相反, 这种系统要多少就有多少. 例如在一个代数中, 我们可以随心所欲地加入一个满足指定的代数方程的元素. 回想历史上人们对虚数 $i$ 的引入曾产生多么大的抵触: 在实数中加入一个满足 $i^2 = -1$ 的元素, 而这个方程在实数中没有任何道理.
+人们不是不能对这个方程进行运算, 而是不能接受自古以来熟悉的系统, 实数的代数 $\mathbb{R}$, 被外来者污染, 以至于失去它不可撼动的地位.</p>
+<p>当然, 现在的人们早已不再对各式各样的代数产生恐慌. 复代数几何的基础 $\mathbb{C}$, $p$-进几何的基础 $\mathbb{Z}_p$, 已经是每一个数学家如数家珍的代数对象. 人们研究的代数中的运算也不断丰富, Lie 代数, Poisson 代数, Hopf 代数, … 这些结构在各自的领域中发光发热.</p>
+<p>总结从研究实数的运算到研究抽象代数发生的观念转变:</p>
+<ul>
+<li>一个<strong>代数</strong>是一个带有结构的<strong>集合</strong>, “实数” 不过是那个特殊的代数 $\mathbb{R}$ 的元素;</li>
+<li>通过<strong>四则运算</strong>, 我们不仅是在研究实数的规律, 而且可以研究任何代数中的规律, 不依赖于这些集合中元素的具体形式.</li>
+</ul>
+<p>现在提升一个范畴层级, 看看集合范畴 $\mathsf{Set}$ 的性质. 它不是一个赤裸的范畴, 正如 $\mathbb{R}$ 不是一个赤裸的集合. 它的对象 (也就是集合) 之间有加法 $+$ 和乘法 $\times$ 的运算:
+$A+B$ 是两个集合的无交并, 其元素为 $l(a)$ 或 $r(b)$; $A\times B$ 是两个集合的积, 其元素为 $(a,b)$. 加法和乘法都有交换律, 结合律: $A+B\simeq B+A$, $(A+B)+C\simeq A+(B+C)$ 等等. 乘法对加法有分配律: $A\times (B+C) \simeq A\times B + A\times C$. 由此可得
+$$
+(A+B)^2 \simeq A^2 + 2 \times A\times B + B^2.
+$$
+很多时候我们对于集合的操作表面上是在操作集合的元素, 实际上是在操作范畴论结构. 例如, 对于映射 $f\colon A\to B$ 以及 $b\in B$, 取出 $A$ 中满足 $f(a) = b$ 的元素 $a$ 构成的集合 $S = \{a\in A\mid f(a) = b\}$, 实际上是在做范畴论中名为<span class="link local"><a href="/拉回.html" title="拉回 (范畴论) [拉回]">拉回</a></span>的操作:
+$$
+\begin{array}
+    {ccc}
+    S &amp; \to &amp; 1\\
+    \downarrow &amp; &amp; \downarrow\\
+    A &amp; \underset{f}{\to} &amp; B.
+\end{array}
+$$
+由此可见, 只要一个范畴中具有拉回, 那么 $\{a\in A\mid f(a) = b\}$ 这样的表达式就有意义, 而不需要对象 $A$ 真的是由一个一个的元素组成.</p>
+<p>任意量词 $\forall$ 和存在量词 $\exists$ 也不是只在集合范畴中有意义. 它们分别是<span class="link local"><a href="/依值积.html" title="依值积 [依值积]">依值积</a></span>, <span class="link local"><a href="/依值和.html" title="依值和 [依值和]">依值和</a></span>的特例, 而这两者分别是拉回操作 $\mathcal{C}_{/Y} \to \mathcal{C}_{/X}$ 的左右伴随. (更一般地, 每种<span class="link local"><a href="/类型论.html" title="类型论 [类型论]">类型论</a></span>都有与之相应的范畴论结构. 见<span class="link local"><a href="/Trinitarianism.html" title="三位一体 [Trinitarianism]">三位一体</a></span>.)</p>
+<p>经过如此多的铺垫, 如果我现在告诉读者, 我们自古以来熟悉的这个集合范畴, 并不是唯一存在的, 唯一合理的 “集合的范畴”, 我们使用的数学语言描述的不一定是集合, 而可能是任何适当结构的范畴的对象, 不知读者是否还会像只熟悉实数的古人见到虚数那样感到恐慌.</p>
+<p>更关键的是, 就像在抽象代数中我们不需要关心<strong>集合</strong>中的<strong>元素</strong>的具体构造一样, 在综合数学中我们不需要关心<strong>范畴</strong>中的<strong>对象</strong>的具体构造, 这便是综合数学的核心观念; 这种观念无非是抽象代数的核心观念的一次范畴化.</p>
+<p>将集合范畴 $\mathsf{Set}$ 的性质抽象出来, 得到一种允许通常数学语言在其中获得语义的范畴的概念, 这就是<span class="link local"><a href="/意象.html" title="意象 [意象]">意象</a></span>.</p>
+<p>在以<span class="link local"><a href="/意象理论.html" title="意象理论 [意象理论]">意象理论</a></span>为主要表现方式的<span class="link local"><a href="/综合数学.html" title="综合数学 [综合数学]">综合数学</a></span>中,</p>
+<ul>
+<li>一个<strong></strong><span class="link local"><a href="/意象.html" title="意象 [意象]">意象</a></span>是一个带有结构的<strong>范畴</strong>, “集合” 不过是那个最基本的意象 $\mathsf{Set}$ 的对象;</li>
+<li>通过<strong></strong><span class="link local"><a href="/一阶语言.html" title="一阶语言与一阶逻辑 [一阶语言]">一阶逻辑</a></span>, 我们不仅是在研究集合的规律, 而且可以研究任何<span class="link local"><a href="/意象.html" title="意象 [意象]">意象</a></span>中的规律, 不依赖于这些范畴中对象的具体形式.</li>
+</ul>
+<p>我们认为的 “带结构的集合”, 不过是最基本的<span class="link local"><a href="/意象.html" title="意象 [意象]">意象</a></span> $\mathsf{Set}$ 中的结构; 而同样的结构发生在任何一个意象中.</p>
+<p>换言之, 随着范畴层级的提升, 我们发现自己从那个 “思想开放” 的 “现代人”, 变成了 “抱残守缺” 的 “古人”.</p>
+<p>综合数学的一个出现较早的分支是<span class="link local"><a href="/综合微分几何.html" title="综合微分几何 [综合微分几何]">综合微分几何</a></span>. 它的理论是这样建立的: 首先规定存在一个对象, 称为直线 $R$; 它具有 $0,1$, 加法和乘法, 构成一个代数. 定义<span class="link local"><a href="/一阶无穷小线段.html" title="一阶无穷小线段 [一阶无穷小线段]">一阶无穷小线段</a></span> $D$ 是 $R$ 中平方为零的元素的 “集合”
+$$
+D = \{x\in R \mid x^2 = 0\}.
+$$
+一条重要的公理是: 对任意函数 $f\colon D\to R$, 存在唯一的 $a,b\in R$ 满足对任意 $d\in D$, 有 $f(d) = ad+b$. 对任意 “集合” $M$, 定义其切向量为映射 $v\colon D \to M$; 定义 $M$ 的切丛为 $M^D \to M,v\mapsto v(0)$. 微分几何最重要的概念就这样产生了.</p>
+<p>如果认为上述理论谈论的是普通的集合范畴, 就会发现它简直是天方夜谭. 实直线上平方为零的元素只有 $0$, 又怎能表达切向量这样的概念呢? 感兴趣的读者可以进一步阅读<span class="link local"><a href="/SDG-notes.html" title="综合微分几何讲稿 [SDG-notes]">综合微分几何讲稿</a></span>. 结论是, 我们应当认为综合微分几何谈论的是一种满足特定条件的<span class="link local"><a href="/意象.html" title="意象 [意象]">意象</a></span>中的对象. 综合数学的每一个分支, 都可视为对所讨论的意象作某种约束. 任何一个满足约束的意象都可以作为这个学科的模型, 而这个学科所产生的定理在所有模型中同样成立.</p>
+<p>我将目前的类比总结成一个表格.</p>
+<table><thead><tr><th>范畴层级</th><th>0</th><th>1</th></tr></thead><tbody>
+<tr><td>对象</td><td>实数</td><td>集合</td></tr>
+<tr><td>语言</td><td>四则运算</td><td><span class="link local"><a href="/一阶语言.html" title="一阶语言与一阶逻辑 [一阶语言]">一阶语言</a></span></td></tr>
+<tr><td>全体对象</td><td>实数的全体 $\mathbb{R}$</td><td>集合的全体 $\mathsf{Set}$</td></tr>
+<tr><td>抽象概念</td><td>代数 <br> = 带结构的集合</td><td><span class="link local"><a href="/意象.html" title="意象 [意象]">意象</a></span> <br> = 带结构的范畴<sup class="footnote-reference" id="synthetic_1-back"><a href="#synthetic_1">1</a></sup></td></tr>
+<tr><td>约束</td><td>代数方程</td><td>公理</td></tr>
+</tbody></table>
+<div class="footnote-definition" id="synthetic_1">
+  <sup class="footnote-definition-label"><a href="#synthetic_1-back">1</a></sup>
+<p>其实一个范畴构成一个意象这件事是<span class="link local"><a href="/结构.html" title="结构, 性质 [结构]">性质而非结构</a></span>. 不过这里的结构与 “<span class="link local"><a href="/积幺半范畴.html" title="积幺半范畴 [积幺半范畴]">积幺半结构</a></span>” 中的结构是同一种用法.</p>
+</div>
+<p>表格有没有可能向右延申? 有没有可能, 范畴的 $2$-范畴 $\mathsf{Cat}$ 不是唯一合理的 “范畴的范畴”, 而是所有的范畴论语言都可以在一个 “$2$-意象” 中解读? 这种语言该如何设计? 我不知道.</p>
+</details></section><section class="block" data-taxon=""><details ><summary id="terminologies"><header><h1><span class="taxon"></span>单纯百科 - 术语翻译表 <a class="slug" href="/terminologies.html">[terminologies]</a><a class="edit" href="vscode://file/E:/Simplopedia_source/trees/terminologies.md">[edit]</a></h1><div class="metadata"><ul><li class="meta-item">meta</li><li class="meta-item"><span class="link local"><a href="/SimplicialCat.html" title="单纯猫 [SimplicialCat]">SimplicialCat</a></span></li></ul></div></header></summary>
+<p>下表的第二列是<span class="link local"><a href="/单纯百科.html" title="单纯百科 [单纯百科]">单纯百科</a></span>使用的译文.</p>
+<p>表格第三列是其它地方也曾出现的译文, 它们有的是历史淘汰的选择, 有的是机翻造成的错误. 这个表格的作用是为 LLM 提供正确的术语.</p>
+<table><thead><tr><th>原文</th><th>译文</th><th>其它译文</th></tr></thead><tbody>
+<tr><td>anima</td><td><span class="link local"><a href="/生象.html" title="生象, ∞-群胚 [生象]">生象</a></span></td><td></td></tr>
+<tr><td>associated bundle</td><td><span class="link local"><a href="/关联丛.html" title="关联丛 [关联丛]">关联丛</a></span></td><td>配丛</td></tr>
+<tr><td>coherent sheaf</td><td><span class="link local"><a href="/凝聚层.html" title="凝聚层 [凝聚层]">凝聚层</a></span></td><td>相干层</td></tr>
+<tr><td>dependent type</td><td><span class="link local"><a href="/依值类型.html" title="依值类型 [依值类型]">依值类型</a></span></td><td>依赖类型</td></tr>
+<tr><td>groupoid</td><td><span class="link local"><a href="/群胚.html" title="群胚 [群胚]">群胚</a></span></td><td>广群</td></tr>
+<tr><td>homotopy-coherent</td><td><span class="link local"><a href="/融贯.html" title="融贯 [融贯]">融贯</a></span></td><td></td></tr>
+<tr><td>lax</td><td>松</td><td></td></tr>
+<tr><td>locale</td><td><span class="link local"><a href="/位象.html" title="位象 [位象]">位象</a></span></td><td></td></tr>
+<tr><td>nerve</td><td><span class="link local"><a href="/脉.html" title="脉 [脉]">脉</a></span></td><td>神经</td></tr>
+<tr><td>operad</td><td><span class="link local"><a href="/算畴.html" title="算畴 [算畴]">算畴</a></span></td><td></td></tr>
+<tr><td>over category</td><td><span class="link local"><a href="/俯范畴.html" title="俯范畴 [俯范畴]">俯范畴</a></span></td><td></td></tr>
+<tr><td>presheaf</td><td><span class="link local"><a href="/预层.html" title="预层 [预层]">预层</a></span></td><td>预束</td></tr>
+<tr><td>profunctor</td><td><span class="link local"><a href="/代函子.html" title="代函子 [代函子]">代函子</a></span></td><td></td></tr>
+<tr><td>quasicoherent sheaf</td><td><span class="link local"><a href="/拟凝聚层.html" title="拟凝聚层 [拟凝聚层]">拟凝聚层</a></span></td><td></td></tr>
+<tr><td>section</td><td>截面</td><td></td></tr>
+<tr><td>sheaf</td><td><span class="link local"><a href="/层.html" title="拓扑空间上的层 [层]">层</a></span></td><td>束</td></tr>
+<tr><td>site</td><td><span class="link local"><a href="/景.html" title="景 [景]">景</a></span></td><td></td></tr>
+<tr><td>stack</td><td><span class="link local"><a href="/叠.html" title="叠 [叠]">叠</a></span></td><td>栈</td></tr>
+<tr><td>stalk</td><td>茎</td><td></td></tr>
+<tr><td>topos</td><td><span class="link local"><a href="/意象.html" title="意象 [意象]">意象</a></span></td><td>拓扑斯</td></tr>
+<tr><td>torsor</td><td><span class="link local"><a href="/主丛.html" title="主齐性空间, 主丛 [主丛]">主丛</a></span></td><td>旋子, 扭子, 挠子</td></tr>
+<tr><td>walking</td><td><span class="link local"><a href="/游走.html" title="游走 [游走]">游走</a></span></td><td></td></tr>
+</tbody></table>
+<h2>未确定的术语</h2>
+<p>|原文|译文|
+|suave|<span class="link local"><a href="/term-suave.html" title="温滑 [term-suave]">温滑</a></span>|</p>
+<h2>相关内容</h2>
+<p><span class="link local"><a href="/关于译名-意象.html" title="关于译名 “意象” [关于译名-意象]">关于译名 “意象”</a></span></p>
+</details></section><section class="block" data-taxon=""><details ><summary id="∞-意象"><header><h1><span class="taxon"></span>∞-意象 <a class="slug" href="/∞-意象.html">[∞-意象]</a><a class="edit" href="vscode://file/E:/Simplopedia_source/trees/%E2%88%9E-%E6%84%8F%E8%B1%A1.md">[edit]</a></h1><div class="metadata"><ul><li class="meta-item">百科</li><li class="meta-item"><span class="link local"><a href="/意象理论.html" title="意象理论 [意象理论]">意象理论</a></span></li><li class="meta-item"><span class="link local"><a href="/SimplicialCat.html" title="单纯猫 [SimplicialCat]">SimplicialCat</a></span></li></ul></div></header></summary>
+<h2>观念</h2>
+<p>$\infty$-意象是<span class="link local"><a href="/意象.html" title="意象 [意象]">意象</a></span>在 <span class="link local"><a href="/无穷范畴.html" title="无穷范畴 [无穷范畴]">$\infty$-范畴</a></span>语境中的相应概念.</p>
+<h2>定义</h2>
+<p>Grothendieck ∞-意象是 (取值于 <span class="link local"><a href="/Ani.html" title="生象的范畴 [Ani]">$\mathsf{Ani}$</a></span> 的) <span class="link local"><a href="/预层意象.html" title="预层意象 [预层意象]">预层范畴</a></span>的<span class="link local"><a href="/正合局部化.html" title="正合局部化 [正合局部化]">正合局部化</a></span>.</p>
+<h2>例</h2>
+<p><span class="link local"><a href="/Ani.html" title="生象的范畴 [Ani]">$\mathsf{Ani}$</a></span> 是最基本的 $\infty$-意象.</p>
+<h2>性质</h2>
+<p><span class="link local"><a href="/Giraud公理.html" title="Giraud 公理 [Giraud公理]">Giraud 公理</a></span></p>
+<h2>相关概念</h2>
+<p><span class="link local"><a href="/同伦维数.html" title="同伦维数 (意象) [同伦维数]">同伦维数</a></span></p>
+</details></section><section class="block" data-taxon=""><details ><summary id="不动点"><header><h1><span class="taxon"></span>不动点 <a class="slug" href="/不动点.html">[不动点]</a><a class="edit" href="vscode://file/E:/Simplopedia_source/trees/%E4%B8%8D%E5%8A%A8%E7%82%B9.md">[edit]</a></h1><div class="metadata"><ul><li class="meta-item">百科</li><li class="meta-item"><span class="link local"><a href="/SimplicialCat.html" title="单纯猫 [SimplicialCat]">SimplicialCat</a></span></li></ul></div></header></summary>
+<h2>观念</h2>
+<p>不动点, 顾名思义即<span class="link local"><a href="/群作用.html" title="群作用 [群作用]">群作用</a></span>之下 “不变” 的元素:
+$$
+X^G = \{x\in X\mid \forall g\in G, gx=x\}.
+$$</p>
+<p>在高阶范畴中, 何谓不变需要更仔细的解释, 但若正确理解高阶范畴中的等式, 仍有合适的不动点概念. 以<span class="link local"><a href="/同伦类型论.html" title="同伦类型论 [同伦类型论]">同伦类型论</a></span>的语言, 群 $G$ 作用于类型 $X$, 其不动点的类型为
+$$
+X^G := \sum_{x : X} \prod_{g : G} gx = x.
+$$
+(注意这个定义与前面用集合语言写的定义的类比.)</p>
+<p><span class="link local"><a href="/意象.html" title="意象 [意象]">意象</a></span> $\mathcal C$ 中, $G$-作用的不动点可以理解为沿 $\mathbf{B}G \to *$ 的拉回 (即 “平凡 $G$-作用” 函子)
+$\mathcal C = \mathcal C_{/*} \to \mathcal C_{/\mathbf{B}G}$ 的右伴随 $\mathcal C_{/\mathbf{B}G} \to \mathcal C$, 从而理解为 $\mathbf{B}G$ 上的<span class="link local"><a href="/依值积.html" title="依值积 [依值积]">依值积</a></span>, 也即 $\mathbf{B}G$ 上的层的<span class="link local"><a href="/整体截面.html" title="整体截面 [整体截面]">整体截面</a></span>.</p>
+<h2>例</h2>
+<h3>等变对象</h3>
+<p>在数学上, “<span class="link local"><a href="/等变对象.html" title="等变对象 [等变对象]">等变</a></span>” (equivariant) 某某对象常常可理解为带群作用的范畴的不动点. 等变即是<span class="link local"><a href="/高阶范畴.html" title="高阶范畴 [高阶范畴]">高阶范畴</a></span>语境下的不变.</p>
+</details></section><section class="block" data-taxon=""><details ><summary id="主丛"><header><h1><span class="taxon"></span>主齐性空间, 主丛 <a class="slug" href="/主丛.html">[主丛]</a><a class="edit" href="vscode://file/E:/Simplopedia_source/trees/%E4%B8%BB%E4%B8%9B.md">[edit]</a></h1><div class="metadata"><ul><li class="meta-item">百科</li><li class="meta-item"><span class="link local"><a href="/SimplicialCat.html" title="单纯猫 [SimplicialCat]">SimplicialCat</a></span></li></ul></div></header></summary>
+<h2>观念</h2>
+<p><strong>主齐性空间</strong> (principal homogeneous space), 又称<strong>旋子</strong> (torsor), 是一个 “忘掉了单位元在哪里的群”. 对于群 $G$, 一个 $G$-主齐性空间是一个带有 $G$-<span class="link local"><a href="/群作用.html" title="群作用 [群作用]">作用</a></span>的对象 $P$, 且满足其商 $P / G$ 是一个点 (在 $1$-范畴语境中这等同于说作用是自由且<span class="link local"><a href="/传递作用.html" title="传递作用 [传递作用]">传递</a></span>的).</p>
+<p>当我们谈论的对象是<span class="link local"><a href="/相对.html" title="相对观点 [相对]">相对</a></span>于一个基底空间 $X$ 上的丛 (或<span class="link local"><a href="/层.html" title="拓扑空间上的层 [层]">层</a></span>) 时, 主齐性空间又称为 $X$ 上的<strong>主丛</strong> (principal bundle). 对于群 $G$, 空间 $X$ 上的 $G$-主丛是 $X$ 上一个带有 $G$-作用的对象 $P\to X$, 满足其商 $P / G$ 就是 $X$.</p>
+<p>空间 $X$ 上的 $G$-主丛在<strong>局部</strong>上是 $G$, 但不一定有<span class="link local"><a href="/整体截面.html" title="整体截面 [整体截面]">整体截面</a></span>; 有整体截面的 $G$-主丛即同构于平凡 $G$-主丛.</p>
+<p>在 <span class="link local"><a href="/∞-意象.html" title="∞-意象 [∞-意象]">$\infty$-意象</a></span>中可以谈论群和主丛 (主齐性空间); 这涵盖了所有 “主丛” 的概念.</p>
+<p>群 $G$ 的主丛的<span class="link local"><a href="/分类空间.html" title="分类空间 [分类空间]">分类空间</a></span>是其<span class="link local"><a href="/逆环路空间.html" title="逆环路空间 [逆环路空间]">逆环路空间</a></span> $\mathbf{B}G$; 空间 $X$ 到 $\mathbf{B}G$ 的映射同伦类又称为 <span class="link local"><a href="/非Abel上同调.html" title="非 Abel 上同调 [非Abel上同调]">$1$ 阶非 Abel 上同调类</a></span>.</p>
+<h2>定义</h2>
+<h3>意象中的主丛</h3>
+<p>设 $G$ 是 <span class="link local"><a href="/∞-意象.html" title="∞-意象 [∞-意象]">$\infty$-意象</a></span> $\mathcal X$ 中的<span class="link local"><a href="/群.html" title="群 [群]">群</a></span>. 定义 $\mathcal X$ 上的 $G$-主丛即是<span class="link local"><a href="/终对象.html" title="终对象 [终对象]">终对象</a></span> $1$ 到<span class="link local"><a href="/逆环路空间.html" title="逆环路空间 [逆环路空间]">逆环路空间</a></span> $\mathbf{B}G$ 的态射 $P\colon 1\to\mathbf{B}G$. 换言之, 它是一个 $G$-<span class="link local"><a href="/群作用.html" title="群作用 [群作用]">作用</a></span> $P\colon \mathbf{B}G\to\mathcal X$, 满足<span class="link local"><a href="/余不动点.html" title="余不动点 [余不动点]">余不动点</a></span>为<span class="link local"><a href="/单点(同伦类型论).html" title="单点 (同伦类型论) [单点(同伦类型论)]">单点</a></span>:
+$$\operatorname{colim}_{\mathbf{B}G} P = 1.$$</p>
+<p>定义对象 $X\in\mathcal X$ 上的 $G$-主丛为<span class="link local"><a href="/俯意象.html" title="俯意象 [俯意象]">俯意象</a></span> $\mathcal X_{/X}$ 上的 $G$-主丛, 这相当于 $\mathcal X$ 中的态射 $X\to \mathbf{B}G$, 给出如下拉回图,
+$$
+\begin{array}
+    {ccc}
+    P &amp; \to &amp; 1 \\
+    \downarrow &amp; &amp; \downarrow \\
+    X &amp; \to &amp; \mathbf{B}G
+\end{array}
+$$
+因此 $X$ 上的 $G$-主丛也即 $G$ 在某对象 $P$ 上的<span class="link local"><a href="/群作用.html" title="群作用 [群作用]">作用</a></span>, 且使得商 $P/G$ 等价于 $X$.</p>
+<p><strong>注</strong>. 一般而言 $G$-主丛会共享 $G$ 的许多拉回稳定的性质. 例如当 $G$ 是 $0$-截断对象时, 映射 $1\to \mathbf{B}G$ 是 $0$-截断映射, 从而其拉回也是 $0$-截断映射. 这意味着 $0$-截断对象 $X$ 上的 $G$-主丛的全空间也是 $0$-截断对象, 也就是落在 $1$-意象 $\mathcal X_{\leq 0}$ 中.</p>
+<p>上述定义中 $\mathbf{B}G$ 也可替换为任意的<span class="link local"><a href="/生象.html" title="生象, ∞-群胚 [生象]">生象</a></span> $A$, 通过<span class="link local"><a href="/常值层.html" title="常值层 [常值层]">常值层</a></span>函子视为<span class="link local"><a href="/意象.html" title="意象 [意象]">意象</a></span>的对象. 由<span class="link local"><a href="/意象.html" title="意象 [意象]">意象</a></span>的下降,
+$$
+\mathcal X_{/A}\simeq \operatorname{lim}_A \mathcal X =\mathsf{Fun}(A,\mathcal X),
+$$
+态射 $1\to A$ 等同于函子 $P\colon A\to \mathcal X$, 满足 $\operatorname{colim}_{a\in A}P_a\simeq 1$.</p>
+<h3>一般范畴</h3>
+<p>要想在一般的范畴 (如拓扑空间的范畴, 流形的范畴) 中定义主丛, 只需要将其嵌入到一个<span class="link local"><a href="/层意象.html" title="层意象 [层意象]">层意象</a></span>中, 再使用意象中的主丛的定义. 不过需要注意<span class="link local"><a href="/逆环路空间.html" title="逆环路空间 [逆环路空间]">逆环路空间</a></span> $\mathbf{B}G = * / G$ 以及一般的商 $X / G$ 可能不再是原来范畴的对象.</p>
+<h3>$1$-范畴的具体情形</h3>
+<p>在 $(1,1)$-范畴中, 可以用更简单具体的资料来定义群的主齐性空间. 每个 $G$-作用都给出 <span class="link local"><a href="/∞-意象.html" title="∞-意象 [∞-意象]">$\infty$-意象</a></span>中的一个 $G$-主丛, 但要使得基底空间 $X / G$ 落在原来的 $1$-范畴, 就需要加<strong>自由作用</strong>的条件.</p>
+<h2>性质</h2>
+<h3>使用 Čech 上同调的计算</h3>
+<p>对于覆盖 (即<span class="link local"><a href="/∞-意象.html" title="∞-意象 [∞-意象]">意象</a></span>中的满射) $U\to X$, 由于 <span class="link local"><a href="/Giraud公理.html" title="Giraud 公理 [Giraud公理]">Giraud 公理</a></span>, $X$ 是 <span class="link local"><a href="/Čech脉.html" title="Čech 脉 [Čech脉]">Čech 脉</a></span>的<span class="link local"><a href="/几何实现(单纯图表的余极限).html" title="几何实现 (作为单纯图表的余极限) [几何实现(单纯图表的余极限)]">几何实现</a></span>
+$$
+X \simeq \operatorname{colim} \text{\v{C}}(U\to X),
+$$
+故对象 $X$ 上的主丛可表示为 $\text{\v{C}}(U\to X)$ 上的主丛:
+$$
+\operatorname{Hom}(X,\mathbf{B}G) \simeq \operatorname{lim} \big(\operatorname{Hom}(U,\mathbf{BG})\rightrightarrows \operatorname{Hom}(U\times_X U,\mathbf{BG})\cdots\big).
+$$
+由此, 可用<span class="link local"><a href="/非交换Čech上同调.html" title="非交换 Čech 上同调 [非交换Čech上同调]">非交换 Čech 上同调</a></span>计算 $X$ 上的 $G$-主丛的同构类等信息.</p>
+<h2>例</h2>
+<h3>有限群的主丛</h3>
+<p>对于离散拓扑群 $G$, 其主丛等同于 <span class="link local"><a href="/Galois覆叠.html" title="Galois 覆叠 [Galois覆叠]">Galois 覆叠</a></span>.</p>
+<h2>相关概念</h2>
+<p><span class="link local"><a href="/关联丛.html" title="关联丛 [关联丛]">关联丛</a></span></p>
+<h2>相关资料</h2>
+<p><span class="link local"><a href="/PB∞T.html" title="∞-意象中的主丛 [PB∞T]">$\infty$-意象中的主丛</a></span></p>
+</details></section><section class="block" data-taxon=""><details ><summary id="俯意象"><header><h1><span class="taxon"></span>俯意象 <a class="slug" href="/俯意象.html">[俯意象]</a><a class="edit" href="vscode://file/E:/Simplopedia_source/trees/%E4%BF%AF%E6%84%8F%E8%B1%A1.md">[edit]</a></h1><div class="metadata"><ul><li class="meta-item">百科</li><li class="meta-item"><span class="link local"><a href="/SimplicialCat.html" title="单纯猫 [SimplicialCat]">SimplicialCat</a></span></li></ul></div></header></summary>
+<h2>定义</h2>
+<p><span class="link local"><a href="/意象.html" title="意象 [意象]">意象</a></span>的<span class="link local"><a href="/俯范畴.html" title="俯范畴 [俯范畴]">俯范畴</a></span>仍是意象, 称之为俯意象.</p>
+<h2>性质</h2>
+<p>意象 $\mathcal C$ 的所有俯意象构成函子
+$$
+\mathcal C^{\mathrm{op}} \to \mathsf{Cat},\ X\mapsto\mathcal C_{/X}.
+$$</p>
+</details></section><section class="block" data-taxon=""><details ><summary id="几何态射"><header><h1><span class="taxon"></span>几何态射 <a class="slug" href="/几何态射.html">[几何态射]</a><a class="edit" href="vscode://file/E:/Simplopedia_source/trees/%E5%87%A0%E4%BD%95%E6%80%81%E5%B0%84.md">[edit]</a></h1><div class="metadata"><ul><li class="meta-item">百科</li><li class="meta-item"><span class="link local"><a href="/SimplicialCat.html" title="单纯猫 [SimplicialCat]">SimplicialCat</a></span></li></ul></div></header></summary>
+<h2>观念</h2>
+<p>若将<span class="link local"><a href="/意象.html" title="意象 [意象]">意象</a></span>视为某种几何对象, 那么<strong>几何态射</strong> (geometric morphism) 就是这种几何对象之间合适的映射的概念. (意象之间还有其它的态射的概念, 如<span class="link local"><a href="/逻辑态射.html" title=" [逻辑态射]">逻辑态射</a></span>.)</p>
+<p>一个几何态射是一对<span class="link local"><a href="/伴随.html" title="伴随 [伴随]">伴随</a></span>, 这个概念抽象自拓扑空间的连续映射的<span class="link local"><a href="/直像-逆像伴随.html" title="拓扑空间上的直像-逆像伴随 [直像-逆像伴随]">直像–逆像伴随</a></span>.</p>
+<h2>定义</h2>
+<p><span class="link local"><a href="/意象.html" title="意象 [意象]">意象</a></span>之间的几何态射
+$$
+f\colon \mathcal F \to \mathcal  E
+$$
+由一对伴随函子 $f^*\colon \mathcal E\to\mathcal F$, $f_*\colon \mathcal F\to\mathcal E$ 构成, 满足 $f^*$ 是 $f_*$ 的左伴随, 且 $f^*$ 左正合 (即保持<span class="link local"><a href="/有限极限.html" title="有限极限 [有限极限]">有限极限</a></span>).</p>
+<h2>性质</h2>
+<h3>与拓扑空间的映射的关系</h3>
+<p>当 $Y$ 为 Hausdorff 空间时, 几何映射 $\operatorname{Sh}(X)\to\operatorname{Sh}(Y)$ 唯一确定了 $f\colon X\to Y$.</p>
+<h3>与逻辑的关系</h3>
+<p>几何态射保持<span class="link local"><a href="/几何逻辑.html" title="几何逻辑 [几何逻辑]">几何逻辑</a></span>的公式.</p>
+<h2>例</h2>
+<p>一个意象 $\mathcal E$ 中的箭头 $k\colon B\to A$ 给出了 “换基” (change of base) 函子
+$$
+k^* \colon \mathcal E/A \to \mathcal E/B.
+$$
+它同时具有左伴随 $\sum_k$ 与右伴随 $\prod_k$. 于是, 它给出了几何态射
+$$
+\mathcal E/B\to\mathcal E/A,
+$$
+其中 $k_*=\prod_k$. 而 $k^*$ 左正合是由于它存在左伴随 $\sum_k$.</p>
+<h2>相关概念</h2>
+<p><span class="link local"><a href="/几何态射的性质.html" title="“几何态射的性质” [几何态射的性质]">几何态射的性质</a></span></p>
+</details></section><section class="block" data-taxon=""><details ><summary id="分离几何态射"><header><h1><span class="taxon"></span>“分离几何态射” <a class="slug" href="/分离几何态射.html">[分离几何态射]</a><a class="edit" href="vscode://file/E:/Simplopedia_source/trees/%E5%88%86%E7%A6%BB%E5%87%A0%E4%BD%95%E6%80%81%E5%B0%84.md">[edit]</a></h1><div class="metadata"><ul><li class="meta-item">百科</li><li class="meta-item"><span class="link local"><a href="/SimplicialCat.html" title="单纯猫 [SimplicialCat]">SimplicialCat</a></span></li></ul></div></header></summary>
+<p>称<span class="link local"><a href="/意象.html" title="意象 [意象]">意象</a></span>之间的几何态射 $f\colon X\to Y$ 分离, 是指 $X\to X\times_Y X$ 为<span class="link local"><a href="/紧合几何态射.html" title="“紧合几何态射” [紧合几何态射]">紧合几何态射</a></span>.</p>
+</details></section><section class="block" data-taxon=""><details ><summary id="分类意象"><header><h1><span class="taxon"></span>分类意象 <a class="slug" href="/分类意象.html">[分类意象]</a><a class="edit" href="vscode://file/E:/Simplopedia_source/trees/%E5%88%86%E7%B1%BB%E6%84%8F%E8%B1%A1.md">[edit]</a></h1><div class="metadata"><ul><li class="meta-item">百科</li><li class="meta-item"><span class="link local"><a href="/SimplicialCat.html" title="单纯猫 [SimplicialCat]">SimplicialCat</a></span></li></ul></div></header></summary>
+<h2>观念</h2>
+<h3>“语法” 侧: 意象的表现</h3>
+<p>分类意象是以逻辑理论对<span class="link local"><a href="/意象.html" title="意象 [意象]">意象</a></span>的一种<span class="link local"><a href="/数学对象的表现.html" title="数学对象的表现 [数学对象的表现]">表现</a></span>.</p>
+<h3>“几何” 侧: 作为分类空间</h3>
+<p>分类意象作为一种几何对象, 是<span class="link local"><a href="/分类空间.html" title="分类空间 [分类空间]">分类空间</a></span>的概念在意象理论中的化身. 一种结构的分类意象可理解为分类空间上的<span class="link local"><a href="/层意象.html" title="层意象 [层意象]">层意象</a></span>.</p>
+<h3>“代数” 侧: 作为泛对象所在的范畴</h3>
+<p>一种结构的<strong>分类意象</strong>可理解为 $\mathsf{Set}$ (或 $\mathsf{Ani}$) 自由加入一个 “泛” (generic) 对象所得的意象. 例如带点对象的分类意象可理解为自由加入一个泛带点对象.</p>
+<h2>例</h2>
+<p><span class="link local"><a href="/生象.html" title="生象, ∞-群胚 [生象]">生象</a></span><span class="link local"><a href="/群.html" title="群 [群]">群</a></span> $G$ 的分类意象即是其<span class="link local"><a href="/逆环路空间.html" title="逆环路空间 [逆环路空间]">逆环路空间</a></span> $\mathbf{B}G$ 上的<span class="link local"><a href="/层意象.html" title="层意象 [层意象]">层意象</a></span>, 也即 $\mathsf{Ani}_{/\mathbf{B}G} \simeq \mathsf{Fun}(\mathbf{B}G,\mathsf{Ani})$.</p>
+</details></section><section class="block" data-taxon=""><details ><summary id="叠"><header><h1><span class="taxon"></span>叠 <a class="slug" href="/叠.html">[叠]</a><a class="edit" href="vscode://file/E:/Simplopedia_source/trees/%E5%8F%A0.md">[edit]</a></h1><div class="metadata"><ul><li class="meta-item">百科</li><li class="meta-item"><span class="link local"><a href="/SimplicialCat.html" title="单纯猫 [SimplicialCat]">SimplicialCat</a></span></li></ul></div></header></summary>
+<h2>观念</h2>
+<p><strong>叠</strong>是<span class="link local"><a href="/景.html" title="景 [景]">景</a></span>上取值于<span class="link local"><a href="/高阶范畴.html" title="高阶范畴 [高阶范畴]">高阶范畴</a></span>的<span class="link local"><a href="/景上的层.html" title="景上的层 [景上的层]">层</a></span>, 也即高阶<span class="link local"><a href="/意象.html" title="意象 [意象]">意象</a></span>的对象.</p>
+<h2>例</h2>
+<p>对于 Lie 群 $G$ 有一个叠 $\mathbf{B}G$, 它是一个函子 $\mathsf {Mfd}^{\text{op}}\to\mathsf {Grpd}$, 将流形 $U$ 对应到 $U$ 上的 $G$-<span class="link local"><a href="/主丛.html" title="主齐性空间, 主丛 [主丛]">主丛</a></span>的群胚, 将态射 $U\to V$ 对应到主丛的拉回.</p>
+</details></section><section class="block" data-taxon=""><details ><summary id="可表现范畴"><header><h1><span class="taxon"></span>可表现范畴 <a class="slug" href="/可表现范畴.html">[可表现范畴]</a><a class="edit" href="vscode://file/E:/Simplopedia_source/trees/%E5%8F%AF%E8%A1%A8%E7%8E%B0%E8%8C%83%E7%95%B4.md">[edit]</a></h1><div class="metadata"><ul><li class="meta-item">百科</li><li class="meta-item"><span class="link local"><a href="/SimplicialCat.html" title="单纯猫 [SimplicialCat]">SimplicialCat</a></span></li></ul></div></header></summary>
+<h2>观念</h2>
+<p><strong>可表现范畴</strong> $\mathcal C$ 是一个可能很大的范畴, 却能由较小的一族对象 $\mathcal S\hookrightarrow\mathcal C$ 控制.
+此时, $\mathcal C$ 可<span class="link local"><a href="/数学对象的表现.html" title="数学对象的表现 [数学对象的表现]">表现</a></span>为预层范畴 $\mathsf{Psh}(\mathcal S)$ 的<span class="link local"><a href="/局部化(范畴论).html" title="局部化 (范畴论) [局部化(范畴论)]">局部化</a></span>.</p>
+<p><span class="link local"><a href="/范畴论.html" title="范畴论 [范畴论]">范畴论</a></span>中的许多结论依赖于范畴的可表现性, 例如<span class="link local"><a href="/伴随函子定理.html" title="伴随函子定理 [伴随函子定理]">伴随函子定理</a></span>, 以及刻画<span class="link local"><a href="/意象.html" title="意象 [意象]">意象</a></span>的 <span class="link local"><a href="/Giraud公理.html" title="Giraud 公理 [Giraud公理]">Giraud 公理</a></span>.</p>
+<p>另一种重要的观点: 从<span class="link local"><a href="/范畴逻辑.html" title="范畴逻辑 [范畴逻辑]">范畴逻辑学</a></span>的角度, 可表现范畴是<span class="link local"><a href="/本质代数理论.html" title="本质代数理论 [本质代数理论]">本质代数理论</a></span>的<span class="link local"><a href="/语法–语义对偶.html" title="语法–语义对偶 [语法–语义对偶]">模型</a></span>的范畴.</p>
+<h2>定义</h2>
+<p>对于<span class="link local"><a href="/正则基数.html" title="正则基数 [正则基数]">正则基数</a></span> $\kappa$ (通常取为 $\aleph_0$, 见<span class="link local"><a href="/紧生成范畴.html" title="紧生成范畴 [紧生成范畴]">紧生成范畴</a></span>), 称满足如下等价条件的范畴 $\mathcal C$ 为 $\kappa$-可表现范畴:</p>
+<ul>
+<li>$\mathcal C$ 余完备, 且有一族 <span class="link local"><a href="/可表现对象.html" title="可表现对象 [可表现对象]">$\kappa$-可表现对象</a></span>构成的集合, 在 <span class="link local"><a href="/滤余极限.html" title="滤余极限 [滤余极限]">$\kappa$-滤余极限</a></span>下生成整个范畴.</li>
+<li>$\mathcal C$ 等价于一个小范畴的 <span class="link local"><a href="/Ind范畴.html" title=" [Ind范畴]">$\kappa$-Ind 范畴</a></span>.</li>
+</ul>
+<p>称 $\mathcal C$ 为可表现范畴是指存在一个基数 $\kappa$, $\mathcal C$ 为 $\kappa$-可表现范畴.</p>
+<p>等价的定义是: 有一个小范畴到 $\mathcal C$ 的函子 $j\colon \mathcal S\hookrightarrow\mathcal C$, 使得米田扩张 $\mathsf{Psh}(\mathcal S) \to \mathcal C$ 是预层范畴 $\mathsf{Psh}(\mathcal S)$ 关于某个小态射族 $W \subset \mathsf{Fun}([1],\mathsf{Psh}(\mathcal S))$ 的局部化.</p>
+<p>可表现范畴以及保持余极限的函子构成的范畴记为 $\mathsf{Pr}^{\mathrm{L}}$, 其中 $\mathrm{L}$ 的含义是这些函子是左伴随 (<span class="link local"><a href="/伴随函子定理.html" title="伴随函子定理 [伴随函子定理]">伴随函子定理</a></span>).</p>
+<h2>性质</h2>
+<p>由<span class="link local"><a href="/景.html" title="景 [景]">景</a></span>表现的<span class="link local"><a href="/意象.html" title="意象 [意象]">意象</a></span>是可表现范畴.</p>
+<h3>张量积</h3>
+<p>可表现范畴的范畴 $\mathsf{Pr}$ 上有一个<span class="link local"><a href="/对称幺半范畴.html" title="对称幺半范畴 [对称幺半范畴]">对称幺半范畴</a></span>结构, 称为 <strong>Lurie 张量积</strong>.</p>
+<p><strong>命题-定义</strong>. 对于可表现范畴 $\mathcal C,\mathcal D$, 存在万有的可表现范畴 $\mathcal C\otimes\mathcal D$, 带有一个双线性 (即保持每个分量的余极限) 的函子
+$$
+\mathcal C\times \mathcal D \to \mathcal C\otimes\mathcal D.
+$$</p>
+<p>可表现范畴的张量积的单位是 <span class="link local"><a href="/生象.html" title="生象, ∞-群胚 [生象]">$\mathsf{Ani}$</a></span>.</p>
+<h2>高阶可表现范畴</h2>
+<p>见<span class="link local"><a href="/高阶可表现范畴.html" title="高阶可表现范畴 [高阶可表现范畴]">高阶可表现范畴</a></span></p>
+</details></section><section class="block" data-taxon=""><details ><summary id="多项式函子"><header><h1><span class="taxon"></span>多项式函子 <a class="slug" href="/多项式函子.html">[多项式函子]</a><a class="edit" href="vscode://file/E:/Simplopedia_source/trees/%E5%A4%9A%E9%A1%B9%E5%BC%8F%E5%87%BD%E5%AD%90.md">[edit]</a></h1><div class="metadata"><ul><li class="meta-item">百科</li><li class="meta-item"><span class="link local"><a href="/SimplicialCat.html" title="单纯猫 [SimplicialCat]">SimplicialCat</a></span></li></ul></div></header></summary>
+<h2>观念</h2>
+<p><strong>多项式函子</strong>是多项式函数 (形式幂级数) 的<span class="link local"><a href="/范畴化.html" title="范畴化 [范畴化]">范畴化</a></span>. 另见<span class="link local"><a href="/解析函子.html" title="解析函子 (算畴理论) [解析函子]">解析函子</a></span>.</p>
+<h2>定义</h2>
+<p>设 $\mathcal C$ 为<span class="link local"><a href="/LCCC.html" title="局部积闭范畴 [LCCC]">局部积闭范畴</a></span> (如<span class="link local"><a href="/意象.html" title="意象 [意象]">意象</a></span>), 固定两个对象 $X,Y\in\mathcal C$.
+定义<strong>多项式函子</strong> $\mathcal C_{/X}\to \mathcal C_{/Y}$ 为形如 $t_! p_* s^*$ 的函子, 其中 $t,p,s$ 如下图:
+$$
+X \overset{s}{\leftarrow} E \overset{p}{\rightarrow} B \overset{t}{\rightarrow} Y
+$$
+$t_!$ 是 $t^*$ 的左伴随, $p_*$ 是 $p^*$ 的右伴随.
+直观上,</p>
+<ul>
+<li>$s^*$ 是在每个 $e\in E$ 上放一个来自 $X$ 的东西,</li>
+<li>$p_*$ 是对每个 $b \in B$ 将 $b$ 上的一堆东西相乘 (见<span class="link local"><a href="/依值积.html" title="依值积 [依值积]">依值积</a></span>),</li>
+<li>$t_!$ 是对每个 $y\in Y$ 将 $y$ 上的一堆东西相加 (见<span class="link local"><a href="/依值和.html" title="依值和 [依值和]">依值和</a></span>);</li>
+<li>因此 $t_! p_* s^*$ 就是 “拿 $X$ 个不同的东西, 每个可以拿多份, 共有 $E$ 份; 然后将这 $E$ 份分成 $B$ 组; 将每一组乘起来, 将这 $B$ 个乘积再分成 $Y$ 组, 每一组加起来”. 这正是<strong>多项式</strong>的直观, 只是这里每一项的 “次数” 以及 “项数” 都未必有限.</li>
+</ul>
+<p>注. 当 $p\colon E\to B$ 的纤维离散且有限时, 所得的多项式函子是<span class="link local"><a href="/解析函子.html" title="解析函子 (算畴理论) [解析函子]">解析函子</a></span>.</p>
+<h2>性质</h2>
+<h3>复合</h3>
+<p>多项式的重要性质是: 多项式的<strong>复合</strong>仍是多项式. 多项式函子也是如此.</p>
+<p>文献中记载着一种使用巨大交换图的证明 (见 <span class="link local"><a href="/GHK-analytic-monads.html" title="∞-Operads as Analytic Monads [GHK-analytic-monads]">Gepner–Haugseng–Kock</a></span> 定理 2.1.8), 但我们使用一种类似于<span class="link local"><a href="/依值类型论.html" title="依值类型论 [依值类型论]">依值类型论</a></span>的表述, 这样似乎更直观, 因为在语法的形式上, 它和 “多项式的复合仍是多项式” 的证明完全一致. 实际上这和那个巨大交换图证明说的是同一件事.</p>
+<p>首先, 将图 $X \overset{s}{\leftarrow} E \overset{p}{\rightarrow} B \overset{t}{\rightarrow} Y$ 给出的多项式函子记为
+$$
+A(x) \mapsto \sum_{b\in t^{-1}(y)} \prod_{e\in p^{-1}(b)} A(s(e)).
+$$
+现设有两个图</p>
+<ul>
+<li>$X \overset{s}{\leftarrow} E \overset{p}{\rightarrow} B \overset{t}{\rightarrow} Y$,</li>
+<li>$Y \overset{u}{\leftarrow} F \overset{q}{\rightarrow} C \overset{v}{\rightarrow} Z$.</li>
+</ul>
+<p>那么两个多项式函子的复合为
+$$
+A(x) \mapsto \sum_{c\in v^{-1}(z)} \prod_{f\in q^{-1}(c)}  \sum_{b\in t^{-1}(u(f))} \prod_{e\in p^{-1}(b)} A(s(e)).\,\,\,\,\,(\star)
+$$
+我们的想法是将中间的 “和的积” 展开为 “积的和”, 从而将 $\Sigma\Pi\Sigma\Pi$ 化简为 $\Sigma\Sigma\Pi\Pi$, 再化简为 $\Sigma\Pi$.
+$$
+\begin{aligned}
+&amp;\prod_{f\in q^{-1}(c)}\sum_{b\in t^{-1}(u(f))} B(b)\\
+&amp;=\sum_{g\colon (f: q^{-1}(c))\to t^{-1}(u(f))}\prod_{f\in q^{-1}(c)}B(g(f)),
+\end{aligned}
+$$
+其中 $(f: q^{-1}(c))\to t^{-1}(u(f))$ 是<span class="link local"><a href="/依值积.html" title="依值积 [依值积]">依值积</a></span>类型 $\prod_{f: q^{-1}(c)}t^{-1}(u(f))$ 的简写.
+于是 $(\star)$ 的右端等于
+$$
+\sum_{c\in v^{-1}(z),g\colon (f: q^{-1}(c))\to t^{-1}(u(f))}\prod_{f\in q^{-1}(c), e\in p^{-1}(g(f))} A(s(e)).
+$$
+这便证明了它是多项式函子.</p>
+</details></section><section class="block" data-taxon=""><details ><summary id="子对象分类子"><header><h1><span class="taxon"></span>子对象分类子 <a class="slug" href="/子对象分类子.html">[子对象分类子]</a><a class="edit" href="vscode://file/E:/Simplopedia_source/trees/%E5%AD%90%E5%AF%B9%E8%B1%A1%E5%88%86%E7%B1%BB%E5%AD%90.md">[edit]</a></h1><div class="metadata"><ul><li class="meta-item">百科</li><li class="meta-item"><span class="link local"><a href="/SimplicialCat.html" title="单纯猫 [SimplicialCat]">SimplicialCat</a></span></li></ul></div></header></summary>
+<h2>观念</h2>
+<p>子对象分类子是 <span class="link local"><a href="/截断性.html" title="截断性 [截断性]">$(-1)$-截断对象</a></span>的<span class="link local"><a href="/分类空间.html" title="分类空间 [分类空间]">分类空间</a></span>.</p>
+<h2>定义</h2>
+<p>子对象分类子 $\Omega$ 是<span class="link local"><a href="/意象.html" title="意象 [意象]">意象</a></span>中一个特殊的对象, 任意对象到 $\Omega$ 的态射一一对应于其<span class="link local"><a href="/子对象.html" title="子对象 [子对象]">子对象</a></span>.</p>
+<h2>真值</h2>
+<p>$\Omega$ 是 $1$ 的幂集. 逻辑公式 $\varphi$ 的真值为 $1$ 的子集, 也即 $\Omega$ 的元素. 在经典逻辑中当然 $\Omega=\{\text{false},\text{true}\}$. 而在<span class="link local"><a href="/直觉主义逻辑.html" title="直觉主义逻辑 [直觉主义逻辑]">直觉主义逻辑</a></span>中, $\Omega$ 不一定只有两个元素.</p>
+<p>例如, 空间 $X$ 上的<span class="link local"><a href="/层意象.html" title="层意象 [层意象]">层意象</a></span>中, 子对象分类子是终层 $1$ 的幂对象
+$$
+\Omega\colon\quad U\subset X\text{ open} \quad \mapsto \quad \{V\subset U\text{ open}\}.
+$$
+此时, 逻辑公式 $\varphi$ 的真值是 $X$ 中最大的使得 $U\models\varphi$ 的开集 $U$.</p>
+<h2>相关概念</h2>
+<p><span class="link local"><a href="/对象分类子.html" title="对象分类子 [对象分类子]">对象分类子</a></span></p>
+</details></section><section class="block" data-taxon=""><details ><summary id="对象分类子"><header><h1><span class="taxon"></span>对象分类子 <a class="slug" href="/对象分类子.html">[对象分类子]</a><a class="edit" href="vscode://file/E:/Simplopedia_source/trees/%E5%AF%B9%E8%B1%A1%E5%88%86%E7%B1%BB%E5%AD%90.md">[edit]</a></h1><div class="metadata"><ul><li class="meta-item">百科</li><li class="meta-item"><span class="link local"><a href="/SimplicialCat.html" title="单纯猫 [SimplicialCat]">SimplicialCat</a></span></li></ul></div></header></summary>
+<h2>观念</h2>
+<p>在一些范畴 (尤其是<span class="link local"><a href="/意象.html" title="意象 [意象]">意象</a></span>) 中, 我们常常将态射
+$$
+\begin{array}
+{c}
+Y\\
+\downarrow\\
+X
+\end{array}
+$$
+视为对象 $X$ 上的<strong>一族</strong>对象; 进而我们希望这个族由一个映射 $X\to O$ 分类. 这里 $O$ 是 “对象的<span class="link local"><a href="/分类空间.html" title="分类空间 [分类空间]">分类空间</a></span>”.</p>
+<h2>定义</h2>
+<p><strong>定义</strong> (意象的对象分类子). <span class="link local"><a href="/∞-意象.html" title="∞-意象 [∞-意象]">意象</a></span> $\mathcal C$ 的<strong>对象分类子</strong> (object classifier) 是一个保持极限的函子 $O\colon \mathcal C^{\mathrm{op}} \to\mathsf{Ani}$, 使得
+$$
+\operatorname{Hom}(X,O) \simeq (\mathcal C_{/X})^\simeq.
+$$</p>
+<h2>相关概念</h2>
+<p><span class="link local"><a href="/子对象分类子.html" title="子对象分类子 [子对象分类子]">子对象分类子</a></span>, <span class="link local"><a href="/局部类.html" title="局部类 [局部类]">局部类</a></span></p>
+</details></section><section class="block" data-taxon=""><details ><summary id="局部类的分类子"><header><h1><span class="taxon"></span>局部类 <a class="slug" href="/局部类的分类子.html">[局部类的分类子]</a><a class="edit" href="vscode://file/E:/Simplopedia_source/trees/%E5%B1%80%E9%83%A8%E7%B1%BB%E7%9A%84%E5%88%86%E7%B1%BB%E5%AD%90.md">[edit]</a></h1><div class="metadata"><ul><li class="meta-item">百科</li><li class="meta-item"><span class="link local"><a href="/SimplicialCat.html" title="单纯猫 [SimplicialCat]">SimplicialCat</a></span></li></ul></div></header></summary>
+<p>设 $\Sigma$ 为<span class="link local"><a href="/意象.html" title="意象 [意象]">意象</a></span> $\mathcal C$ 中映射的<span class="link local"><a href="/局部类.html" title="局部类 [局部类]">局部类</a></span> (关于<span class="link local"><a href="/基变换.html" title="基变换 [基变换]">基变换</a></span>与<span class="link local"><a href="/和(范畴论).html" title="和 (范畴论) [和(范畴论)]">余积</a></span>封闭, 且被<span class="link local"><a href="/意象中的满射.html" title="意象中的满射 [意象中的满射]">满射</a></span>的<span class="link local"><a href="/基变换.html" title="基变换 [基变换]">基变换</a></span>探测).
+定义 $\Sigma$ 的<strong>分类子</strong>为态射 $f_\Sigma\colon Y_\Sigma \to X_\Sigma$, 又称为 $\Sigma$ 中的<strong>万有态射</strong>, 满足 “$\Sigma$ 的任何态射都是其基变换”; 具体地, 对任意对象 $X$,
+$$
+\operatorname{Hom}(X,X_\Sigma) \to (\mathcal C_{/X})^\simeq,
+g\mapsto g^*f_\Sigma
+$$
+的像恰为 $\mathcal C_{/X}$ 中由 $\Sigma$ 中的态射构成的子<span class="link local"><a href="/生象.html" title="生象, ∞-群胚 [生象]">生象</a></span>. 由<span class="link local"><a href="/米田引理.html" title="米田引理 [米田引理]">米田引理</a></span>, 分类子一旦存在, 就是唯一的.</p>
+<h2>例</h2>
+<ul>
+<li>单射 ($(-1)$-<span class="link local"><a href="/截断性.html" title="截断性 [截断性]">截断</a></span>映射) 的分类子叫做<span class="link local"><a href="/子对象分类子.html" title="子对象分类子 [子对象分类子]">子对象分类子</a></span>.</li>
+</ul>
+</details></section><section class="block" data-taxon=""><details ><summary id="层意象"><header><h1><span class="taxon"></span>层意象 <a class="slug" href="/层意象.html">[层意象]</a><a class="edit" href="vscode://file/E:/Simplopedia_source/trees/%E5%B1%82%E6%84%8F%E8%B1%A1.md">[edit]</a></h1><div class="metadata"><ul><li class="meta-item">百科</li><li class="meta-item"><span class="link local"><a href="/SimplicialCat.html" title="单纯猫 [SimplicialCat]">SimplicialCat</a></span></li></ul></div></header></summary>
+<p>层意象是<span class="link local"><a href="/景.html" title="景 [景]">景</a></span>上的<span class="link local"><a href="/景上的层.html" title="景上的层 [景上的层]">层</a></span>构成的<span class="link local"><a href="/意象.html" title="意象 [意象]">意象</a></span>, 也即由<span class="link local"><a href="/景.html" title="景 [景]">景</a></span>所<span class="link local"><a href="/数学对象的表现.html" title="数学对象的表现 [数学对象的表现]">表现</a></span>的<span class="link local"><a href="/意象.html" title="意象 [意象]">意象</a></span>.</p>
+<p>几何对象 (如拓扑空间, 代数簇, 概形) 上的层意象可视为几何对象在意象范畴中的化身.</p>
+<p>层意象的<span class="link local"><a href="/意象的内语言.html" title="意象的内语言 [意象的内语言]">内语言</a></span>具有<span class="link local"><a href="/层语义.html" title="层语义 [层语义]">层语义</a></span>.</p>
+</details></section><section class="block" data-taxon=""><details ><summary id="常值层"><header><h1><span class="taxon"></span>常值层 <a class="slug" href="/常值层.html">[常值层]</a><a class="edit" href="vscode://file/E:/Simplopedia_source/trees/%E5%B8%B8%E5%80%BC%E5%B1%82.md">[edit]</a></h1><div class="metadata"><ul><li class="meta-item">百科</li><li class="meta-item"><span class="link local"><a href="/SimplicialCat.html" title="单纯猫 [SimplicialCat]">SimplicialCat</a></span></li></ul></div></header></summary>
+<h2>定义</h2>
+<p>对于<span class="link local"><a href="/意象.html" title="意象 [意象]">意象</a></span> $\mathcal X$, <strong>常值层函子</strong>是<span class="link local"><a href="/几何态射.html" title="几何态射 [几何态射]">几何态射</a></span>
+$$
+    \pi\colon \mathcal X \to\mathsf{Ani} = \operatorname{Sh}(*)
+$$
+的左伴随部分 (拉回部分)
+$$
+    \pi^*\colon \mathsf{Ani} \to\mathcal X.
+$$</p>
+</details></section><section class="block" data-taxon=""><details ><summary id="意象中的满射"><header><h1><span class="taxon"></span>意象中的满射 <a class="slug" href="/意象中的满射.html">[意象中的满射]</a><a class="edit" href="vscode://file/E:/Simplopedia_source/trees/%E6%84%8F%E8%B1%A1%E4%B8%AD%E7%9A%84%E6%BB%A1%E5%B0%84.md">[edit]</a></h1><div class="metadata"><ul><li class="meta-item">百科</li><li class="meta-item"><span class="link local"><a href="/意象理论.html" title="意象理论 [意象理论]">意象理论</a></span></li><li class="meta-item"><span class="link local"><a href="/SimplicialCat.html" title="单纯猫 [SimplicialCat]">SimplicialCat</a></span></li></ul></div></header></summary>
+<h2>定义</h2>
+<h3>∞-意象</h3>
+<p>$\infty$-意象中的<strong>有效满射</strong> (effective epimorphism) 是可被 <span class="link local"><a href="/Čech脉.html" title="Čech 脉 [Čech脉]">Čech 脉</a></span><span class="link local"><a href="/几何实现(单纯图表的余极限).html" title="几何实现 (作为单纯图表的余极限) [几何实现(单纯图表的余极限)]">实现</a></span>的映射, 也等价于 $0$-<span class="link local"><a href="/截断性.html" title="截断性 [截断性]">截断</a></span>后为 $1$-意象中的 (有效) 满射.</p>
+<h3>1-意象, 内语言定义</h3>
+<p><span class="link local"><a href="/意象.html" title="意象 [意象]">$1$-意象</a></span>中的 (有效) 满射是<span class="link local"><a href="/意象的内语言.html" title="意象的内语言 [意象的内语言]">内语言</a></span>中满足如下条件的映射 $f\colon X\to Y$:
+$$
+\forall y\in Y\exists x\in X \, f(x) = y.
+$$</p>
+<p>注意这句话不能在外部语言中解释; 不能推出 (外部语言) $f$ 存在截面.</p>
+<h3>层意象</h3>
+<p><span class="link local"><a href="/层意象.html" title="层意象 [层意象]">层意象</a></span>中的满射可用<span class="link local"><a href="/景.html" title="景 [景]">景</a></span>的信息来定义. 对于景 $(\mathcal C,J)$ 上的<span class="link local"><a href="/景上的层.html" title="景上的层 [景上的层]">层</a></span> $X,Y$ 以及态射 $f\colon X\to Y$, $f$ 为<span class="link local"><a href="/层意象.html" title="层意象 [层意象]">层意象</a></span> $\mathsf{Sh}(\mathcal C,J)$ 中的满射当且仅当</p>
+<ul>
+<li>对任意 $U\in\mathcal C$ 与 $y\in Y(U)$, 存在 $U$ 的 $J$-覆盖 $\{U_i\to U\}$ 以及 $x_i\in X(U_i)$, 使得 $f_{U_i}(x_i) = y|_{U_i}$.</li>
+</ul>
+</details></section><section class="block" data-taxon=""><details ><summary id="意象的内语言"><header><h1><span class="taxon"></span>意象的内语言 <a class="slug" href="/意象的内语言.html">[意象的内语言]</a><a class="edit" href="vscode://file/E:/Simplopedia_source/trees/%E6%84%8F%E8%B1%A1%E7%9A%84%E5%86%85%E8%AF%AD%E8%A8%80.md">[edit]</a></h1><div class="metadata"><ul><li class="meta-item">百科</li><li class="meta-item"><span class="link local"><a href="/SimplicialCat.html" title="单纯猫 [SimplicialCat]">SimplicialCat</a></span></li></ul></div></header></summary>
+<p>每个<span class="link local"><a href="/意象.html" title="意象 [意象]">意象</a></span>都有一个以其对象为类型, 其态射为函数符号的<span class="link local"><a href="/一阶语言.html" title="一阶语言与一阶逻辑 [一阶语言]">一阶语言</a></span>, 称为<strong>内语言</strong>.</p>
+<p>直观地说, 使用这种语言, 我们可以假装<span class="link local"><a href="/意象.html" title="意象 [意象]">意象</a></span>中的对象是集合, 态射是集合的映射, 并且像对待集合一样对 $\mathcal E$ 中的命题进行推理.</p>
+<p>例如, 态射 $\alpha\colon X\to Y$ 是满射这一命题可使用内语言表达为
+$$
+\forall y:Y , \exists x:X , \alpha(x)=y.
+$$
+对于集合, 满射的复合是满射; 那么意象中满态射的复合是满态射.
+因为一条元定理指出, 若语句 $\varphi$ 在意象 $\mathcal E$ 的内语言中成立, 且逻辑上 $\varphi$ 推出 $\psi$, 则 $\psi$ 也在这一内语言中成立.</p>
+<p>意象的内语言通常是<span class="link local"><a href="/直觉主义逻辑.html" title="直觉主义逻辑 [直觉主义逻辑]">直觉主义逻辑</a></span>的, 而非经典逻辑的. 这意味着不能使用排中律, 且一个命题 $P$ 的否定之否定不能推出 $P$ 本身.</p>
+<h2>例</h2>
+<h3>概形上的层语义</h3>
+<p>概形上的<span class="link local"><a href="/层意象.html" title="层意象 [层意象]">层意象</a></span>的<span class="link local"><a href="/层语义.html" title="层语义 [层语义]">层语义</a></span>简化了代数几何中的许多概念和命题.</p>
+<p>见<span class="link local"><a href="/概形上的层语义.html" title="概形上的层语义 [概形上的层语义]">概形上的层语义</a></span>.</p>
+<h3>物理</h3>
+<p>一个量子力学系统可赋予一个 <span class="link local"><a href="/Bohr意象.html" title="Bohr 意象 [Bohr意象]">Bohr 意象</a></span>.</p>
+<h3>其他</h3>
+<p>另见 <span class="link local"><a href="/Newton--Puiseux定理.html" title="“Newton–Puiseux 定理” [Newton--Puiseux定理]">Newton–Puiseux 定理</a></span></p>
+</details></section><section class="block" data-taxon=""><details ><summary id="景"><header><h1><span class="taxon"></span>景 <a class="slug" href="/景.html">[景]</a><a class="edit" href="vscode://file/E:/Simplopedia_source/trees/%E6%99%AF.md">[edit]</a></h1><div class="metadata"><ul><li class="meta-item">百科</li><li class="meta-item"><span class="link local"><a href="/SimplicialCat.html" title="单纯猫 [SimplicialCat]">SimplicialCat</a></span></li></ul></div></header></summary>
+<h2>观念</h2>
+<p><strong>景</strong>是<span class="link local"><a href="/意象.html" title="意象 [意象]">意象</a></span>的一种<span class="link local"><a href="/数学对象的表现.html" title="数学对象的表现 [数学对象的表现]">表现</a></span>.</p>
+<p>Grothendieck 将拓扑空间上的<span class="link local"><a href="/层.html" title="拓扑空间上的层 [层]">层</a></span>推广为<span class="link local"><a href="/景上的层.html" title="景上的层 [景上的层]">景上的层</a></span>. <strong>景</strong> (site) 是带有覆盖结构 (又称 <span class="link local"><a href="/Grothendieck拓扑.html" title="Grothendieck 拓扑 [Grothendieck拓扑]">Grothendieck 拓扑</a></span>) 的范畴. 正如拓扑空间中的开集可由子开集覆盖, 景规定了其对象何时由一族到它的态射覆盖.</p>
+<h2>例</h2>
+<p><span class="link local"><a href="/Zariski景.html" title="Zariski 景 [Zariski景]">Zariski 景</a></span></p>
+<p><span class="link local"><a href="/无穷小景.html" title="“无穷小景” [无穷小景]">无穷小景</a></span></p>
+</details></section><section class="block" data-taxon=""><details ><summary id="景上的层"><header><h1><span class="taxon"></span>景上的层 <a class="slug" href="/景上的层.html">[景上的层]</a><a class="edit" href="vscode://file/E:/Simplopedia_source/trees/%E6%99%AF%E4%B8%8A%E7%9A%84%E5%B1%82.md">[edit]</a></h1><div class="metadata"><ul><li class="meta-item">百科</li><li class="meta-item"><span class="link local"><a href="/SimplicialCat.html" title="单纯猫 [SimplicialCat]">SimplicialCat</a></span></li></ul></div></header></summary>
+<h2>观念</h2>
+<p>一个<span class="link local"><a href="/景.html" title="景 [景]">景</a></span>上的层, 就是这个<span class="link local"><a href="/景.html" title="景 [景]">景</a></span>所<span class="link local"><a href="/数学对象的表现.html" title="数学对象的表现 [数学对象的表现]">表现</a></span>的<span class="link local"><a href="/意象.html" title="意象 [意象]">意象</a></span>中的对象.</p>
+<p><span class="link local"><a href="/景.html" title="景 [景]">景</a></span>上的层是<span class="link local"><a href="/层.html" title="拓扑空间上的层 [层]">拓扑空间上的层</a></span>的推广.</p>
+<h2>定义</h2>
+<h3>逐元素定义</h3>
+<p>设 $(C,J)$ 为<span class="link local"><a href="/景.html" title="景 [景]">景</a></span>, $P\colon C^{\text{op}}\to \mathsf {Set}$ 是 $C$ 上的预层.</p>
+<p>固定一个对象 $c\in C$ 以及覆盖筛 $S \in J(c)$. 定义 $P$ 的一个<strong>相容族</strong> (matching family) 是如下资料: 对 $S$ 中的每个 $f\colon d\to c$ 指定一个元素 $x_f\in P(D)$, 使得
+$$
+x_f\cdot g := P(g)(x_f) = x_{fg},\quad \forall g\colon e\to d.
+$$
+上式可形象地表示为下图的 “相容性”.
+$$
+e \overset{g}{\to} d \overset{f}{\to} c \overset{x}{\leadsto} P
+$$</p>
+<p>(todo)</p>
+<h3>范畴论定义</h3>
+<p>(todo)</p>
+</details></section><section class="block" data-taxon=""><details ><summary id="景的态射"><header><h1><span class="taxon"></span>景的态射 <a class="slug" href="/景的态射.html">[景的态射]</a><a class="edit" href="vscode://file/E:/Simplopedia_source/trees/%E6%99%AF%E7%9A%84%E6%80%81%E5%B0%84.md">[edit]</a></h1><div class="metadata"><ul><li class="meta-item">百科</li><li class="meta-item"><span class="link local"><a href="/SimplicialCat.html" title="单纯猫 [SimplicialCat]">SimplicialCat</a></span></li></ul></div></header></summary>
+<p>景的态射 $f\colon (\mathcal C,J) \to (\mathcal D,K)$ 是诱导<span class="link local"><a href="/意象.html" title="意象 [意象]">意象</a></span>之间的<span class="link local"><a href="/几何态射.html" title="几何态射 [几何态射]">几何态射</a></span>
+$$
+f\colon \operatorname{Sh}(\mathcal D,K) \to \operatorname{Sh}(\mathcal C,J)
+$$
+的函子 $f\colon \mathcal C\to\mathcal D$.</p>
+<p>注意这个态射的方向和 $f\colon \mathcal C\to\mathcal D$ 的方向相反.</p>
+<p>(todo)</p>
+</details></section><section class="block" data-taxon=""><details ><summary id="束"><header><h1><span class="taxon"></span>束 <a class="slug" href="/束.html">[束]</a><a class="edit" href="vscode://file/E:/Simplopedia_source/trees/%E6%9D%9F.md">[edit]</a></h1><div class="metadata"><ul><li class="meta-item">百科</li><li class="meta-item"><span class="link local"><a href="/SimplicialCat.html" title="单纯猫 [SimplicialCat]">SimplicialCat</a></span></li></ul></div></header></summary>
+<p>束 (gerbe) 是<span class="link local"><a href="/意象.html" title="意象 [意象]">意象</a></span>中的一种特殊的对象, 仅包含某一个阶数的非平凡同伦信息.</p>
+<h2>定义</h2>
+<h3>抽象定义</h3>
+<p>束就是<span class="link local"><a href="/∞-意象.html" title="∞-意象 [∞-意象]">意象</a></span>中的 $1$-<span class="link local"><a href="/截断性.html" title="截断性 [截断性]">截断</a></span> $0$-<span class="link local"><a href="/连通性.html" title="连通性 [连通性]">连通</a></span>对象.</p>
+<p>一般地, 定义 $n$-<strong>束</strong>为 $n$-截断 $(n-1)$-<span class="link local"><a href="/连通性.html" title="连通性 [连通性]">连通</a></span>对象.</p>
+<p>使用<span class="link local"><a href="/相对.html" title="相对观点 [相对]">相对观点</a></span>, 对于态射 $Y\to X$, 若其在 $X$ 上的<span class="link local"><a href="/俯意象.html" title="俯意象 [俯意象]">俯意象</a></span>中为 $n$-束, 我们也可称之为 $X$ 上的 $n$-束.</p>
+<p>一般的束没有 (<span class="link local"><a href="/整体截面.html" title="整体截面 [整体截面]">整体</a></span>的) <strong>点</strong>.
+由定义, <strong>带点</strong>的 $n$-束等同于 $n$ 阶 <span class="link local"><a href="/Eilenberg–MacLane空间.html" title="Eilenberg–MacLane 对象 [Eilenberg–MacLane空间]">Eilenberg–MacLane 对象</a></span>, 又称为<strong>平凡</strong> $n$-束 (trivial $n$-gerbe).</p>
+<h3>通过景定义</h3>
+<p><span class="link local"><a href="/景.html" title="景 [景]">景</a></span> $(\mathcal C,J)$ 上的<strong>束</strong> (gerbe) 是 $1$-群胚取值的<span class="link local"><a href="/景上的层.html" title="景上的层 [景上的层]">层</a></span> $F \colon \mathcal C\to\mathsf{Ani}_{\leq 1}$, 满足</p>
+<ul>
+<li>($(-1)$-<span class="link local"><a href="/连通性.html" title="连通性 [连通性]">连通性</a></span>) $F$ 局部非空, 即存在终对象的覆盖 $(U_i)$, 使得 $F(U_i)$ 非空;</li>
+<li>($0$-<span class="link local"><a href="/连通性.html" title="连通性 [连通性]">连通性</a></span>) 对任意 $U\in\mathcal C$, 任意两个元素 $x,y\in F(U)$ 局部同构, 即存在 $U$ 的覆盖使得 $x,y$ 在其上的限制 (拉回) 同构.</li>
+</ul>
+<h2>性质</h2>
+<p>设 $F$ 为 $n$-束, $x,y\colon * \to F$ 为两个点. 考虑拉回
+$$
+\begin{array}
+    {ccc}
+    *\times_F * &amp; \to &amp; * \\
+    \downarrow &amp; &amp; \downarrow {\scriptsize{x}}\!\!\! \\
+    * &amp; \underset{y}{\to} &amp; F,
+\end{array}
+$$
+那么 $*\times_F *$ 为 $(n-1)$-束.</p>
+<h3>由群控制的束</h3>
+<p>类似于 Eilenberg–MacLane 空间由一个 (Abel) 群控制, 束有时也可由群控制.</p>
+<p>$n=1$ 情形.</p>
+<p><strong>定义</strong>. 设 $G$ 为<span class="link local"><a href="/意象.html" title="意象 [意象]">意象</a></span> $\mathcal{C}$ 中的 $0$-<span class="link local"><a href="/截断性.html" title="截断性 [截断性]">截断</a></span><span class="link local"><a href="/群.html" title="群 [群]">群</a></span>, 定义由 $G$ <strong>控制</strong>的 $1$-束是一个 $1$-束带有如下结构:</p>
+<ul>
+<li>(抽象表述) $F$ 的 $1$ 阶整体<span class="link local"><a href="/同伦群.html" title="同伦群 [同伦群]">同伦群</a></span>与 $G$ 的同构 $\pi_1(F)\simeq G_F := G\times F$;</li>
+<li>(传统表述, 对于<span class="link local"><a href="/景.html" title="景 [景]">景</a></span> $(\mathcal C,J)$ 上的<span class="link local"><a href="/层意象.html" title="层意象 [层意象]">层意象</a></span>定义) 对任意 $U\in\mathcal C$, 任意 $x\in F(U)$, 有函子性的同构 $G(U) \simeq \operatorname{Aut}_{F(U)}(x)$.</li>
+</ul>
+<p>注. 假设 $\pi_1(F)\simeq G_F$, 即 “对任意 $x\in F$” (只能在局部上或在<span class="link local"><a href="/意象的内语言.html" title="意象的内语言 [意象的内语言]">内语言</a></span>中解读) 有 $\pi_1(F,x)\simeq G$, 由<span class="link local"><a href="/截断性.html" title="截断性 [截断性]">截断性</a></span>实际上有 $\Omega(F,x)\simeq G$; 那么 (外部语言) 对任意 $x\in F(U)$ 就有 $\operatorname{Aut}_{F(U)}(x)\simeq\operatorname{Hom}_{\mathcal{C}_{/U}}(U,\Omega (F\times U,x)) \simeq G(U)$.</p>
+<p>注. 对于 $1$-束 $F$, 上面的群 $G$ 不一定存在.</p>
+<p>$n\geq 2$ 情形.</p>
+<p><strong>定义</strong>. 设 $n\geq 2$, $A$ 为<span class="link local"><a href="/意象.html" title="意象 [意象]">意象</a></span> $\mathcal{C}$ 中的 $0$-<span class="link local"><a href="/截断性.html" title="截断性 [截断性]">截断</a></span> Abel 群. 定义由 $A$ 控制的 $n$-束为一个 $n$-束 $F$ 带有一个同构 $\pi_n(F) \simeq A\times F$.</p>
+<p>直观上, $A$-束 $F$ 在每一点处的 $n$ 阶<span class="link local"><a href="/同伦群.html" title="同伦群 [同伦群]">同伦群</a></span>均为 $A$. 注意这不能推出 $F$ 同构于 <span class="link local"><a href="/Eilenberg–MacLane空间.html" title="Eilenberg–MacLane 对象 [Eilenberg–MacLane空间]">Eilenberg–MacLane 对象</a></span> $\mathbf{B}^n A$. 因为 $F$ 甚至可以没有整体的点.</p>
+<p>记 Abel 群 $A$ 控制的 $n$-束的范畴为 $\mathsf{Gerb}_n^A(\mathcal{C})$.</p>
+<p><strong>命题</strong>. 设 $F$ 为意象 $\mathcal C$ 中的 $n$-束 ($n\geq 2$), 则存在 $\mathcal C$ 中的 $0$-截断 Abel 群 $A$, 使得
+$$
+\pi_n (F) \simeq A \times F.
+$$</p>
+<p>证明.
+由于 $F$ 是 $(n-1)$-<span class="link local"><a href="/连通性.html" title="连通性 [连通性]">连通</a></span>对象, 函子 $F\times (-) \colon \mathcal{C} \to\mathcal{C}_{/F}$ 诱导了<span class="link local"><a href="/俯意象.html" title="俯意象 [俯意象]">俯意象</a></span>的 $(n-2)$-截断部分的等价
+$$
+\mathcal{C}_{\leq n-2} \simeq (\mathcal{C}_{/F})_{\leq n-2}.
+$$
+特别地, 两边的 $0$-截断部分等价, 从而 $\pi_n (F) \in \mathsf{Ab}((\mathcal{C}_{/F})_{\leq 0})$ 对应于 $A\in\mathsf{Ab}(\mathcal{C}_{\leq 0})$.</p>
+<h3>平凡性与局部平凡性</h3>
+<p>对于 $0$-截断群 $A$, 由 $A$ 控制的带点 $n$-束即为 <span class="link local"><a href="/Eilenberg–MacLane空间.html" title="Eilenberg–MacLane 对象 [Eilenberg–MacLane空间]">Eilenberg–MacLane 对象</a></span> $K(A,n)=\mathbf{B}^n A$. 定义一个 $A$ 控制的 $n$-束 $F$ 的<strong>平凡化</strong>为其 (<span class="link local"><a href="/整体截面.html" title="整体截面 [整体截面]">整体</a></span>) 点; 也等同于其到 $\mathbf{B}^n A$ 的等价.</p>
+<p>设 $A$ 是<span class="link local"><a href="/意象.html" title="意象 [意象]">意象</a></span> $\mathcal C$ 中的 $0$-截断 Abel 群, 对于 $X$ 上 $A$ 控制的 $n$-束 $\tilde{X} \to X$, 若有 $\mathcal C_{/X}$ 中的同构 $\tilde{X} \simeq X\times\mathbf{B}^{n}A$, 则称 $\tilde{X}\to X$ 为<strong>平凡</strong> $n$-束, 称同构 $\tilde{X} \simeq X\times\mathbf{B}^{n}A$ 为 $\tilde{X}$ 的 <strong>平凡化</strong>.</p>
+<p><strong>命题</strong>. 若 $n$-束 $\tilde{X}\to X$ 有截面 $s\colon X\to \tilde{X}$, 则它是平凡 $n$-束.</p>
+<p><strong>命题</strong>. $X$ 上的 $n$-束 $\tilde{X} \to X$ 在 $X$ 的<strong>局部</strong>有截面; 即沿某个<span class="link local"><a href="/意象中的满射.html" title="意象中的满射 [意象中的满射]">满射</a></span> $U\to X$ 的拉回有截面 (从而为平凡 $n$-束).</p>
+<h3>与上同调的关系</h3>
+<p><strong>命题</strong>. 设 $A$ 为<span class="link local"><a href="/意象.html" title="意象 [意象]">意象</a></span> $\mathcal{C}$ 中的 $0$-截断 Abel 群, $n\geq 2$. 则有<span class="link local"><a href="/生象.html" title="生象, ∞-群胚 [生象]">生象</a></span>的等价
+$$
+\operatorname{Hom}_{\mathcal{C}}(X,\mathbf{B}^n A) \simeq \mathsf{Gerb}_{n-1}^A(\mathcal C_{/X}),
+$$
+将 $X\to\mathbf{B}^n A$ 对应到拉回 $(n-1)$-束
+$$
+\begin{array}
+    {ccc}
+    \tilde{X} &amp; \to &amp; * \\
+    \downarrow &amp; &amp; \downarrow \\
+    X &amp; \to &amp; \mathbf{B}^n A.
+\end{array}
+$$
+换言之, $*\to \mathbf{B}^n A$ 是<strong>万有</strong>的 $A$ 控制的 $(n-1)$-束.</p>
+<p>特别地 (取 $0$-<span class="link local"><a href="/截断性.html" title="截断性 [截断性]">截断</a></span>), $X$ 的 $A$-系数<span class="link local"><a href="/上同调.html" title="上同调 [上同调]">上同调</a></span> $H^n(X,A)$ 等同于 $A$ 控制的 $(n-1)$-束的等价类.</p>
+<p><em>证明</em>. 要证的是对任意由 $A$ 控制的 $(n-1)$-束 $\tilde{X}\to X$, 存在唯一如上的拉回图.</p>
+<p>采用从局部到整体的方法. 首先, 要证明的结论关于 $X$ 是<strong>局部</strong>的; 也就是对任意<span class="link local"><a href="/意象中的满射.html" title="意象中的满射 [意象中的满射]">满射</a></span> $U\to X$, 只要结论对拉回 $(n-1)$-束 $\tilde{X}\times_X U \to U$ 成立, 就有结论对 $(n-1)$-束 $\tilde{X}\to X$ 成立.</p>
+<h3>扭层</h3>
+<p>(集合值的) <span class="link local"><a href="/层.html" title="拓扑空间上的层 [层]">层</a></span>可以视为平凡束的截面; 一般地, 每一个束的截面给出一种<strong>扭层</strong>的概念, 用传统的观点即一个 “粘合条件被 $2$-上圈扭过” 的层.</p>
+</details></section><section class="block" data-taxon=""><details ><summary id="环化意象"><header><h1><span class="taxon"></span>“环化意象” <a class="slug" href="/环化意象.html">[环化意象]</a><a class="edit" href="vscode://file/E:/Simplopedia_source/trees/%E7%8E%AF%E5%8C%96%E6%84%8F%E8%B1%A1.md">[edit]</a></h1><div class="metadata"><ul><li class="meta-item">百科</li><li class="meta-item"><span class="link local"><a href="/SimplicialCat.html" title="单纯猫 [SimplicialCat]">SimplicialCat</a></span></li></ul></div></header></summary>
+<h2>定义</h2>
+<p><span class="link external"><a href="https://ncatlab.org/nlab/show/ringed+topos" title="nLab 页面 [https://ncatlab.org/nlab/show/ringed+topos]">nLab 页面</a></span></p>
+<p>设 $\mathcal E$ 为<span class="link local"><a href="/意象.html" title="意象 [意象]">意象</a></span>, 其中有内蕴交换环对象 $R$, 则称 $(\mathcal E,R)$ 为环化意象.</p>
+<p>若 $\mathcal{E}$ 为景 $\mathcal C$ 上的<span class="link local"><a href="/层意象.html" title="层意象 [层意象]">层意象</a></span>, 则 $R$ 为 $\mathcal C$ 上的环层 (结构层).</p>
+<h2>例</h2>
+<p>一个<span class="link local"><a href="/环化空间.html" title="环化空间 [环化空间]">环化空间</a></span> $(X,\mathcal O_X)$ 诱导了环化意象 $(\operatorname{Sh}(X),\mathcal O_X)$.</p>
+<h2>综合微分几何</h2>
+<p>在<span class="link local"><a href="/综合微分几何.html" title="综合微分几何 [综合微分几何]">综合微分几何</a></span>中, $\mathcal E$ 的对象称作 “空间” 或 “集合”, $R$ 称作 “数轴”. “环” 指的就是 “环对象”, “映射” 指的就是 “光滑映射”. $R$ 类似于实数轴 $\mathbb{R}$, 但不是一个域, 因为我们需要考虑幂零元. 简单起见我们设 $R$ 是特征 $0$ 的, 且 $1+1+\cdots + 1$ 可逆, 即 $R$ 包含 $\mathbb{Q}$. (但代数几何中人们会认真对待正特征的情形.) 有时我们需要 $R$ 是局部环: 若一些数的和可逆, 则其中至少有一个数可逆.</p>
+<p>$R$-模 $V$ 称作有限维向量空间, 是指存在线性同构 $V\to R^n$. 其中 “存在” 一词应在层的语义 (sheaf semantics) 下理解, 即 $V$ 局部同构于 $R^n$.</p>
+</details></section><section class="block" data-taxon=""><details ><summary id="生象"><header><h1><span class="taxon"></span>生象, ∞-群胚 <a class="slug" href="/生象.html">[生象]</a><a class="edit" href="vscode://file/E:/Simplopedia_source/trees/%E7%94%9F%E8%B1%A1.md">[edit]</a></h1><div class="metadata"><ul><li class="meta-item">百科</li><li class="meta-item"><span class="link local"><a href="/SimplicialCat.html" title="单纯猫 [SimplicialCat]">SimplicialCat</a></span></li></ul></div></header></summary>
+<h2>观念</h2>
+<p>从现代数学的观点, “<strong>生象</strong>” 的概念代替了传统的 “集合” 的概念: 对生象的最好描述就是<strong>一类数学对象的全体构成一个生象</strong>. Anima 有 “灵魂” 之意, 而生象在历史上的来源是从拓扑空间或其它几何对象中提取的同伦信息.</p>
+<blockquote>
+<p>Philosophically, “anima” means something like “soul”—and, indeed, the functor from topological spaces to their homotopy category extracts something like the soul of a space: it only remembers data independent of any worldly representation in terms of physical points.</p>
+<p>Kestutis Cesnavicius, Peter Scholze, <span class="link local"><a href="/CesnaviciusScholzePurity.html" title="Purity for flat cohomology [CesnaviciusScholzePurity]">Purity for flat cohomology</a></span></p>
+</blockquote>
+<p>在<span class="link local"><a href="/范畴论.html" title="范畴论 [范畴论]">范畴论</a></span> (尤其是<span class="link local"><a href="/高阶范畴.html" title="高阶范畴 [高阶范畴]">高阶范畴论</a></span>) 上, 生象等同于 <span class="link local"><a href="/∞-群胚.html" title="∞-群胚 [∞-群胚]">$\infty$-群胚</a></span>. 但是它值得一个特别的名字, 因为它比范畴的概念更为基本.</p>
+<h3>从集合到生象</h3>
+<p>当我们把一类事物放到一起作为一个整体来谈论的时候, “<strong>集合</strong>” 的概念便产生了. 随着数学 (尤其是同伦论, 高阶代数) 的发展, 人们发现数学语言中的 “集合” 有时不能表达实践中的 “一类事物的集体” 这一概念, 其关键的缺陷在于对<strong>何为相等</strong>这一问题的过于草率的回答.</p>
+<p>诚然, 对于基础算术而言, 何为相等不是一个问题: $1+1$ 等于 $2$ 而不等于 $3$; 任何两个数<strong>要么</strong>相等, <strong>要么</strong>不相等, 绝无第三种情形. 但当数学研究的对象从简单的数变成了代数, 拓扑空间, 层, 叠等等越来越复杂的结构时, 这些对象之间的相等不再是一个是或否的命题, 而是一个同样越来越复杂的问题. 甚至一个对象和自身的相等也可能不是一个平凡的命题, 而是存在多个不平凡的途径.</p>
+<p>最终人们走向这样一个观念:</p>
+<p><strong>一类事物的 “集合” 之中, 任何两个事物之间的等式须构成一类新的事物</strong>, 从而这个新的 “集合” 中又可以谈论相等构成的 “集合”, 以至于无穷. 这种革新的 “集合” 概念就是<strong>生象</strong>.</p>
+<p>生象有别于集合的特点在于, 生象 $A$ 中两个元素 $x,y$ 之间的<strong>相等</strong>不一定是一个是或否的<strong>命题</strong>, 而是一个新的<strong>生象</strong> (换言之, 相等是<span class="link local"><a href="/结构.html" title="结构, 性质 [结构]">结构而非性质</a></span>), 记作 $x =_A y$. 一个直观是空间中两个点之间的道路空间.</p>
+<p>当然, 集合是特殊的生象, 集合的定义是任何两个元素之间的相等都是<span class="link local"><a href="/命题(同伦类型论).html" title="命题 (同伦类型论) [命题(同伦类型论)]">命题</a></span>的生象.</p>
+<p>一种适合用于谈论生象的语言是<span class="link local"><a href="/同伦类型论.html" title="同伦类型论 [同伦类型论]">同伦类型论</a></span>.</p>
+<h2>性质</h2>
+<h3>生象的范畴</h3>
+<p>生象的范畴 <span class="link local"><a href="/Ani.html" title="生象的范畴 [Ani]">$\mathsf{Ani}$</a></span> 是最基本的 <span class="link local"><a href="/无穷范畴.html" title="无穷范畴 [无穷范畴]">∞-范畴</a></span>, 也是最简单的 <span class="link local"><a href="/∞-意象.html" title="∞-意象 [∞-意象]">$\infty$-意象</a></span>.</p>
+<h3>生象的表现</h3>
+<p>如下类型的对象可以<span class="link local"><a href="/数学对象的表现.html" title="数学对象的表现 [数学对象的表现]">表现</a></span>生象, 其表现的生象有时称为<strong>同伦型</strong>:</p>
+<ul>
+<li><span class="link local"><a href="/单纯集.html" title="单纯集 [单纯集]">单纯集</a></span></li>
+<li>拓扑空间</li>
+<li><span class="link local"><a href="/意象.html" title="意象 [意象]">意象</a></span> (见<span class="link local"><a href="/∞-意象的形.html" title="意象的形 [∞-意象的形]">意象的形</a></span>)</li>
+</ul>
+<h2>相关概念</h2>
+<p><span class="link local"><a href="/生象化.html" title="生象化 [生象化]">生象化</a></span></p>
+</details></section><section class="block" data-taxon=""><details ><summary id="盲人摸象"><header><h1><span class="taxon"></span>盲人摸象 <a class="slug" href="/盲人摸象.html">[盲人摸象]</a><a class="edit" href="vscode://file/E:/Simplopedia_source/trees/%E7%9B%B2%E4%BA%BA%E6%91%B8%E8%B1%A1.md">[edit]</a></h1><div class="metadata"><ul><li class="meta-item">参考资料</li><li class="meta-item"><span class="link external"><a href="https://simplicialcat.github.io" title="我 [https://simplicialcat.github.io]">我</a></span></li></ul></div></header></summary>
+<p>项目 (包括 tex 源代码): https://github.com/SimplicialCat/topos</p>
+<p>PDF : https://simplicialcat.github.io/topos.pdf</p>
+<p>2023 年开始的项目, 包含 $1$-<span class="link local"><a href="/意象.html" title="意象 [意象]">意象</a></span>的基本知识, <span class="link local"><a href="/位象.html" title="位象 [位象]">位象</a></span>的概念, 以及范畴论和<span class="link local"><a href="/一阶语言.html" title="一阶语言与一阶逻辑 [一阶语言]">一阶逻辑</a></span>基础.</p>
+<h2>内容</h2>
+<ul>
+<li>1 意象的范畴论性质
+<ul>
+<li>1.1 范畴论基本概念</li>
+<li>1.2 <span class="link local"><a href="/意象.html" title="意象 [意象]">意象</a></span></li>
+<li>1.3 更多范畴论结构</li>
+</ul>
+</li>
+<li>2 <span class="link local"><a href="/位象.html" title="位象 [位象]">位象</a></span>: 无点拓扑学
+<ul>
+<li>2.1 基本概念</li>
+<li>2.2 位象的几何性质</li>
+<li>2.3 位象与逻辑</li>
+</ul>
+</li>
+<li>3 意象与空间的概念
+<ul>
+<li>3.1 拓扑空间上的层与平展空间</li>
+<li>3.2 位象上的层与平展空间</li>
+<li>3.3 范畴上的<span class="link local"><a href="/预层.html" title="预层 [预层]">预层</a></span></li>
+<li>3.4 <span class="link local"><a href="/景.html" title="景 [景]">景</a></span></li>
+<li>3.5 层化与 Grothendieck+构造</li>
+<li>3.6 Grothendieck 意象</li>
+<li>3.7 <span class="link local"><a href="/Lawvere--Tierney拓扑.html" title="Lawvere–Tierney 拓扑 [Lawvere--Tierney拓扑]">Lawvere–Tierney 拓扑</a></span>,内蕴层化与局部化</li>
+<li>3.8 意象之间的态射</li>
+<li>3.9 景之间的态射</li>
+<li>3.10 意象的几何性质</li>
+<li>3.11 <span class="link local"><a href="/Giraud公理.html" title="Giraud 公理 [Giraud公理]">Giraud 定理</a></span></li>
+<li>3.12 等变层与拓扑群胚</li>
+<li>3.13 意象的余极限</li>
+</ul>
+</li>
+<li>4 意象的内语言
+<ul>
+<li>4.1 Mitchell–Bénabou 语言</li>
+<li>4.2 Kripke–Joyal 语义</li>
+<li>4.3 不同意象的内语言的联系</li>
+</ul>
+</li>
+<li>5 语法景与分类意象
+<ul>
+<li>5.1 语法范畴:语法–语义对偶</li>
+<li>5.2 分类意象</li>
+</ul>
+</li>
+<li>6 意象理论的应用
+<ul>
+<li>(这一章没有完成)</li>
+</ul>
+</li>
+<li>A 范畴论基础
+<ul>
+<li>A.1 $2$-范畴</li>
+<li>A.2 伴随</li>
+<li>A.3 <span class="link local"><a href="/自反子范畴.html" title="自反子范畴 [自反子范畴]">自反子范畴</a></span>与局部化</li>
+<li>A.4 预层范畴与<span class="link local"><a href="/米田嵌入.html" title="米田嵌入 [米田嵌入]">米田嵌入</a></span></li>
+<li>A.5 (余)<span class="link local"><a href="/滤范畴.html" title="滤范畴 [滤范畴]">滤范畴</a></span>和(余)<span class="link local"><a href="/滤余极限.html" title="滤余极限 [滤余极限]">滤(余)极限</a></span></li>
+<li>A.6 <span class="link local"><a href="/可表现范畴.html" title="可表现范畴 [可表现范畴]">可表现范畴</a></span></li>
+<li>A.7 Kan扩张</li>
+<li>A.8 单子论</li>
+<li>A.9 万有代数</li>
+<li>A.10 纤维范畴与索引范畴</li>
+<li>A.11 下降</li>
+</ul>
+</li>
+<li>B 形式逻辑和范畴逻辑基础
+<ul>
+<li>B.1 <span class="link local"><a href="/一阶语言.html" title="一阶语言与一阶逻辑 [一阶语言]">一阶逻辑</a></span></li>
+<li>B.2 一阶逻辑的范畴语义</li>
+<li>B.3 高阶逻辑</li>
+<li>B.4 类型论</li>
+<li>B.5 模态逻辑</li>
+</ul>
+</li>
+<li>术语和符号表</li>
+<li>参考文献</li>
+</ul>
+</details></section><section class="block" data-taxon=""><details ><summary id="相对同伦群"><header><h1><span class="taxon"></span>相对同伦群 <a class="slug" href="/相对同伦群.html">[相对同伦群]</a><a class="edit" href="vscode://file/E:/Simplopedia_source/trees/%E7%9B%B8%E5%AF%B9%E5%90%8C%E4%BC%A6%E7%BE%A4.md">[edit]</a></h1><div class="metadata"><ul><li class="meta-item">百科</li><li class="meta-item"><span class="link local"><a href="/SimplicialCat.html" title="单纯猫 [SimplicialCat]">SimplicialCat</a></span></li></ul></div></header></summary>
+<h2>观念</h2>
+<p>相对同伦群是<span class="link local"><a href="/同伦群.html" title="同伦群 [同伦群]">同伦群</a></span>的<span class="link local"><a href="/相对.html" title="相对观点 [相对]">相对</a></span>版本.</p>
+<h2>定义</h2>
+<h3>一般定义</h3>
+<p><span class="link local"><a href="/意象.html" title="意象 [意象]">意象</a></span> $\mathcal C$ 中的映射 $A\to X$ 的相对同伦群是其作为 $X$ 的<span class="link local"><a href="/俯意象.html" title="俯意象 [俯意象]">俯意象</a></span>的对象的<span class="link local"><a href="/同伦群.html" title="同伦群 [同伦群]">同伦群</a></span>
+$$
+\pi_n(A\to X) \in \mathcal (\mathcal C_{/X})_{/A} = \mathcal C_{/A}.
+$$
+对于 $A$ 的点 $a\colon 1\to A$, 定义 $a$ 处的相对同伦群
+$$
+\pi_n(A\to X, a) := a^*\pi_n(A\to X).
+$$</p>
+<h3>传统</h3>
+<p>设 $(X,A)$ 为空间偶, $A$ 带有基点 $x_0$. 设 $n$ 为正整数.</p>
+<p>定义相对同伦群 $\pi_n(X,A,x_0)$ 的元素为映射 $(I^n,\partial I^n,J^{n-1}) \to (X,A,x_0)$ 的同伦类, 其中 $J^{n-1}$ 是 $\partial I^n$ 去掉一个面 (“开口的盒子”).</p>
+<p>另一种等价的定义是, $\pi_n(X,A,x_0)$ 的元素为映射 $(D^n,S^{n-1},s_0) \to (X,A,x_0)$ 的同伦类.</p>
+<p>对于 $n\geq 2$, 定义 $\pi_n(X,A,x_0)$ 的群运算如下. 设 $[f],[g] \in\pi_n(X,A,x_0)$ 分别由映射 $f,g \colon (I^n,\partial I^n,J^{n-1}) \to (X,A,x_0)$ 代表. 设 $J^{n-1}$ 是 $\partial I^n$ 去掉了对应于 $x_n=1$ 的面. 定义 $f\cdot g$ 为映射
+$$
+(x_1,\cdots,x_n)\mapsto\begin{cases}
+f(2x_1,x_2,\cdots,x_n) &amp; x_1&lt;1/2;\\
+f(2x_1-1,x_2,\cdots,x_n) &amp; x_1\geq 1/2.\\
+\end{cases}
+$$
+这个映射的同伦类不依赖于代表元 $f,g$ 的选取.</p>
+<h2>性质</h2>
+<h3>零元</h3>
+<p>映射 $(D^n,S^{n-1},s_0) \to (X,A,x_0)$ 代表相对同伦群的零元的充要条件是它可相对于 $S^{n-1}$ 同伦到 $A$ 中.</p>
+<h3>交换性</h3>
+<p>对于 $n\geq 3$, $\pi_n(X,A,x_0)$ 是交换群.</p>
+<h3>长正合列</h3>
+<h4>三元组</h4>
+<p>对三元组 $(X,A,B,x_0)$ 有相对同伦群的长正合列
+$$
+\cdots\to \pi_n(A,B,x_0) \to \pi_n(X,B,x_0) \to \pi_n(X,A,x_0) \to \pi_{n-1}(A,B,x_0) \to\cdots.
+$$</p>
+<h2>例</h2>
+</details></section><section class="block" data-taxon=""><details ><summary id="真值"><header><h1><span class="taxon"></span>真值 <a class="slug" href="/真值.html">[真值]</a><a class="edit" href="vscode://file/E:/Simplopedia_source/trees/%E7%9C%9F%E5%80%BC.md">[edit]</a></h1><div class="metadata"><ul><li class="meta-item">百科</li><li class="meta-item"><span class="link local"><a href="/SimplicialCat.html" title="单纯猫 [SimplicialCat]">SimplicialCat</a></span></li></ul></div></header></summary>
+<h2>定义</h2>
+<ul>
+<li>在经典逻辑中, 真值只有两个: $\top$ (真), $\bot$ (假).</li>
+<li>在<span class="link local"><a href="/意象.html" title="意象 [意象]">意象</a></span>中, 真值是<span class="link local"><a href="/子终对象.html" title="子终对象 [子终对象]">子终对象</a></span>, 即终对象 $1$ 的子对象.</li>
+<li>在<span class="link local"><a href="/同伦类型论.html" title="同伦类型论 [同伦类型论]">同伦类型论</a></span>中, 真值是 $(-1)$-<span class="link local"><a href="/截断性.html" title="截断性 [截断性]">截断</a></span>类型. 见<span class="link local"><a href="/命题(同伦类型论).html" title="命题 (同伦类型论) [命题(同伦类型论)]">命题 (同伦类型论)</a></span>.</li>
+</ul>
+</details></section><section class="block" data-taxon=""><details ><summary id="空意象"><header><h1><span class="taxon"></span>空意象 <a class="slug" href="/空意象.html">[空意象]</a><a class="edit" href="vscode://file/E:/Simplopedia_source/trees/%E7%A9%BA%E6%84%8F%E8%B1%A1.md">[edit]</a></h1><div class="metadata"><ul><li class="meta-item">百科</li><li class="meta-item"><span class="link local"><a href="/意象理论.html" title="意象理论 [意象理论]">意象理论</a></span></li><li class="meta-item"><span class="link local"><a href="/SimplicialCat.html" title="单纯猫 [SimplicialCat]">SimplicialCat</a></span></li></ul></div></header></summary>
+<h2>定义</h2>
+<p>空意象是终范畴 $1$, 也即空空间对应的<span class="link local"><a href="/意象.html" title="意象 [意象]">意象</a></span>.</p>
+</details></section><section class="block" data-taxon=""><details ><summary id="紧合几何态射"><header><h1><span class="taxon"></span>“紧合几何态射” <a class="slug" href="/紧合几何态射.html">[紧合几何态射]</a><a class="edit" href="vscode://file/E:/Simplopedia_source/trees/%E7%B4%A7%E5%90%88%E5%87%A0%E4%BD%95%E6%80%81%E5%B0%84.md">[edit]</a></h1><div class="metadata"><ul><li class="meta-item">百科</li><li class="meta-item"><span class="link local"><a href="/SimplicialCat.html" title="单纯猫 [SimplicialCat]">SimplicialCat</a></span></li></ul></div></header></summary>
+<p>称意象 $\mathcal C$ 为紧意象是指<span class="link local"><a href="/整体截面.html" title="整体截面 [整体截面]">整体截面</a></span>的直像部分保持<span class="link local"><a href="/子终对象.html" title="子终对象 [子终对象]">子终对象</a></span>的定向并.</p>
+<p>称<span class="link local"><a href="/意象.html" title="意象 [意象]">意象</a></span>态射 $f\colon \mathcal F\to\mathcal E$ 为紧合的, 是指其为 $\mathcal E$ 上的紧意象. 这个条件可用<span class="link local"><a href="/叠语义.html" title="“叠语义” [叠语义]">叠语义</a></span>表述.</p>
+</details></section><section class="block" data-taxon=""><details ><summary id="纤维函子"><header><h1><span class="taxon"></span>纤维函子 <a class="slug" href="/纤维函子.html">[纤维函子]</a><a class="edit" href="vscode://file/E:/Simplopedia_source/trees/%E7%BA%A4%E7%BB%B4%E5%87%BD%E5%AD%90.md">[edit]</a></h1><div class="metadata"><ul><li class="meta-item">百科</li><li class="meta-item"><span class="link local"><a href="/SimplicialCat.html" title="单纯猫 [SimplicialCat]">SimplicialCat</a></span></li></ul></div></header></summary>
+<h2>观念</h2>
+<p>纤维函子指的是某种空间 $X$ 上的层范畴 (作为几何对象的<span class="link local"><a href="/代数-几何对偶.html" title="代数–几何对偶 [代数-几何对偶]">代数侧对偶</a></span>) 到点上的层范畴的函子, 在<span class="link local"><a href="/代数-几何对偶.html" title="代数–几何对偶 [代数-几何对偶]">代数–几何对偶</a></span>下对应空间 $X$ 的一个<strong>点</strong>.</p>
+<p><span class="link local"><a href="/意象.html" title="意象 [意象]">意象</a></span>的<span class="link local"><a href="/茎.html" title="茎 [茎]">茎</a></span>是最常见的纤维函子.</p>
+</details></section><section class="block" data-taxon=""><details ><summary id="综合微分几何"><header><h1><span class="taxon"></span>综合微分几何 <a class="slug" href="/综合微分几何.html">[综合微分几何]</a><a class="edit" href="vscode://file/E:/Simplopedia_source/trees/%E7%BB%BC%E5%90%88%E5%BE%AE%E5%88%86%E5%87%A0%E4%BD%95.md">[edit]</a></h1><div class="metadata"><ul><li class="meta-item">学科</li><li class="meta-item"><span class="link local"><a href="/SimplicialCat.html" title="单纯猫 [SimplicialCat]">SimplicialCat</a></span></li></ul></div></header></summary>
+<p>综合微分几何是<span class="link local"><a href="/综合数学.html" title="综合数学 [综合数学]">综合数学</a></span>的微分几何的分支.</p>
+<p>综合微分几何的模型一般是一个包含光滑流形和一些微分几何关心的<span class="link local"><a href="/无穷小空间.html" title="无穷小对象 (综合微分几何) [无穷小空间]">无穷小对象</a></span>的<span class="link local"><a href="/意象.html" title="意象 [意象]">意象</a></span>, 即其语言可理解为该意象的<span class="link local"><a href="/意象的内语言.html" title="意象的内语言 [意象的内语言]">内语言</a></span>.</p>
+<p><span class="link local"><a href="/SDG-notes.html" title="综合微分几何讲稿 [SDG-notes]">综合微分几何讲稿</a></span></p>
+<p>todo: 重写</p>
+<p>综合微分几何使用无穷小的空间, 以无坐标的方式, 将 “微分” 的过程变成纯粹的代数.</p>
+<p>综合微分几何的公理始于<span class="link local"><a href="/环化意象.html" title="“环化意象” [环化意象]">环化意象</a></span> $(\mathcal E,R)$. <span class="link local"><a href="/无穷小空间.html" title="无穷小对象 (综合微分几何) [无穷小空间]">无穷小空间</a></span>引入了 $k$-阶<span class="link local"><a href="/相邻.html" title="“相邻” [相邻]">相邻</a></span> $(k=0,1,2,\cdots)$ 的概念, 这个关系在所有映射下不变.</p>
+<h2>开集的概念</h2>
+<p>我们在 $R$ 上公理化地定义开集, 其中最重要的是要求可逆元的集合 $R^*$ 是开集.</p>
+<p>具体地, 我们假定在 $\mathcal E$ 的所有态射中 (先天) 给定了一类态射, 称作 “开含入” (open inclusions), 满足<strong>拉回之下的稳定性</strong> (stability under pullback), 且 $R$ 的可逆元集合到 $R$ 的含入是开含入.</p>
+<blockquote>
+<p>开集的概念有多种不同的选择. 内蕴 (intrinsic) 地定义开集是有可能的, 例如下面讲的形式开; 但形式开的概念会使得 $R$ 不连通. 还有另外一种内蕴的开集的概念, 不会让 $R$ 不连通, 但更复杂.</p>
+</blockquote>
+<p>有了开集, 就可以谈论局部的概念. <strong>流形</strong>是局部微分同胚于向量空间的空间, 即存在一族空间 $\{U_i: i\in I\}$ 与开含入 $U_i\to M$, $U_i\to R^n$, 且所有 $U_i\to M$ 合在一起是满的.</p>
+<blockquote>
+<p>注意, 流形的概念不仅依赖于 “开集” 的概念, 还依赖于 “族” 的概念. 这里指标集 $I$ 是一个外蕴 (external) 的集合, 而不是 $\mathcal E$ 中的空间.</p>
+</blockquote>
+<p>我们假设开集都是 “形式开” 的. 称子集 $M\subset R^n$ <strong>形式开</strong> (formally open) 是指, 若 $a\in M$, $x$ 无穷小, 则 $a+x\in M$. 在综合微分几何中 “开” 的概念常常需要替换为形式开.</p>
+<h2>微积分</h2>
+<p>在综合微分几何中, 微分的技术建立在 <span class="link local"><a href="/KL公理.html" title="Kock–Lawvere 公理 [KL公理]">KL 公理</a></span>之上. KL 公理大致是说<span class="link local"><a href="/无穷小空间.html" title="无穷小对象 (综合微分几何) [无穷小空间]">无穷小空间</a></span>出发的映射都是多项式.</p>
+</details></section><section class="block" data-taxon=""><details ><summary id="综合数学"><header><h1><span class="taxon"></span>综合数学 <a class="slug" href="/综合数学.html">[综合数学]</a><a class="edit" href="vscode://file/E:/Simplopedia_source/trees/%E7%BB%BC%E5%90%88%E6%95%B0%E5%AD%A6.md">[edit]</a></h1><div class="metadata"><ul><li class="meta-item">观念</li><li class="meta-item"><span class="link local"><a href="/SimplicialCat.html" title="单纯猫 [SimplicialCat]">SimplicialCat</a></span></li></ul></div></header></summary>
+<h2>观念</h2>
+<h3>分析与综合之辨</h3>
+<p><strong>分析</strong> (analysis) 与<strong>综合</strong> (synthesis) 是数学的两种思维模式:</p>
+<ul>
+<li><strong>分析</strong>是将所研究的对象拆解为更简单的东西, 直至还原为最基本的对象 (通常是集合);</li>
+<li><strong>综合</strong>是规定所研究的对象应当具有的性质, 行为或关系, 而不关心其底层的构造.</li>
+</ul>
+<p>以平面几何为例,</p>
+<ul>
+<li>经典的<strong>分析</strong>方法是 Descartes 建立的解析几何, 使用平面直角坐标系将所有几何对象还原为点的集合;</li>
+<li>经典的<strong>综合</strong>方法是 Euclid (或更严格的 Hilbert) 建立的公理几何, 规定点, 直线等对象的性质, 而不关心其具体构造.</li>
+</ul>
+<h3>综合数学</h3>
+<p>通常, 一种综合数学的理论可视为对一个具有较丰富性质的范畴, 如<span class="link local"><a href="/意象.html" title="意象 [意象]">意象</a></span>, 以<span class="link local"><a href="/意象的内语言.html" title="意象的内语言 [意象的内语言]">内语言</a></span>的方式强加的要求; 正如一个代数方程是对一个环强加的要求. 见<span class="link local"><a href="/synthetic.html" title="综合数学是抽象代数的范畴化 [synthetic]">综合数学是抽象代数的范畴化</a></span>.</p>
+</details></section><section class="block" data-taxon=""><details ><summary id="群胚对象"><header><h1><span class="taxon"></span>群胚对象 (∞-范畴论) <a class="slug" href="/群胚对象.html">[群胚对象]</a><a class="edit" href="vscode://file/E:/Simplopedia_source/trees/%E7%BE%A4%E8%83%9A%E5%AF%B9%E8%B1%A1.md">[edit]</a></h1><div class="metadata"><ul><li class="meta-item">百科</li><li class="meta-item"><span class="link local"><a href="/SimplicialCat.html" title="单纯猫 [SimplicialCat]">SimplicialCat</a></span></li></ul></div></header></summary><h2>观念</h2>
+<p>群胚对象可视为 $1$-范畴论中 “<span class="link local"><a href="/等价关系.html" title="等价关系 [等价关系]">等价关系</a></span>” 的概念在 $\infty$-范畴论中的推广. 与等价关系类似, (在<span class="link local"><a href="/意象.html" title="意象 [意象]">意象</a></span>中) 每个群胚对象都给出一个商映射, 而每个满射都通过 <span class="link local"><a href="/Čech脉.html" title="Čech 脉 [Čech脉]">Čech 脉</a></span>给出一个群胚对象. 这是刻画<span class="link local"><a href="/意象.html" title="意象 [意象]">意象</a></span>的 <span class="link local"><a href="/Giraud公理.html" title="Giraud 公理 [Giraud公理]">Giraud 公理</a></span>的一部分.</p>
+<h2>定义</h2>
+<p>设范畴 $\mathcal C$ 具有<span class="link local"><a href="/有限极限.html" title="有限极限 [有限极限]">有限极限</a></span>. 定义 $\mathcal C$ 中的<strong>群胚对象</strong>是满足如下条件的<span class="link local"><a href="/单纯对象.html" title="单纯对象 [单纯对象]">单纯对象</a></span> $X\colon \Delta^{\mathrm{op}} \to \mathcal C$:</p>
+<ul>
+<li>对任意 $n\geq 2$, 若 $[n] = \{0&lt; 1&lt;\cdots &lt; n\} = S \cup T$, 且 $S\cap T = \{i\}$, 则 $X([n]) \to X(S)\times_{X_{\{i\}}} X(T)$ 为等价.</li>
+</ul>
+<p>例如, $\{0&lt;1&lt;2\} = \{0&lt;1\} \cup \{0&lt; 2\}$, 上述条件说 $X(\{0&lt;1&lt;2\}) \to X(\{0&lt;1\})\times_{X_{\{0\}}} X(\{0&lt;2\})$ 为等价. 直观上, 这表示从同一对象出发的任意两个态射都互相穿过.</p>
+<h3>商映射</h3>
+<p>群胚对象 $X$ 的<strong>商映射</strong>定义为映射
+$$
+X_0 \to \operatorname{colim}X.
+$$</p>
+<p>其中 $\operatorname{colim}X$ 又称为 $X$ 的<span class="link local"><a href="/几何实现(单纯图表的余极限).html" title="几何实现 (作为单纯图表的余极限) [几何实现(单纯图表的余极限)]">几何实现</a></span>.</p>
+</details></section><section class="block" data-taxon=""><details ><summary id="自然数对象"><header><h1><span class="taxon"></span>“自然数对象” <a class="slug" href="/自然数对象.html">[自然数对象]</a><a class="edit" href="vscode://file/E:/Simplopedia_source/trees/%E8%87%AA%E7%84%B6%E6%95%B0%E5%AF%B9%E8%B1%A1.md">[edit]</a></h1><div class="metadata"><ul><li class="meta-item">百科</li><li class="meta-item"><span class="link local"><a href="/SimplicialCat.html" title="单纯猫 [SimplicialCat]">SimplicialCat</a></span></li></ul></div></header></summary>
+<p>对于<span class="link local"><a href="/意象.html" title="意象 [意象]">意象</a></span> $\mathcal E$, 若存在对象 $\mathbb N$, 以及两个箭头
+$$
+1\overset{0}{\longrightarrow} \mathbb N \overset{s}{\longrightarrow} \mathbb N,
+$$
+使得此图为所有形如 $1\to X\to X$ 的图中的始对象, 则称 $\mathbb N$ 为 $\mathcal E$ 的<strong>自然数对象</strong> (n. n. o.)</p>
+<p>自然数对象是<span class="link local"><a href="/集合意象.html" title=" [集合意象]">集合意象</a></span>中自然数集 $\mathbb N$ 的推广. 自然数对象的存在性又叫<strong>无穷公理</strong> (axiom of infinity).</p>
+<h2>性质</h2>
+<p>设意象 $\mathcal E$ 有自然数对象 $\mathbb N$, $\mathcal F$ 为另一意象, 有一对伴随函子
+$$
+g_*\colon \mathcal F \to \mathcal E,\quad g^*\colon \mathcal E\to\mathcal F,\quad g^*\dashv g_*,
+$$
+且满足 $g^* 1 =1$, (特别地, <span class="link local"><a href="/几何态射.html" title="几何态射 [几何态射]">几何态射</a></span> $g\colon \mathcal F\to\mathcal E$ 满足上述性质), 则 $g^*\mathbb N$ 为 $\mathcal F$ 的自然数对象.</p>
+<p>例如, 由 $\mathsf {Set}^{C^{\mathrm{op}}}$ 与 $\mathsf {Set}$ 之间的全局截面 $\Gamma$ 与常值预层 $\Delta$ 的伴随, 可得 $\mathsf {Set}^{C^{\mathrm{op}}}$ 的自然数对象是常值预层 $\Delta(\mathbb N)$.</p>
+</details></section><section class="block" data-taxon=""><details ><summary id="逆像"><header><h1><span class="taxon"></span>逆像 <a class="slug" href="/逆像.html">[逆像]</a><a class="edit" href="vscode://file/E:/Simplopedia_source/trees/%E9%80%86%E5%83%8F.md">[edit]</a></h1><div class="metadata"><ul><li class="meta-item">百科</li><li class="meta-item"><span class="link local"><a href="/SimplicialCat.html" title="单纯猫 [SimplicialCat]">SimplicialCat</a></span></li></ul></div></header></summary>
+<p><strong>逆像</strong> (inverse image) 是指<span class="link local"><a href="/意象.html" title="意象 [意象]">意象</a></span>的<span class="link local"><a href="/几何态射.html" title="几何态射 [几何态射]">几何态射</a></span>的左伴随部分.</p>
+<h2>定义</h2>
+<p>对于<span class="link local"><a href="/景的态射.html" title="景的态射 [景的态射]">景的态射</a></span> $f\colon (\mathcal C,J) \to (\mathcal D,K)$, 定义 $(\mathcal C,J)$ 上的层 $F$ 的逆像 $f^*F$ 为
+$$
+f^*F(d) = \operatorname{colim}_{f(c) \to d} F(c),
+$$
+也即沿 $f$ 的左 <span class="link local"><a href="/Kan扩张.html" title="Kan 扩张 [Kan扩张]">Kan 扩张</a></span>.</p>
+<h2>相关概念</h2>
+<p><span class="link local"><a href="/直像-逆像伴随.html" title="拓扑空间上的直像-逆像伴随 [直像-逆像伴随]">拓扑空间上的直像-逆像伴随</a></span></p>
+</details></section><section class="block" data-taxon=""><details ><summary id="预层"><header><h1><span class="taxon"></span>预层 <a class="slug" href="/预层.html">[预层]</a><a class="edit" href="vscode://file/E:/Simplopedia_source/trees/%E9%A2%84%E5%B1%82.md">[edit]</a></h1><div class="metadata"><ul><li class="meta-item">百科</li><li class="meta-item"><span class="link local"><a href="/SimplicialCat.html" title="单纯猫 [SimplicialCat]">SimplicialCat</a></span></li></ul></div></header></summary>
+<p>范畴 $\mathcal C$ 上的<strong>预层</strong>即是<span class="link local"><a href="/对偶(范畴论).html" title="对偶 (范畴论) [对偶(范畴论)]">对偶范畴</a></span> $\mathcal C^{\mathrm{op}}$ 到 $\mathsf{Set}$ (或 $\mathsf{Ani}$) 的函子.</p>
+<p><span class="link local"><a href="/充实范畴.html" title="充实范畴 [充实范畴]">充实范畴</a></span>中也有类似概念. $\mathcal V$-<span class="link local"><a href="/充实范畴.html" title="充实范畴 [充实范畴]">充实</a></span>单对象范畴上的预层, 也可视为 $\mathcal V$ 中的结合代数上的模.</p>
+<h2>性质</h2>
+<h3>可表函子的余极限</h3>
+<p>每个预层 $X\colon\mathcal{C}^{\mathrm{op}}\to\mathsf{Set}$ 都是<span class="link local"><a href="/可表函子.html" title="可表函子 [可表函子]">可表函子</a></span>的余极限:
+$$
+X = \operatorname{colim}_{\mathbf{y}(c) \to X}\mathbf{y}(c).
+$$</p>
+<h3>预层意象</h3>
+<p>任何 $\mathsf{Set}$ (或 $\mathsf{Ani}$) 取值的预层范畴都是<span class="link local"><a href="/意象.html" title="意象 [意象]">意象</a></span>; 见<span class="link local"><a href="/预层意象.html" title="预层意象 [预层意象]">预层意象</a></span>.</p>
+<h3>态射的计算</h3>
+<p>$$
+\begin{aligned}
+    \operatorname{Hom}_{\mathsf{Psh}(\mathcal C)}(X,Y)
+    &amp;=
+    \operatorname{Hom}_{\mathsf{Psh}(\mathcal C)}(
+        \operatorname{colim}_{c\to X}\mathbf{y}(c),Y)\\
+    &amp;=
+    \operatorname{lim}_{c\to X}
+    \operatorname{Hom}_{\mathsf{Psh}(\mathcal C)}
+    (\mathbf{y}(c),Y)\\
+    &amp;=
+    \operatorname{lim}_{c\to X}
+    \operatorname{Hom}_{\mathsf{Psh}(\mathcal C)}
+    (\mathbf{y}(c),
+        \operatorname{colim}_{d\to Y}\mathbf{y}(d))\\
+    &amp;=
+    \operatorname{lim}_{c\to X}
+    \operatorname{colim}_{d\to Y}
+    \operatorname{Hom}_{\mathsf{Psh}(\mathcal C)}
+    (\mathbf{y}(c),
+    \mathbf{y}(d))\\
+    &amp;=
+    \operatorname{lim}_{c\to X}
+    \operatorname{colim}_{d\to Y}
+    \operatorname{Hom}_{\mathcal C}
+    (c,d).
+\end{aligned}
+$$</p>
+<h2>例</h2>
+<h3>群作用</h3>
+<p><span class="link local"><a href="/群.html" title="群 [群]">群</a></span> $G$ 的<span class="link local"><a href="/群作用.html" title="群作用 [群作用]">作用</a></span>等同于 $\mathbf{B}G$ 上的预层. 因此预层也可视为群作用的推广.</p>
+</details></section><section class="block" data-taxon=""><details ><summary id="预层意象"><header><h1><span class="taxon"></span>预层意象 <a class="slug" href="/预层意象.html">[预层意象]</a><a class="edit" href="vscode://file/E:/Simplopedia_source/trees/%E9%A2%84%E5%B1%82%E6%84%8F%E8%B1%A1.md">[edit]</a></h1><div class="metadata"><ul><li class="meta-item">百科</li><li class="meta-item"><span class="link local"><a href="/SimplicialCat.html" title="单纯猫 [SimplicialCat]">SimplicialCat</a></span></li></ul></div></header></summary>
+<p>预层意象指的是某范畴上 $\mathsf{Set}$ (或 $\mathsf{Ani}$) 取值的<span class="link local"><a href="/预层.html" title="预层 [预层]">预层</a></span>构成的<span class="link local"><a href="/意象.html" title="意象 [意象]">意象</a></span>.</p>
+<h2>性质</h2>
+</details></section></details></section></footer></article></div></body></html>

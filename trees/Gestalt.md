@@ -4,7 +4,13 @@ tag: 百科
 author: [SimplicialCat](SimplicialCat.md)
 ---
 
-Gestalt (复数 Gestalten, 在心理学上的译名为 "格式塔") 是 [Scholze–Stefanich](ScholzeStefanichGestalten.md) 提出的一种几何概念, 旨在恢复完全的[代数–几何对偶](代数-几何对偶.md): 通过考虑几何对象上的 "线性 $(\infty,n)$-范畴" 取值的层, 即[高阶拟凝聚层](高阶拟凝聚层.md), 使得任何几何对象都具有代数的对应物, 而不再需要对 "仿射" 几何对象进行粘合操作.
+[](term-gestalt.md) (Gestalt, 复数 Gestalten) 是 [Scholze–Stefanich](ScholzeStefanichGestalten.md) 提出的一种几何概念, 旨在恢复完全的[代数–几何对偶](代数-几何对偶.md): 通过考虑几何对象上的 "线性 $(\infty,n)$-范畴" 取值的层, 即[高阶拟凝聚层](高阶拟凝聚层.md), 使得任何几何对象都具有代数的对应物, 而不再需要对 "仿射" 几何对象进行粘合操作.
+
+> The language of Gestalten translates difficult algebra of higher categories into more intuitively manageable geometry, in the same way that the language of schemes translates difficult commutative algebra into more intuitively manageable geometry.
+>
+> --- Peter Scholze, [2026 年 3 月 Bourbaki 演讲](ScholzeBourbakiGL.md)
+
+[](notes-Gestalten.md)
 
 ## 观念
 
@@ -18,9 +24,11 @@ Gestalt (复数 Gestalten, 在心理学上的译名为 "格式塔") 是 [Scholze
 6. 但仍旧有几何对象无法被拟凝聚层的 (导出) 范畴记录. 例如 $\mathbf{B}^2\mathbb G_m$ (与 [Brauer 群](Brauer群.md)有关) 上就没有足够的拟凝聚层, 以至于仅看拟凝聚层无法将它和一个点区分开. 而 $\mathbf{B}^2\mathbb G_m$ 上能够记录其全部几何信息的是一个 "范畴值" 的拟凝聚层, 事实上是万有的 "范畴值线丛" (正如 $\mathbf{B}\mathbb G_m$ 上有万有线丛一样).
 7. 为了记录所有几何对象, 我们需要不断地走向范畴层级更高的代数对象, 即[高阶拟凝聚层](高阶拟凝聚层.md). 这就是 Gestalt 的起源.
 
+
+
 ## 定义
 
-Gestalt 的定义是基于一个称为 **Stefanich 环**的代数对象.
+[](term-gestalt.md)的定义是基于一个称为 **Stefanich 环**的代数对象.
 
 一个 Stefanich 环 $A$ 是如下资料:
 
@@ -44,11 +52,11 @@ $$
 A_n = \operatorname{End}_{A_{n+1}}(*) = \operatorname{End}_{\operatorname{End}_{A_{n+2}}(*)}(*) = \cdots.
 $$
 
-**定义**. Gestalt 为 Stefanich 环的对偶: $\mathsf{Gest} = \mathsf{StRing}^{\mathrm{op}}$.
+**定义**. [](term-gestalt.md)为 Stefanich 环的对偶: $\mathsf{Gest} = \mathsf{StRing}^{\mathrm{op}}$.
 
 ## 性质
 
-**定理** ([Scholze–Stefanich](ScholzeStefanichGestalten.md)). $\mathsf{Gest}$ 是一个 [$\infty$-意象](∞-意象.md).
+**定理** ([Scholze–Stefanich](ScholzeStefanichGestalten.md)). (在实用的意义上,) $\mathsf{Gest}$ 是一个 [$\infty$-意象](∞-意象.md).
 
 ## 例
 
@@ -58,3 +66,11 @@ $$
 $$
 
 对于仿射概形范畴上适当的 Grothendieck 拓扑, 该构造即延拓至适当的叠.
+
+### 映射空间
+
+"Betti 局部系统的叠" $\mathrm{LocSys}_G$ 可表示为[](term-gestalt.md)的映射空间
+$$
+\mathrm{LocSys}^{\text{Betti}}_G \simeq \operatorname{Map}(*/\pi_1, */G) = \operatorname{Hom}(\pi_1,G)/G.
+$$
+其中 $*/G$ 为[逆环路空间](逆环路空间.md), $G$-作用为[共轭作用](共轭作用.md).

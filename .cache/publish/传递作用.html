@@ -1,0 +1,905 @@
+<!DOCTYPE html>
+<html lang="en-US"><head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<meta name="viewport" content="width=device-width"><title>传递作用</title><link rel="icon" href="/assets/favicon.ico" /><style>
+  @font-face {
+    font-family: 'NewCM10';
+    src: url(assets/NewCM10-Book.otf) format('opentype');
+    font-weight: 400;
+    font-style: normal;
+  }
+
+  @font-face {
+    font-family: 'NewCM10';
+    src: url(assets/NewCM10-Italic.otf) format('opentype');
+    font-weight: 400;
+    font-style: italic;
+  }
+
+  @font-face {
+    font-family: 'NewCM10';
+    src: url(assets/NewCM10-Bold.otf) format('opentype');
+    font-weight: 700;
+    font-style: normal;
+  }
+
+  body {
+    --text-font-family: "NewCM10", serif !important;
+  }
+</style><template id="inline-section">
+  <section class="inline block" data-taxon="">
+    <details open="">
+      <summary>
+        <header>
+          <h1>
+            <span class="taxon"></span>
+            <div id="title"></div>
+          </h1>
+        </header>
+      </summary>
+      <div id="content"></div>
+    </details>
+  </section>
+</template>
+
+<script>
+  function inlineSection(template, section, taxon, title) {
+    taxon = taxon || section.getAttribute("taxon") || null;
+    title = title || section.getAttribute("title") || "";
+
+    const clone = template.content.cloneNode(true);
+    clone.querySelector("section").dataset.taxon = taxon;
+    clone.querySelector(".taxon").textContent = taxon ? `${taxon}. ` : "";
+    clone.querySelector("#title").replaceWith(title);
+    clone.querySelector("#content").replaceWith(...section.childNodes);
+
+    if (section.hasAttribute("close")) {
+      clone.querySelector("details").removeAttribute("open");
+    }
+    
+    section.replaceWith(clone);
+  }
+
+  const tagTaxonTable = {
+    "exegesis": "Exegesis",
+    "definition": "Definition",
+    "proposition": "Proposition",
+    "remark": "Remark",
+    "conjecture": "Conjecture",
+    "postulate": "Postulate",
+    "claim": "Claim",
+    "observation": "Observation",
+    "fact": "Fact",
+    "hypothesis": "Hypothesis",
+    "axiom": "Axiom",
+    "lemma": "Lemma",
+    "theorem": "Theorem",
+    "corollary": "Corollary",
+    "example": "Example", 
+    "proof": "Proof",
+  };
+
+  document.addEventListener("DOMContentLoaded", () => {
+    const template = document.getElementById("inline-section");
+
+    [...document.getElementsByTagName("block")].forEach(section => inlineSection(template, section));
+
+    Object.entries(tagTaxonTable).forEach(([tag, taxon]) => {
+      [...document.getElementsByTagName(tag)].forEach(section => inlineSection(template, section, taxon));
+    });
+  });
+</script><script>
+  function toggleDetailsOpen() {
+    const details = document.querySelector("#toc>div>details");
+    if (!details) return;
+
+    if (window.matchMedia("(max-width: 1000px)").matches) {
+      details.removeAttribute("open");
+    } else {
+      details.setAttribute("open", "");
+    }
+  }
+
+  document.addEventListener("DOMContentLoaded", toggleDetailsOpen);
+  window.addEventListener("resize", toggleDetailsOpen);
+</script><style>
+  theme-option {
+    display: inline-block;
+  }
+
+  theme-option>input {
+    display: none;
+  }
+
+  theme-option>label {
+    color: var(--slug-color);
+  }
+
+  theme-option>label:hover {
+    background-color: var(--hover-color-link);
+  }
+
+  theme-option:has(input:checked)>label {
+    color: var(--link-color);
+  }
+
+  theme-option>label::before {
+    content: "[";
+    color: rgba(0, 0, 0, 0);
+  }
+
+  theme-option>label::after {
+    content: "]";
+    color: rgba(0, 0, 0, 0);
+  }
+
+  theme-option:has(input:checked)>label::before {
+    color: var(--link-color);
+  }
+
+  theme-option:has(input:checked)>label::after {
+    color: var(--link-color);
+  }
+</style>
+
+<template id="theme-option-template">
+  <input type="radio" name="theme" />
+  <label></label>
+</template>
+
+<script>
+  const THEME_KEY = `kodama-theme`;
+
+  function storeSelectedTheme(name) {
+    localStorage.setItem(THEME_KEY, name);
+  }
+
+  function getCurrentTheme() {
+    return localStorage.getItem(THEME_KEY) || window.primaryTheme;
+  }
+
+  function selectTheme(themeName) {
+    storeSelectedTheme(themeName);
+    requestAnimationFrame(applyDynamicColorInvert);
+  }
+
+  function applyFavorTheme() {
+    const favoredTheme = getCurrentTheme();
+    if (favoredTheme) {
+      const selector = `input[type='radio'][id='${favoredTheme}']`;
+      const favoredOption = window.themeOptions.querySelector(selector);
+
+      if (favoredOption) {
+        favoredOption.checked = true;
+      } else if (window.primaryOption) {
+        // Fallback to primary theme, if the favored theme is not found
+        // e.g., when the theme options have changed, and the stored theme is no longer available.
+        window.primaryOption.checked = true;
+      }
+    }
+    applyDynamicColorInvert();
+  }
+
+  document.addEventListener("DOMContentLoaded", function () {
+    window.themeOptions = document.getElementById("theme-options");
+    const templateContent = document.getElementById("theme-option-template").content;
+
+    customElements.define(
+      "theme-option",
+      class extends HTMLElement {
+        constructor() {
+          super();
+
+          const node = templateContent.cloneNode(true);
+          const themeName = this.getAttribute("name");
+
+          const input = node.querySelector("input");
+          input.setAttribute("id", themeName);
+          input.setAttribute("value", themeName);
+
+          const label = node.querySelector("label");
+          label.setAttribute("for", themeName);
+          label.addEventListener("click", () => selectTheme(themeName));
+
+          while (this.firstChild) {
+            label.appendChild(this.firstChild);
+          }
+          this.appendChild(node);
+        }
+      },
+    );
+
+    window.primaryOption = window.themeOptions.querySelector("input[type='radio']");
+    window.primaryTheme = primaryOption?.value;
+
+    applyFavorTheme();
+  });
+</script>
+
+<script>
+  const clamp = (value) => Math.max(0, Math.min(255, value));
+
+  const multiply = ([r, g, b], matrix) => {
+    const nr = clamp(r * matrix[0] + g * matrix[1] + b * matrix[2]);
+    const ng = clamp(r * matrix[3] + g * matrix[4] + b * matrix[5]);
+    const nb = clamp(r * matrix[6] + g * matrix[7] + b * matrix[8]);
+    return [nr, ng, nb];
+  };
+
+  const hueRotate = ([r, g, b], angle = 0) => {
+    const rad = (angle / 180) * Math.PI;
+    const sin = Math.sin(rad);
+    const cos = Math.cos(rad);
+    const matrix = [
+      0.213 + cos * 0.787 - sin * 0.213,
+      0.715 - cos * 0.715 - sin * 0.715,
+      0.072 - cos * 0.072 + sin * 0.928,
+      0.213 - cos * 0.213 + sin * 0.143,
+      0.715 + cos * 0.285 + sin * 0.140,
+      0.072 - cos * 0.072 - sin * 0.283,
+      0.213 - cos * 0.213 - sin * 0.787,
+      0.715 - cos * 0.715 + sin * 0.715,
+      0.072 + cos * 0.928 + sin * 0.072,
+    ];
+    return multiply([r, g, b], matrix);
+  };
+
+  const grayscale = ([r, g, b], value = 1) => {
+    const matrix = [
+      0.2126 + 0.7874 * (1 - value),
+      0.7152 - 0.7152 * (1 - value),
+      0.0722 - 0.0722 * (1 - value),
+      0.2126 - 0.2126 * (1 - value),
+      0.7152 + 0.2848 * (1 - value),
+      0.0722 - 0.0722 * (1 - value),
+      0.2126 - 0.2126 * (1 - value),
+      0.7152 - 0.7152 * (1 - value),
+      0.0722 + 0.9278 * (1 - value),
+    ];
+    return multiply([r, g, b], matrix);
+  };
+
+  const sepia = ([r, g, b], value = 1) => {
+    const matrix = [
+      0.393 + 0.607 * (1 - value),
+      0.769 - 0.769 * (1 - value),
+      0.189 - 0.189 * (1 - value),
+      0.349 - 0.349 * (1 - value),
+      0.686 + 0.314 * (1 - value),
+      0.168 - 0.168 * (1 - value),
+      0.272 - 0.272 * (1 - value),
+      0.534 - 0.534 * (1 - value),
+      0.131 + 0.869 * (1 - value),
+    ];
+    return multiply([r, g, b], matrix);
+  };
+
+  const saturate = ([r, g, b], value = 1) => {
+    const matrix = [
+      0.213 + 0.787 * value,
+      0.715 - 0.715 * value,
+      0.072 - 0.072 * value,
+      0.213 - 0.213 * value,
+      0.715 + 0.285 * value,
+      0.072 - 0.072 * value,
+      0.213 - 0.213 * value,
+      0.715 - 0.715 * value,
+      0.072 + 0.928 * value,
+    ];
+    return multiply([r, g, b], matrix);
+  };
+
+  const linear = ([r, g, b], slope = 1, intercept = 0) => {
+    const scale = 255;
+    return [
+      clamp(r * slope + intercept * scale),
+      clamp(g * slope + intercept * scale),
+      clamp(b * slope + intercept * scale),
+    ];
+  };
+
+  const brightness = (rgb, value = 1) => linear(rgb, value);
+  const contrast = (rgb, value = 1) => linear(rgb, value, -0.5 * value + 0.5);
+
+  const invert = ([r, g, b], value = 1) => {
+    const nr = (value + r / 255 * (1 - 2 * value)) * 255;
+    const ng = (value + g / 255 * (1 - 2 * value)) * 255;
+    const nb = (value + b / 255 * (1 - 2 * value)) * 255;
+    return [clamp(nr), clamp(ng), clamp(nb)];
+  };
+
+  // Code taken from https://stackoverflow.com/a/9493060/2688027, licensed under CC BY-SA.
+  const rgbToHsl = (r, g, b) => {
+    r /= 255; g /= 255; b /= 255;
+    const max = Math.max(r, g, b);
+    const min = Math.min(r, g, b);
+    let h, s, l = (max + min) / 2;
+    if (max === min) {
+      h = s = 0;
+    } else {
+      const d = max - min;
+      s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
+      switch (max) {
+        case r: h = (g - b) / d + (g < b ? 6 : 0); break;
+        case g: h = (b - r) / d + 2; break;
+        case b: h = (r - g) / d + 4; break;
+      }
+      h /= 6;
+    }
+    return { h: h * 100, s: s * 100, l: l * 100 };
+  };
+
+  const applyFilters = (rgb, [inv, sep, sat, hue, bri, con]) => {
+    let color = [...rgb];
+    color = invert(color, inv / 100);
+    color = sepia(color, sep / 100);
+    color = saturate(color, sat / 100);
+    color = hueRotate(color, hue * 3.6);
+    color = brightness(color, bri / 100);
+    color = contrast(color, con / 100);
+    return color;
+  };
+
+  const lossFn = (targetRgb, filters) => {
+    const resultRgb = applyFilters([0, 0, 0], filters);
+    const targetHsl = rgbToHsl(...targetRgb);
+    const resultHsl = rgbToHsl(...resultRgb);
+    return (
+      Math.abs(resultRgb[0] - targetRgb[0]) +
+      Math.abs(resultRgb[1] - targetRgb[1]) +
+      Math.abs(resultRgb[2] - targetRgb[2]) +
+      Math.abs(resultHsl.h - targetHsl.h) +
+      Math.abs(resultHsl.s - targetHsl.s) +
+      Math.abs(resultHsl.l - targetHsl.l)
+    );
+  };
+
+  const fix = (value, idx) => {
+    let max = 100;
+    if (idx === 2) max = 7500;                  // saturate
+    else if (idx === 4 || idx === 5) max = 200; // brightness, contrast
+    if (idx === 3) { // hue-rotate
+      if (value > max) return value % max;
+      if (value < 0) return max + (value % max);
+      return value;
+    }
+    return Math.max(0, Math.min(max, value));
+  };
+
+  const spsa = (targetRgb, A, a, c, initial, iters) => {
+    const alpha = 1;
+    const gamma = 1 / 6;
+    let values = [...initial];
+    let best = [...values];
+    let bestLoss = Infinity;
+
+    for (let k = 0; k < iters; k++) {
+      const ck = c / Math.pow(k + 1, gamma);
+      const deltas = Array(6).fill().map(() => (Math.random() > 0.5 ? 1 : -1));
+      const highArgs = values.map((v, i) => v + ck * deltas[i]);
+      const lowArgs = values.map((v, i) => v - ck * deltas[i]);
+      const lossDiff = lossFn(targetRgb, highArgs) - lossFn(targetRgb, lowArgs);
+
+      values = values.map((v, i) => {
+        const g = (lossDiff / (2 * ck)) * deltas[i];
+        const ak = a[i] / Math.pow(A + k + 1, alpha);
+        return fix(v - ak * g, i);
+      });
+
+      const loss = lossFn(targetRgb, values);
+      if (loss < bestLoss) {
+        best = [...values];
+        bestLoss = loss;
+      }
+    }
+    return { values: best, loss: bestLoss };
+  };
+
+  // Threshold for acceptable color loss. This value determines when the SPSA algorithm stops early.
+  // A loss below this value is considered visually indistinguishable for most use cases.
+  // The value 25 was determined empirically to balance performance and color accuracy.
+  const ACCEPTABLE_COLOR_LOSS = 25;
+
+  const solveWide = (targetRgb) => {
+    const A = 5;
+    const c = 15;
+    const a = [60, 180, 18000, 600, 1.2, 1.2];
+    let best = { loss: Infinity, values: null };
+    for (let i = 0; best.loss > ACCEPTABLE_COLOR_LOSS && i < 3; i++) {
+      const initial = [50, 20, 3750, 50, 100, 100];
+      const result = spsa(targetRgb, A, a, c, initial, 1000);
+      if (result.loss < best.loss) best = result;
+    }
+    return best;
+  };
+
+  const solveNarrow = (targetRgb, wideResult) => {
+    const A = wideResult.loss;
+    const c = 2;
+    const A1 = A + 1;
+    const a = [0.25 * A1, 0.25 * A1, A1, 0.25 * A1, 0.2 * A1, 0.2 * A1];
+    return spsa(targetRgb, A, a, c, wideResult.values, 500);
+  };
+
+  const cssFilterString = (filters) => {
+    const [inv, sep, sat, hue, bri, con] = filters.map(Math.round);
+    const hueDeg = Math.round(hue * 3.6);
+    return `filter: invert(${inv}%) sepia(${sep}%) saturate(${sat}%) hue-rotate(${hueDeg}deg) brightness(${bri}%) contrast(${con}%);`;
+  };
+
+  const solveColor = (targetRgb) => {
+    const wide = solveWide(targetRgb);
+    const narrow = solveNarrow(targetRgb, wide);
+    return {
+      values: narrow.values,
+      loss: narrow.loss,
+      filter: cssFilterString(narrow.values),
+    };
+  };
+
+  // Reuse a single canvas / context to avoid memory leaks
+  const colorParseCanvas = document.createElement('canvas');
+  colorParseCanvas.width = 1;
+  colorParseCanvas.height = 1;
+  const colorParseContext = colorParseCanvas.getContext('2d');
+
+  const toRGBArray = (cssColor) => {
+    colorParseContext.fillStyle = cssColor;
+    colorParseContext.fillRect(0, 0, 1, 1);
+
+    // The `getImageData().data` returns a Uint8ClampedArray with 4 values per pixel (RGBA). 
+    // also see: https://developer.mozilla.org/zh-CN/docs/Web/API/ImageData/data
+    const rgba = colorParseContext.getImageData(0, 0, 1, 1).data;
+    return Array.from(rgba.slice(0, 3));
+  };
+
+  const DYNAMIC_STYLE_ID = 'dynamic-color-invert-style';
+  const SOLVED_COLOR_KEY = "solved-";
+
+  function memorizedSolvedFilter(color) {
+    const colorKey = SOLVED_COLOR_KEY + color;
+    const storedFilterOption = localStorage.getItem(colorKey);
+    if (storedFilterOption) {
+      return storedFilterOption;
+    } else {
+      const filter = solveColor(color).filter;
+      localStorage.setItem(colorKey, filter);
+      return filter;
+    }
+  }
+
+  function applyDynamicColorInvert() {
+    const textColor = getComputedStyle(document.body).getPropertyValue('--text-color');
+    if (textColor && textColor.length > 0) {
+      const rgb = toRGBArray(textColor);
+      const filter = memorizedSolvedFilter(rgb);
+
+      const existingStyle = document.getElementById(DYNAMIC_STYLE_ID);
+      if (existingStyle) {
+        existingStyle.textContent = `.color-invert {${filter}}`;
+      } else {
+        const style = document.createElement('style');
+        style.id = DYNAMIC_STYLE_ID;
+        style.textContent = `.color-invert {${filter}}`;
+        document.head.appendChild(style);
+      }
+    }
+  }
+</script><script>
+  (() => {
+    const url = "/kodama.json";
+    const interval = 1000; // 1 second
+
+    let lastModified = null;
+
+    async function check() {
+      try {
+        const res = await fetch(url + "?t=" + Date.now(), {
+          method: "HEAD",
+          cache: "no-store",
+        });
+
+        const lm = res.headers.get("last-modified");
+
+        if (lastModified && lm && lm !== lastModified) {
+          location.reload();
+          return;
+        }
+
+        lastModified = lm || lastModified;
+      } catch (e) {
+        // Ignore
+        console.warn("Reload check failed:", e);
+      }
+
+      setTimeout(check, interval);
+    }
+
+    check();
+  })();
+</script><!-- Also see: https://katex.org/docs/autorender -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.25/dist/katex.min.css" integrity="sha384-WcoG4HRXMzYzfCgiyfrySxx90XSl2rxY5mnVY5TwtWE6KLrArNKn0T/mOgNL0Mmi" crossorigin="anonymous">
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.25/dist/katex.min.js" integrity="sha384-J+9dG2KMoiR9hqcFao0IBLwxt6zpcyN68IgwzsCSkbreXUjmNVRhPFTssqdSGjwQ" crossorigin="anonymous"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.25/dist/contrib/auto-render.min.js" integrity="sha384-hCXGrW6PitJEwbkoStFjeJxv+fSOOQKOPbJxSfM6G5sWZjAyWhXiTIIAmQqnlLlh" crossorigin="anonymous"></script>
+<!-- Also see: https://github.com/KaTeX/KaTeX/tree/main/contrib/copy-tex -->
+<script src="https://cdn.jsdelivr.net/npm/katex@0.16.25/dist/contrib/copy-tex.min.js" integrity="sha384-HORx6nWi8j5/mYA+y57/9/CZc5z8HnEw4WUZWy5yOn9ToKBv1l58vJaufFAn9Zzi" crossorigin="anonymous"></script>
+
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    renderMathInElement(document.body, {
+      delimiters: [
+        { left: "$$", right: "$$", display: true },
+        { left: "$", right: "$", display: false },
+        { left: "\\(", right: "\\)", display: false },
+        { left: "\\[", right: "\\]", display: true },
+      ],
+      trust: true,
+      strict: false,
+      throwOnError: false,
+      minRuleThickness: 0.05,
+    });
+  });
+</script>
+<link rel="stylesheet" href="/main.css"><style>
+@media only screen and (min-width: 1000px) {
+  #grid-wrapper { grid-template-columns: var(--article-max-width) var(--toc-max-width); }
+  nav#toc { max-width: max-content; }
+}
+</style></head><body><header class="header"><nav class="nav"><div class="logo"><span class="cursor-pointer" onclick="window.location.href='/index.html'" title="单纯百科 Simplopedia">« 单纯百科 Simplopedia</span></div></nav></header><div id="grid-wrapper" style="grid-template-areas: 'article toc';" data-base-url="./"><nav id="toc" class="sticky-nav mobile-sticky-nav"><div id="theme-options"><style>
+  body:has(input[value="furina"]:checked) {
+    --article-max-width: 110ex; /* default: 90ex */
+
+    --color-Furina-deep-navy: #253085;
+    --color-Furina-royal-blue: #465BCF;
+    --color-Furina-aqua-cyan: #6AC6E8;
+    --color-Furina-frost-white: #FAFBFC;
+    --color-Furina-misty-blue: #C4D7ED;
+    --color-Furina-vivid-sapphire: #5670E9;
+    --color-Furina-luminous-hydro: #70DBFF;
+    --color-Furina-bright-periwinkle: #8DA4F1;
+    --color-Furina-vintage-gold: #BD9368;
+    --color-Furina-vintage-gold-light: #DDB368;
+    --color-Furina-vintage-gold-ultra-light: #FDF388;
+
+    --background-color: var(--color-Furina-frost-white);
+    --link-color: var(--color-Furina-vivid-sapphire);
+    --slug-color: var(--color-Furina-aqua-cyan);
+    --logo-color: var(--color-Furina-deep-navy);
+
+    --block-background-color: #FFFFFF;
+    --shadow-color: rgba(27, 63, 143, 0.06);
+    --radius: 5px;
+    --margin-left: 14px;
+
+    --hover-color-block: var(--block-background-color);
+    --logo-hover-color: #88d;
+    --span-tag-color: #88d;
+    --article-tag-color: #88d;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    body:has(input[value="furina"]:checked) {
+      --color-Furina-deep-navy: #B5C0F5;
+      --color-Furina-royal-blue: #D6EBFF;
+
+      --background-color: #2f2f2f;
+      --block-background-color: #3a3a3a;
+    }
+  }
+
+  .block {
+    /*2026-3-16 21:10 新增*/
+    padding: 15px;
+    margin-top: 6px;
+    margin-bottom: 6px;
+
+    border-radius: var(--radius);
+    background-color: var(--block-background-color);
+    box-shadow: 0 2px 12px var(--shadow-color);
+  }
+
+  .footnote-definition {
+    margin-left: var(--margin-left);
+  }
+
+  h5,
+  h6,
+  p {
+    margin: 5px;
+  }
+
+  tr {
+    border-bottom: 1px solid var(--color-Furina-bright-periwinkle);
+  }
+
+  /* 可选：去除表头下方的重复横线（如果表头需要特殊样式） */
+  thead tr {
+    border-bottom: 2px solid var(--color-Furina-deep-navy);
+  }
+
+  /* 去除最后一行的边框 */
+  tbody tr:last-child {
+    border-bottom: none;
+  }
+
+  .footnote-definition>p {
+    display: inline;
+    margin-left: 0;
+    color: var(--color-Furina-bright-periwinkle);
+    font-size: small;
+  }
+
+  article > section > details > summary > header > h1 {
+    font-weight: 600;
+    font-size: 1.75rem !important;
+  }
+
+  h2 {
+    font-weight: 500;
+    font-size: 1.5rem !important;
+    color: var(--color-Furina-deep-navy);
+    margin-bottom: 10px;
+    border-bottom: 1px solid #88d;
+    padding-bottom: 1px;
+    /* 增加底部内边距让横线和文字有间距 */
+  }
+
+  h2::before {
+    content: "\2726";
+    /* ✦ 的Unicode转义码 */
+    display: inline-block;
+    margin-right: 0.3em;
+    /*color: var(--color-Furina-vintage-gold-light);*/
+    /* 替换 color 属性，改为以下背景和裁剪属性 */
+    background: linear-gradient(150deg,
+        var(--color-Furina-vintage-gold-ultra-light) 30%,
+        var(--color-Furina-vintage-gold-light) 60%,
+        var(--color-Furina-vintage-gold) 90%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    /* 将文字颜色设为透明以显示背景 */
+    /* 组合径向渐变（中心高光）和线性渐变（基础色调） */
+    /*background: radial-gradient(
+      ellipse at center,
+      var(--color-Furina-vintage-gold-ultra-light) 20%,
+      transparent 70%
+    ),
+    linear-gradient(
+      to bottom,
+      var(--color-Furina-vintage-gold-light),
+      var(--color-Furina-vintage-gold)
+    );
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent; */
+    filter: drop-shadow(0px 1px 1px rgba(184, 150, 131, 0.5));
+    /* 可选：增加与主色呼应的柔和投影 */
+    font-weight: normal;
+  }
+
+
+  h3 {
+    font-weight: 700;
+    color: var(--color-Furina-royal-blue);
+    margin-bottom: 5px;
+  }
+
+  h3::before {
+    content: "\2726";
+    /* ✦ 的Unicode转义码 */
+    display: inline-block;
+    margin-left: 0.06em;
+    margin-right: 0.36em;
+    /*color: var(--color-Furina-vintage-gold-ultra-light);*/
+    background: linear-gradient(150deg,
+        var(--color-Furina-vintage-gold-ultra-light) 20%,
+        var(--color-Furina-vintage-gold-light) 90%,
+        var(--color-Furina-vintage-gold) 95%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    font-weight: normal;
+  }
+
+  h4 {
+    text-indent: var(--marginleft);
+    font-weight: 700;
+    color: #696cd9;
+    margin-bottom: 0;
+  }
+
+  h5 {
+    text-indent: var(--marginleft);
+    font-weight: 700;
+    color: #8a8ff4;
+    margin-bottom: 0;
+  }
+
+  h6 {
+    text-indent: var(--marginleft);
+    font-weight: 700;
+    color: #aaaff4;
+    margin-bottom: 0;
+  }
+
+  code, pre, .mono {
+    font-family: "Liberation Mono", "Courier New", monospace;
+    font-size: 0.9em; /* 可选微调尺寸 */
+  }
+
+  @media only screen and (max-width: 1000px) {
+    #grid-wrapper>nav {
+      display: none !important;
+    }
+  }
+
+  #toc,
+  #toc .block {
+    background: none !important;
+    box-shadow: none !important;
+  }
+
+  ul {
+    margin: 5px;
+    margin-left: calc(5px + 2em);
+    padding-left: 0;
+    list-style-type: none;
+  }
+
+  ul li {
+    margin-bottom: 5px;
+    position: relative;
+    padding-left: 0;
+    /*color: var(--text-secondary);*/
+  }
+
+  ul li::before {
+    content: '✦';
+    position: absolute;
+    left : -1em;
+    /*color: var(--color-Furina-vintage-gold-ultra-light);*/
+    font-size: 0.9em;
+  }
+
+  .metadata {
+    color: var(--article-tag-color);
+  }
+
+  .metadata ul {
+    margin : 0;
+  }
+
+  .metadata li::before {
+    content: none;
+  }
+
+  .music-player button {
+    text-decoration: none;
+  }
+
+  .music-player button:hover {
+    text-decoration: underline;
+    text-decoration-color: var(--color-Furina-vintage-gold-light);
+    /* 金色 */
+    text-underline-offset: 6px;
+    /* 调整下划线与文字距离 */
+    text-decoration-thickness: 1px;
+    /* 线条粗细 */
+  }
+</style>
+
+<theme-option name="furina" style="display: none;">furina</theme-option></div></nav>
+
+<article><section class="block" data-taxon=""><details open><summary id="传递作用"><header><h1><span class="taxon"></span>传递作用 <a class="slug" href="/传递作用.html">[传递作用]</a><a class="edit" href="vscode://file/E:/Simplopedia_source/trees/%E4%BC%A0%E9%80%92%E4%BD%9C%E7%94%A8.md">[edit]</a></h1><div class="metadata"><ul><li class="meta-item">百科</li><li class="meta-item"><span class="link local"><a href="/SimplicialCat.html" title="单纯猫 [SimplicialCat]">SimplicialCat</a></span></li></ul></div></header></summary>
+</details></section><footer><section class="block link-list" id="backlinks"><details open><summary><header><h1>关联页面</h1></header></summary><section class="block" data-taxon=""><details ><summary id="Galois覆叠"><header><h1><span class="taxon"></span>Galois 覆叠 <a class="slug" href="/Galois覆叠.html">[Galois覆叠]</a><a class="edit" href="vscode://file/E:/Simplopedia_source/trees/Galois%E8%A6%86%E5%8F%A0.md">[edit]</a></h1><div class="metadata"><ul><li class="meta-item">百科</li><li class="meta-item"><span class="link local"><a href="/SimplicialCat.html" title="单纯猫 [SimplicialCat]">SimplicialCat</a></span></li></ul></div></header></summary>
+<p><strong>Galois 覆叠</strong> (又叫<strong>正则覆叠</strong>) 是覆叠变换群在纤维上有<span class="link local"><a href="/传递作用.html" title="传递作用 [传递作用]">传递作用</a></span>的<span class="link local"><a href="/覆叠.html" title="覆叠 [覆叠]">覆叠</a></span>, 等同于变换群 (作为离散群) 的<span class="link local"><a href="/主丛.html" title="主齐性空间, 主丛 [主丛]">主丛</a></span>.</p>
+</details></section><section class="block" data-taxon=""><details ><summary id="主丛"><header><h1><span class="taxon"></span>主齐性空间, 主丛 <a class="slug" href="/主丛.html">[主丛]</a><a class="edit" href="vscode://file/E:/Simplopedia_source/trees/%E4%B8%BB%E4%B8%9B.md">[edit]</a></h1><div class="metadata"><ul><li class="meta-item">百科</li><li class="meta-item"><span class="link local"><a href="/SimplicialCat.html" title="单纯猫 [SimplicialCat]">SimplicialCat</a></span></li></ul></div></header></summary>
+<h2>观念</h2>
+<p><strong>主齐性空间</strong> (principal homogeneous space), 又称<strong>旋子</strong> (torsor), 是一个 “忘掉了单位元在哪里的群”. 对于群 $G$, 一个 $G$-主齐性空间是一个带有 $G$-<span class="link local"><a href="/群作用.html" title="群作用 [群作用]">作用</a></span>的对象 $P$, 且满足其商 $P / G$ 是一个点 (在 $1$-范畴语境中这等同于说作用是自由且<span class="link local"><a href="/传递作用.html" title="传递作用 [传递作用]">传递</a></span>的).</p>
+<p>当我们谈论的对象是<span class="link local"><a href="/相对.html" title="相对观点 [相对]">相对</a></span>于一个基底空间 $X$ 上的丛 (或<span class="link local"><a href="/层.html" title="拓扑空间上的层 [层]">层</a></span>) 时, 主齐性空间又称为 $X$ 上的<strong>主丛</strong> (principal bundle). 对于群 $G$, 空间 $X$ 上的 $G$-主丛是 $X$ 上一个带有 $G$-作用的对象 $P\to X$, 满足其商 $P / G$ 就是 $X$.</p>
+<p>空间 $X$ 上的 $G$-主丛在<strong>局部</strong>上是 $G$, 但不一定有<span class="link local"><a href="/整体截面.html" title="整体截面 [整体截面]">整体截面</a></span>; 有整体截面的 $G$-主丛即同构于平凡 $G$-主丛.</p>
+<p>在 <span class="link local"><a href="/∞-意象.html" title="∞-意象 [∞-意象]">$\infty$-意象</a></span>中可以谈论群和主丛 (主齐性空间); 这涵盖了所有 “主丛” 的概念.</p>
+<p>群 $G$ 的主丛的<span class="link local"><a href="/分类空间.html" title="分类空间 [分类空间]">分类空间</a></span>是其<span class="link local"><a href="/逆环路空间.html" title="逆环路空间 [逆环路空间]">逆环路空间</a></span> $\mathbf{B}G$; 空间 $X$ 到 $\mathbf{B}G$ 的映射同伦类又称为 <span class="link local"><a href="/非Abel上同调.html" title="非 Abel 上同调 [非Abel上同调]">$1$ 阶非 Abel 上同调类</a></span>.</p>
+<h2>定义</h2>
+<h3>意象中的主丛</h3>
+<p>设 $G$ 是 <span class="link local"><a href="/∞-意象.html" title="∞-意象 [∞-意象]">$\infty$-意象</a></span> $\mathcal X$ 中的<span class="link local"><a href="/群.html" title="群 [群]">群</a></span>. 定义 $\mathcal X$ 上的 $G$-主丛即是<span class="link local"><a href="/终对象.html" title="终对象 [终对象]">终对象</a></span> $1$ 到<span class="link local"><a href="/逆环路空间.html" title="逆环路空间 [逆环路空间]">逆环路空间</a></span> $\mathbf{B}G$ 的态射 $P\colon 1\to\mathbf{B}G$. 换言之, 它是一个 $G$-<span class="link local"><a href="/群作用.html" title="群作用 [群作用]">作用</a></span> $P\colon \mathbf{B}G\to\mathcal X$, 满足<span class="link local"><a href="/余不动点.html" title="余不动点 [余不动点]">余不动点</a></span>为<span class="link local"><a href="/单点(同伦类型论).html" title="单点 (同伦类型论) [单点(同伦类型论)]">单点</a></span>:
+$$\operatorname{colim}_{\mathbf{B}G} P = 1.$$</p>
+<p>定义对象 $X\in\mathcal X$ 上的 $G$-主丛为<span class="link local"><a href="/俯意象.html" title="俯意象 [俯意象]">俯意象</a></span> $\mathcal X_{/X}$ 上的 $G$-主丛, 这相当于 $\mathcal X$ 中的态射 $X\to \mathbf{B}G$, 给出如下拉回图,
+$$
+\begin{array}
+    {ccc}
+    P &amp; \to &amp; 1 \\
+    \downarrow &amp; &amp; \downarrow \\
+    X &amp; \to &amp; \mathbf{B}G
+\end{array}
+$$
+因此 $X$ 上的 $G$-主丛也即 $G$ 在某对象 $P$ 上的<span class="link local"><a href="/群作用.html" title="群作用 [群作用]">作用</a></span>, 且使得商 $P/G$ 等价于 $X$.</p>
+<p><strong>注</strong>. 一般而言 $G$-主丛会共享 $G$ 的许多拉回稳定的性质. 例如当 $G$ 是 $0$-截断对象时, 映射 $1\to \mathbf{B}G$ 是 $0$-截断映射, 从而其拉回也是 $0$-截断映射. 这意味着 $0$-截断对象 $X$ 上的 $G$-主丛的全空间也是 $0$-截断对象, 也就是落在 $1$-意象 $\mathcal X_{\leq 0}$ 中.</p>
+<p>上述定义中 $\mathbf{B}G$ 也可替换为任意的<span class="link local"><a href="/生象.html" title="生象, ∞-群胚 [生象]">生象</a></span> $A$, 通过<span class="link local"><a href="/常值层.html" title="常值层 [常值层]">常值层</a></span>函子视为<span class="link local"><a href="/意象.html" title="意象 [意象]">意象</a></span>的对象. 由<span class="link local"><a href="/意象.html" title="意象 [意象]">意象</a></span>的下降,
+$$
+\mathcal X_{/A}\simeq \operatorname{lim}_A \mathcal X =\mathsf{Fun}(A,\mathcal X),
+$$
+态射 $1\to A$ 等同于函子 $P\colon A\to \mathcal X$, 满足 $\operatorname{colim}_{a\in A}P_a\simeq 1$.</p>
+<h3>一般范畴</h3>
+<p>要想在一般的范畴 (如拓扑空间的范畴, 流形的范畴) 中定义主丛, 只需要将其嵌入到一个<span class="link local"><a href="/层意象.html" title="层意象 [层意象]">层意象</a></span>中, 再使用意象中的主丛的定义. 不过需要注意<span class="link local"><a href="/逆环路空间.html" title="逆环路空间 [逆环路空间]">逆环路空间</a></span> $\mathbf{B}G = * / G$ 以及一般的商 $X / G$ 可能不再是原来范畴的对象.</p>
+<h3>$1$-范畴的具体情形</h3>
+<p>在 $(1,1)$-范畴中, 可以用更简单具体的资料来定义群的主齐性空间. 每个 $G$-作用都给出 <span class="link local"><a href="/∞-意象.html" title="∞-意象 [∞-意象]">$\infty$-意象</a></span>中的一个 $G$-主丛, 但要使得基底空间 $X / G$ 落在原来的 $1$-范畴, 就需要加<strong>自由作用</strong>的条件.</p>
+<h2>性质</h2>
+<h3>使用 Čech 上同调的计算</h3>
+<p>对于覆盖 (即<span class="link local"><a href="/∞-意象.html" title="∞-意象 [∞-意象]">意象</a></span>中的满射) $U\to X$, 由于 <span class="link local"><a href="/Giraud公理.html" title="Giraud 公理 [Giraud公理]">Giraud 公理</a></span>, $X$ 是 <span class="link local"><a href="/Čech脉.html" title="Čech 脉 [Čech脉]">Čech 脉</a></span>的<span class="link local"><a href="/几何实现(单纯图表的余极限).html" title="几何实现 (作为单纯图表的余极限) [几何实现(单纯图表的余极限)]">几何实现</a></span>
+$$
+X \simeq \operatorname{colim} \text{\v{C}}(U\to X),
+$$
+故对象 $X$ 上的主丛可表示为 $\text{\v{C}}(U\to X)$ 上的主丛:
+$$
+\operatorname{Hom}(X,\mathbf{B}G) \simeq \operatorname{lim} \big(\operatorname{Hom}(U,\mathbf{BG})\rightrightarrows \operatorname{Hom}(U\times_X U,\mathbf{BG})\cdots\big).
+$$
+由此, 可用<span class="link local"><a href="/非交换Čech上同调.html" title="非交换 Čech 上同调 [非交换Čech上同调]">非交换 Čech 上同调</a></span>计算 $X$ 上的 $G$-主丛的同构类等信息.</p>
+<h2>例</h2>
+<h3>有限群的主丛</h3>
+<p>对于离散拓扑群 $G$, 其主丛等同于 <span class="link local"><a href="/Galois覆叠.html" title="Galois 覆叠 [Galois覆叠]">Galois 覆叠</a></span>.</p>
+<h2>相关概念</h2>
+<p><span class="link local"><a href="/关联丛.html" title="关联丛 [关联丛]">关联丛</a></span></p>
+<h2>相关资料</h2>
+<p><span class="link local"><a href="/PB∞T.html" title="∞-意象中的主丛 [PB∞T]">$\infty$-意象中的主丛</a></span></p>
+</details></section><section class="block" data-taxon=""><details ><summary id="正规扩张"><header><h1><span class="taxon"></span>正规扩张 <a class="slug" href="/正规扩张.html">[正规扩张]</a><a class="edit" href="vscode://file/E:/Simplopedia_source/trees/%E6%AD%A3%E8%A7%84%E6%89%A9%E5%BC%A0.md">[edit]</a></h1><div class="metadata"><ul><li class="meta-item">百科</li><li class="meta-item"><span class="link local"><a href="/SimplicialCat.html" title="单纯猫 [SimplicialCat]">SimplicialCat</a></span></li></ul></div></header></summary>
+<h2>观念</h2>
+<p>对于域扩张 $k\subset K$, 视为 “覆叠” 映射 $\operatorname{Spec}K\to\operatorname{Spec}k$; <strong>正规扩张</strong>这一条件是 “覆叠变换群在纤维上作用<span class="link local"><a href="/传递作用.html" title="传递作用 [传递作用]">传递</a></span>” 的类比. 所谓纤维即是 $\operatorname{Spec}K$ 沿 $\operatorname{Spec}\bar k \to \operatorname{Spec}k$ 的拉回, 而纤维的一个点即是一个提升 $\operatorname{Spec}\bar k\to\operatorname{Spec}K$, 也即嵌入 $K\hookrightarrow\bar k$.</p>
+<h2>定义</h2>
+<p><strong>正规扩张</strong>是满足如下等价条件的<span class="link local"><a href="/代数扩张.html" title="代数扩张 [代数扩张]">代数扩张</a></span> $k\subset K$:</p>
+<ul>
+<li>$K$ 是 $k$ 上一族多项式 $S\subset k[x]$ 的<span class="link local"><a href="/分裂域.html" title="分裂域 [分裂域]">分裂域</a></span>;</li>
+<li>固定一个<span class="link local"><a href="/代数闭包.html" title="代数闭包 [代数闭包]">代数闭包</a></span> $k\hookrightarrow\bar k$, 那么任意两个保持 $k$ 的嵌入 $K\hookrightarrow \bar k$ 有相同的像;</li>
+<li>$\operatorname{Aut}_k(K)$ 在嵌入的集合 $\{K\hookrightarrow\bar k\}$ 上的作用传递;</li>
+<li>对 $k$ 上任意不可约多项式 $f$, 若 $f$ 在 $K$ 中有根, 则 $f$ 在 $K$ 上分裂为一次式之积.</li>
+</ul>
+<p>对任意<span class="link local"><a href="/代数扩张.html" title="代数扩张 [代数扩张]">代数扩张</a></span> $k\subset L$, 存在同构意义下唯一的最小代数扩张 $L\subset K$ 使得 $k\subset K$ 为正规扩张, 称为 $k\subset L$ 的<strong>正规闭包</strong>.</p>
+<h2>性质</h2>
+<h3>复合</h3>
+<p>设 $k\subset M\subset K$ 是两个接续的域扩张, 若 $k\subset K$ 正规, 则 $M\subset K$ 正规. (考虑 $K$ 到 $\bar k$ 的保持 $M$ 的嵌入.)</p>
+<h2>例</h2>
+<h3>非正规扩张的例子</h3>
+<p>扩张 $\mathbb{Q}\subset \mathbb{Q}(\sqrt[3]{2})$ 不正规, 因为</p>
+<ul>
+<li>$\mathbb{Q}(\sqrt[3]{2})$ 到 $\mathbb{Q}$ 的代数闭包 $\overline{\mathbb{Q}}$ 有另一个嵌入 $\mathbb{Q}(\sqrt[3]{2}\omega)$, 其中 $\omega = \dfrac{-1+\sqrt{3}i}{2}$;</li>
+<li>多项式 $x^3-2$ 有根却不能分裂为一次式之积.</li>
+</ul>
+<p>而扩张 $\mathbb{Q}\subset\mathbb{Q}(\sqrt[3]{2},\omega)$ 正规. 它是 $x^3 - 2$ 的分裂域.</p>
+<p>正规扩张的复合不一定是正规扩张, 如 $\mathbb{Q} \subset \mathbb{Q}(\sqrt{2})\subset\mathbb{Q}(\sqrt[4]{2})$.</p>
+</details></section><section class="block" data-taxon=""><details ><summary id="焊接形式"><header><h1><span class="taxon"></span>焊接形式 <a class="slug" href="/焊接形式.html">[焊接形式]</a><a class="edit" href="vscode://file/E:/Simplopedia_source/trees/%E7%84%8A%E6%8E%A5%E5%BD%A2%E5%BC%8F.md">[edit]</a></h1><div class="metadata"><ul><li class="meta-item">百科</li><li class="meta-item"><span class="link local"><a href="/SimplicialCat.html" title="单纯猫 [SimplicialCat]">SimplicialCat</a></span></li></ul></div></header></summary>
+<h2>定义</h2>
+<p>设 $G$ 为 Lie 群, $M$ 为微分流形, $E\to M$ 是以 $F$ 为纤维, $G$ 为结构群的<span class="link local"><a href="/纤维丛.html" title="纤维丛 [纤维丛]">纤维丛</a></span>. 假设 $G$ <span class="link local"><a href="/传递作用.html" title="传递作用 [传递作用]">传递</a></span>地作用于 $F$ 上, 且 $F$ (作为流形) 的维数与 $M$ 相同. <strong>焊接形式</strong>由如下资料给出:</p>
+<ul>
+<li>特殊截面 $o\colon M\to E$;</li>
+<li>线性同构 $\theta \colon TM \to o^* VE$, 其中 $VE$ 表示 $E$ 的垂直丛, 即由 $E$ 上的垂直向量 (即纤维方向的切向量) 构成的丛, $o^*VE$ 是沿着特殊截面 $o$ 的垂直向量构成的向量丛.</li>
+</ul>
+<p>这样, $\theta$ 将 $E$ 的垂直切空间等同于切空间.</p>
+<h3>主丛</h3>
+<p>设 $P$ 是 $G$-主丛, $V$ 为 $G$-表示. <strong>焊接形式</strong>是一个 $V$-取值的水平 $G$-等变 $1$-形式.</p>
+</details></section><section class="block" data-taxon=""><details ><summary id="相对位置"><header><h1><span class="taxon"></span>相对位置 <a class="slug" href="/相对位置.html">[相对位置]</a><a class="edit" href="vscode://file/E:/Simplopedia_source/trees/%E7%9B%B8%E5%AF%B9%E4%BD%8D%E7%BD%AE.md">[edit]</a></h1><div class="metadata"><ul><li class="meta-item">百科</li><li class="meta-item"><span class="link local"><a href="/SimplicialCat.html" title="单纯猫 [SimplicialCat]">SimplicialCat</a></span></li></ul></div></header></summary>
+<p>设<span class="link local"><a href="/群.html" title="群 [群]">群</a></span> $G$ <span class="link local"><a href="/传递作用.html" title="传递作用 [传递作用]">传递</a></span>地作用于集合 $S$, 那么 $S$ 的两个元素有一个<strong>相对位置</strong>的概念, 即有一个映射 $p\colon S\times S\to P$, 其中 $P$ 是所有可能的相对位置的集合, 满足</p>
+<ul>
+<li>$p(s,s') = p(gs,gs')$ ($s,s'\in S, g\in G$), 即群作用不改变两个元素的相对位置;</li>
+<li>对任意映射 $q\colon S\times S \to Q$, 若 $q(s,s') = q(gs,gs')$ ($s,s'\in S, g\in G$), 则 $q$ 唯一地穿过 $p$, 即若两个元素的某种关系被群作用保持, 那么这种关系一定仅依赖于相对位置.</li>
+</ul>
+<p>上面的冗长描述仅仅是为了建立一种直观; 在数学上, “相对位置的集合” 不过是商集
+$$
+P = G \backslash (S \times S).
+$$</p>
+<p>通常这个故事不是从集合 $S$, 而是从 $G$ 的一个子群 $H$ 开始的; 此时集合 $S$ 是陪集空间 $G/H$, 换言之 $H$ 是 $s_0\in S$ 的稳定子群. 那么 “相对位置的集合” 就是<span class="link local"><a href="/双陪集空间.html" title="双陪集空间 [双陪集空间]">双陪集空间</a></span>
+$$
+P = G \backslash ((G/H)\times (G/H)) \simeq H\backslash G / H.
+$$</p>
+<h2>例</h2>
+<p>对于 Lie 群 $G$ 的 Borel 子群 $B$, 陪集空间 $G/B$ 又称<span class="link local"><a href="/旗流形.html" title="旗流形 [旗流形]">旗流形</a></span> $\mathrm{Fl}$. 两个旗的相对位置是 $G$ 的 <span class="link local"><a href="/Weyl群.html" title="Weyl 群 (极大环面) [Weyl群]">Weyl 群</a></span> $B \backslash G / B \simeq W$ 的元素.</p>
+</details></section><section class="block" data-taxon=""><details ><summary id="轨道范畴"><header><h1><span class="taxon"></span>轨道范畴 <a class="slug" href="/轨道范畴.html">[轨道范畴]</a><a class="edit" href="vscode://file/E:/Simplopedia_source/trees/%E8%BD%A8%E9%81%93%E8%8C%83%E7%95%B4.md">[edit]</a></h1><div class="metadata"><ul><li class="meta-item">百科</li><li class="meta-item"><span class="link local"><a href="/SimplicialCat.html" title="单纯猫 [SimplicialCat]">SimplicialCat</a></span></li></ul></div></header></summary>
+<h2>观念</h2>
+<p><span class="link local"><a href="/群.html" title="群 [群]">群</a></span> $G$ 的<span class="link local"><a href="/群作用.html" title="群作用 [群作用]">作用</a></span>可表示为 $\mathbf{B}G$ 出发的函子, 但有时人们更愿意将其表示为 “轨道范畴” $\mathsf{Orb}_G$ 出发的函子, $\mathsf{Orb}_G$ 中包含了 $\mathbf{B}G$ 作为全子范畴 (对应于 $G$ 自身作为轨道), 同时包含了更多的信息; 这些更多的信息对于 $G$ 的每个子群 $H$ 指出了该作用的 $H$-<span class="link local"><a href="/不动点.html" title="不动点 [不动点]">不动点</a></span>.</p>
+<h2>定义</h2>
+<h3>传统</h3>
+<p>群 $G$ 的轨道范畴 $\mathsf{Orb}_G$ 是由各个子群 $H\subset G$ 对应的陪集空间 $G/H$ 以及它们之间的 $G$-等变映射构成的范畴.</p>
+<h2>性质</h2>
+<h3>与 $G$-集合的关系</h3>
+<p>$G$-集合范畴 $G\text{-}\mathsf{Set}$ 是 $\mathsf{Orb}_G$ 的余积<span class="link local"><a href="/余完备化.html" title="余完备化 [余完备化]">完备化</a></span>, 即 “自由地添加余积” 所得的范畴. 直观上, 这就是说每个 $G$-作用都可分解为<span class="link local"><a href="/传递作用.html" title="传递作用 [传递作用]">传递</a></span>作用的无交并.</p>
+</details></section></details></section></footer></article></div></body></html>

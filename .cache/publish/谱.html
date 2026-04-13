@@ -1,0 +1,1252 @@
+<!DOCTYPE html>
+<html lang="en-US"><head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<meta name="viewport" content="width=device-width"><title>谱 (稳定同伦论)</title><link rel="icon" href="/assets/favicon.ico" /><style>
+  @font-face {
+    font-family: 'NewCM10';
+    src: url(assets/NewCM10-Book.otf) format('opentype');
+    font-weight: 400;
+    font-style: normal;
+  }
+
+  @font-face {
+    font-family: 'NewCM10';
+    src: url(assets/NewCM10-Italic.otf) format('opentype');
+    font-weight: 400;
+    font-style: italic;
+  }
+
+  @font-face {
+    font-family: 'NewCM10';
+    src: url(assets/NewCM10-Bold.otf) format('opentype');
+    font-weight: 700;
+    font-style: normal;
+  }
+
+  body {
+    --text-font-family: "NewCM10", serif !important;
+  }
+</style><template id="inline-section">
+  <section class="inline block" data-taxon="">
+    <details open="">
+      <summary>
+        <header>
+          <h1>
+            <span class="taxon"></span>
+            <div id="title"></div>
+          </h1>
+        </header>
+      </summary>
+      <div id="content"></div>
+    </details>
+  </section>
+</template>
+
+<script>
+  function inlineSection(template, section, taxon, title) {
+    taxon = taxon || section.getAttribute("taxon") || null;
+    title = title || section.getAttribute("title") || "";
+
+    const clone = template.content.cloneNode(true);
+    clone.querySelector("section").dataset.taxon = taxon;
+    clone.querySelector(".taxon").textContent = taxon ? `${taxon}. ` : "";
+    clone.querySelector("#title").replaceWith(title);
+    clone.querySelector("#content").replaceWith(...section.childNodes);
+
+    if (section.hasAttribute("close")) {
+      clone.querySelector("details").removeAttribute("open");
+    }
+    
+    section.replaceWith(clone);
+  }
+
+  const tagTaxonTable = {
+    "exegesis": "Exegesis",
+    "definition": "Definition",
+    "proposition": "Proposition",
+    "remark": "Remark",
+    "conjecture": "Conjecture",
+    "postulate": "Postulate",
+    "claim": "Claim",
+    "observation": "Observation",
+    "fact": "Fact",
+    "hypothesis": "Hypothesis",
+    "axiom": "Axiom",
+    "lemma": "Lemma",
+    "theorem": "Theorem",
+    "corollary": "Corollary",
+    "example": "Example", 
+    "proof": "Proof",
+  };
+
+  document.addEventListener("DOMContentLoaded", () => {
+    const template = document.getElementById("inline-section");
+
+    [...document.getElementsByTagName("block")].forEach(section => inlineSection(template, section));
+
+    Object.entries(tagTaxonTable).forEach(([tag, taxon]) => {
+      [...document.getElementsByTagName(tag)].forEach(section => inlineSection(template, section, taxon));
+    });
+  });
+</script><script>
+  function toggleDetailsOpen() {
+    const details = document.querySelector("#toc>div>details");
+    if (!details) return;
+
+    if (window.matchMedia("(max-width: 1000px)").matches) {
+      details.removeAttribute("open");
+    } else {
+      details.setAttribute("open", "");
+    }
+  }
+
+  document.addEventListener("DOMContentLoaded", toggleDetailsOpen);
+  window.addEventListener("resize", toggleDetailsOpen);
+</script><style>
+  theme-option {
+    display: inline-block;
+  }
+
+  theme-option>input {
+    display: none;
+  }
+
+  theme-option>label {
+    color: var(--slug-color);
+  }
+
+  theme-option>label:hover {
+    background-color: var(--hover-color-link);
+  }
+
+  theme-option:has(input:checked)>label {
+    color: var(--link-color);
+  }
+
+  theme-option>label::before {
+    content: "[";
+    color: rgba(0, 0, 0, 0);
+  }
+
+  theme-option>label::after {
+    content: "]";
+    color: rgba(0, 0, 0, 0);
+  }
+
+  theme-option:has(input:checked)>label::before {
+    color: var(--link-color);
+  }
+
+  theme-option:has(input:checked)>label::after {
+    color: var(--link-color);
+  }
+</style>
+
+<template id="theme-option-template">
+  <input type="radio" name="theme" />
+  <label></label>
+</template>
+
+<script>
+  const THEME_KEY = `kodama-theme`;
+
+  function storeSelectedTheme(name) {
+    localStorage.setItem(THEME_KEY, name);
+  }
+
+  function getCurrentTheme() {
+    return localStorage.getItem(THEME_KEY) || window.primaryTheme;
+  }
+
+  function selectTheme(themeName) {
+    storeSelectedTheme(themeName);
+    requestAnimationFrame(applyDynamicColorInvert);
+  }
+
+  function applyFavorTheme() {
+    const favoredTheme = getCurrentTheme();
+    if (favoredTheme) {
+      const selector = `input[type='radio'][id='${favoredTheme}']`;
+      const favoredOption = window.themeOptions.querySelector(selector);
+
+      if (favoredOption) {
+        favoredOption.checked = true;
+      } else if (window.primaryOption) {
+        // Fallback to primary theme, if the favored theme is not found
+        // e.g., when the theme options have changed, and the stored theme is no longer available.
+        window.primaryOption.checked = true;
+      }
+    }
+    applyDynamicColorInvert();
+  }
+
+  document.addEventListener("DOMContentLoaded", function () {
+    window.themeOptions = document.getElementById("theme-options");
+    const templateContent = document.getElementById("theme-option-template").content;
+
+    customElements.define(
+      "theme-option",
+      class extends HTMLElement {
+        constructor() {
+          super();
+
+          const node = templateContent.cloneNode(true);
+          const themeName = this.getAttribute("name");
+
+          const input = node.querySelector("input");
+          input.setAttribute("id", themeName);
+          input.setAttribute("value", themeName);
+
+          const label = node.querySelector("label");
+          label.setAttribute("for", themeName);
+          label.addEventListener("click", () => selectTheme(themeName));
+
+          while (this.firstChild) {
+            label.appendChild(this.firstChild);
+          }
+          this.appendChild(node);
+        }
+      },
+    );
+
+    window.primaryOption = window.themeOptions.querySelector("input[type='radio']");
+    window.primaryTheme = primaryOption?.value;
+
+    applyFavorTheme();
+  });
+</script>
+
+<script>
+  const clamp = (value) => Math.max(0, Math.min(255, value));
+
+  const multiply = ([r, g, b], matrix) => {
+    const nr = clamp(r * matrix[0] + g * matrix[1] + b * matrix[2]);
+    const ng = clamp(r * matrix[3] + g * matrix[4] + b * matrix[5]);
+    const nb = clamp(r * matrix[6] + g * matrix[7] + b * matrix[8]);
+    return [nr, ng, nb];
+  };
+
+  const hueRotate = ([r, g, b], angle = 0) => {
+    const rad = (angle / 180) * Math.PI;
+    const sin = Math.sin(rad);
+    const cos = Math.cos(rad);
+    const matrix = [
+      0.213 + cos * 0.787 - sin * 0.213,
+      0.715 - cos * 0.715 - sin * 0.715,
+      0.072 - cos * 0.072 + sin * 0.928,
+      0.213 - cos * 0.213 + sin * 0.143,
+      0.715 + cos * 0.285 + sin * 0.140,
+      0.072 - cos * 0.072 - sin * 0.283,
+      0.213 - cos * 0.213 - sin * 0.787,
+      0.715 - cos * 0.715 + sin * 0.715,
+      0.072 + cos * 0.928 + sin * 0.072,
+    ];
+    return multiply([r, g, b], matrix);
+  };
+
+  const grayscale = ([r, g, b], value = 1) => {
+    const matrix = [
+      0.2126 + 0.7874 * (1 - value),
+      0.7152 - 0.7152 * (1 - value),
+      0.0722 - 0.0722 * (1 - value),
+      0.2126 - 0.2126 * (1 - value),
+      0.7152 + 0.2848 * (1 - value),
+      0.0722 - 0.0722 * (1 - value),
+      0.2126 - 0.2126 * (1 - value),
+      0.7152 - 0.7152 * (1 - value),
+      0.0722 + 0.9278 * (1 - value),
+    ];
+    return multiply([r, g, b], matrix);
+  };
+
+  const sepia = ([r, g, b], value = 1) => {
+    const matrix = [
+      0.393 + 0.607 * (1 - value),
+      0.769 - 0.769 * (1 - value),
+      0.189 - 0.189 * (1 - value),
+      0.349 - 0.349 * (1 - value),
+      0.686 + 0.314 * (1 - value),
+      0.168 - 0.168 * (1 - value),
+      0.272 - 0.272 * (1 - value),
+      0.534 - 0.534 * (1 - value),
+      0.131 + 0.869 * (1 - value),
+    ];
+    return multiply([r, g, b], matrix);
+  };
+
+  const saturate = ([r, g, b], value = 1) => {
+    const matrix = [
+      0.213 + 0.787 * value,
+      0.715 - 0.715 * value,
+      0.072 - 0.072 * value,
+      0.213 - 0.213 * value,
+      0.715 + 0.285 * value,
+      0.072 - 0.072 * value,
+      0.213 - 0.213 * value,
+      0.715 - 0.715 * value,
+      0.072 + 0.928 * value,
+    ];
+    return multiply([r, g, b], matrix);
+  };
+
+  const linear = ([r, g, b], slope = 1, intercept = 0) => {
+    const scale = 255;
+    return [
+      clamp(r * slope + intercept * scale),
+      clamp(g * slope + intercept * scale),
+      clamp(b * slope + intercept * scale),
+    ];
+  };
+
+  const brightness = (rgb, value = 1) => linear(rgb, value);
+  const contrast = (rgb, value = 1) => linear(rgb, value, -0.5 * value + 0.5);
+
+  const invert = ([r, g, b], value = 1) => {
+    const nr = (value + r / 255 * (1 - 2 * value)) * 255;
+    const ng = (value + g / 255 * (1 - 2 * value)) * 255;
+    const nb = (value + b / 255 * (1 - 2 * value)) * 255;
+    return [clamp(nr), clamp(ng), clamp(nb)];
+  };
+
+  // Code taken from https://stackoverflow.com/a/9493060/2688027, licensed under CC BY-SA.
+  const rgbToHsl = (r, g, b) => {
+    r /= 255; g /= 255; b /= 255;
+    const max = Math.max(r, g, b);
+    const min = Math.min(r, g, b);
+    let h, s, l = (max + min) / 2;
+    if (max === min) {
+      h = s = 0;
+    } else {
+      const d = max - min;
+      s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
+      switch (max) {
+        case r: h = (g - b) / d + (g < b ? 6 : 0); break;
+        case g: h = (b - r) / d + 2; break;
+        case b: h = (r - g) / d + 4; break;
+      }
+      h /= 6;
+    }
+    return { h: h * 100, s: s * 100, l: l * 100 };
+  };
+
+  const applyFilters = (rgb, [inv, sep, sat, hue, bri, con]) => {
+    let color = [...rgb];
+    color = invert(color, inv / 100);
+    color = sepia(color, sep / 100);
+    color = saturate(color, sat / 100);
+    color = hueRotate(color, hue * 3.6);
+    color = brightness(color, bri / 100);
+    color = contrast(color, con / 100);
+    return color;
+  };
+
+  const lossFn = (targetRgb, filters) => {
+    const resultRgb = applyFilters([0, 0, 0], filters);
+    const targetHsl = rgbToHsl(...targetRgb);
+    const resultHsl = rgbToHsl(...resultRgb);
+    return (
+      Math.abs(resultRgb[0] - targetRgb[0]) +
+      Math.abs(resultRgb[1] - targetRgb[1]) +
+      Math.abs(resultRgb[2] - targetRgb[2]) +
+      Math.abs(resultHsl.h - targetHsl.h) +
+      Math.abs(resultHsl.s - targetHsl.s) +
+      Math.abs(resultHsl.l - targetHsl.l)
+    );
+  };
+
+  const fix = (value, idx) => {
+    let max = 100;
+    if (idx === 2) max = 7500;                  // saturate
+    else if (idx === 4 || idx === 5) max = 200; // brightness, contrast
+    if (idx === 3) { // hue-rotate
+      if (value > max) return value % max;
+      if (value < 0) return max + (value % max);
+      return value;
+    }
+    return Math.max(0, Math.min(max, value));
+  };
+
+  const spsa = (targetRgb, A, a, c, initial, iters) => {
+    const alpha = 1;
+    const gamma = 1 / 6;
+    let values = [...initial];
+    let best = [...values];
+    let bestLoss = Infinity;
+
+    for (let k = 0; k < iters; k++) {
+      const ck = c / Math.pow(k + 1, gamma);
+      const deltas = Array(6).fill().map(() => (Math.random() > 0.5 ? 1 : -1));
+      const highArgs = values.map((v, i) => v + ck * deltas[i]);
+      const lowArgs = values.map((v, i) => v - ck * deltas[i]);
+      const lossDiff = lossFn(targetRgb, highArgs) - lossFn(targetRgb, lowArgs);
+
+      values = values.map((v, i) => {
+        const g = (lossDiff / (2 * ck)) * deltas[i];
+        const ak = a[i] / Math.pow(A + k + 1, alpha);
+        return fix(v - ak * g, i);
+      });
+
+      const loss = lossFn(targetRgb, values);
+      if (loss < bestLoss) {
+        best = [...values];
+        bestLoss = loss;
+      }
+    }
+    return { values: best, loss: bestLoss };
+  };
+
+  // Threshold for acceptable color loss. This value determines when the SPSA algorithm stops early.
+  // A loss below this value is considered visually indistinguishable for most use cases.
+  // The value 25 was determined empirically to balance performance and color accuracy.
+  const ACCEPTABLE_COLOR_LOSS = 25;
+
+  const solveWide = (targetRgb) => {
+    const A = 5;
+    const c = 15;
+    const a = [60, 180, 18000, 600, 1.2, 1.2];
+    let best = { loss: Infinity, values: null };
+    for (let i = 0; best.loss > ACCEPTABLE_COLOR_LOSS && i < 3; i++) {
+      const initial = [50, 20, 3750, 50, 100, 100];
+      const result = spsa(targetRgb, A, a, c, initial, 1000);
+      if (result.loss < best.loss) best = result;
+    }
+    return best;
+  };
+
+  const solveNarrow = (targetRgb, wideResult) => {
+    const A = wideResult.loss;
+    const c = 2;
+    const A1 = A + 1;
+    const a = [0.25 * A1, 0.25 * A1, A1, 0.25 * A1, 0.2 * A1, 0.2 * A1];
+    return spsa(targetRgb, A, a, c, wideResult.values, 500);
+  };
+
+  const cssFilterString = (filters) => {
+    const [inv, sep, sat, hue, bri, con] = filters.map(Math.round);
+    const hueDeg = Math.round(hue * 3.6);
+    return `filter: invert(${inv}%) sepia(${sep}%) saturate(${sat}%) hue-rotate(${hueDeg}deg) brightness(${bri}%) contrast(${con}%);`;
+  };
+
+  const solveColor = (targetRgb) => {
+    const wide = solveWide(targetRgb);
+    const narrow = solveNarrow(targetRgb, wide);
+    return {
+      values: narrow.values,
+      loss: narrow.loss,
+      filter: cssFilterString(narrow.values),
+    };
+  };
+
+  // Reuse a single canvas / context to avoid memory leaks
+  const colorParseCanvas = document.createElement('canvas');
+  colorParseCanvas.width = 1;
+  colorParseCanvas.height = 1;
+  const colorParseContext = colorParseCanvas.getContext('2d');
+
+  const toRGBArray = (cssColor) => {
+    colorParseContext.fillStyle = cssColor;
+    colorParseContext.fillRect(0, 0, 1, 1);
+
+    // The `getImageData().data` returns a Uint8ClampedArray with 4 values per pixel (RGBA). 
+    // also see: https://developer.mozilla.org/zh-CN/docs/Web/API/ImageData/data
+    const rgba = colorParseContext.getImageData(0, 0, 1, 1).data;
+    return Array.from(rgba.slice(0, 3));
+  };
+
+  const DYNAMIC_STYLE_ID = 'dynamic-color-invert-style';
+  const SOLVED_COLOR_KEY = "solved-";
+
+  function memorizedSolvedFilter(color) {
+    const colorKey = SOLVED_COLOR_KEY + color;
+    const storedFilterOption = localStorage.getItem(colorKey);
+    if (storedFilterOption) {
+      return storedFilterOption;
+    } else {
+      const filter = solveColor(color).filter;
+      localStorage.setItem(colorKey, filter);
+      return filter;
+    }
+  }
+
+  function applyDynamicColorInvert() {
+    const textColor = getComputedStyle(document.body).getPropertyValue('--text-color');
+    if (textColor && textColor.length > 0) {
+      const rgb = toRGBArray(textColor);
+      const filter = memorizedSolvedFilter(rgb);
+
+      const existingStyle = document.getElementById(DYNAMIC_STYLE_ID);
+      if (existingStyle) {
+        existingStyle.textContent = `.color-invert {${filter}}`;
+      } else {
+        const style = document.createElement('style');
+        style.id = DYNAMIC_STYLE_ID;
+        style.textContent = `.color-invert {${filter}}`;
+        document.head.appendChild(style);
+      }
+    }
+  }
+</script><script>
+  (() => {
+    const url = "/kodama.json";
+    const interval = 1000; // 1 second
+
+    let lastModified = null;
+
+    async function check() {
+      try {
+        const res = await fetch(url + "?t=" + Date.now(), {
+          method: "HEAD",
+          cache: "no-store",
+        });
+
+        const lm = res.headers.get("last-modified");
+
+        if (lastModified && lm && lm !== lastModified) {
+          location.reload();
+          return;
+        }
+
+        lastModified = lm || lastModified;
+      } catch (e) {
+        // Ignore
+        console.warn("Reload check failed:", e);
+      }
+
+      setTimeout(check, interval);
+    }
+
+    check();
+  })();
+</script><!-- Also see: https://katex.org/docs/autorender -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.25/dist/katex.min.css" integrity="sha384-WcoG4HRXMzYzfCgiyfrySxx90XSl2rxY5mnVY5TwtWE6KLrArNKn0T/mOgNL0Mmi" crossorigin="anonymous">
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.25/dist/katex.min.js" integrity="sha384-J+9dG2KMoiR9hqcFao0IBLwxt6zpcyN68IgwzsCSkbreXUjmNVRhPFTssqdSGjwQ" crossorigin="anonymous"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.25/dist/contrib/auto-render.min.js" integrity="sha384-hCXGrW6PitJEwbkoStFjeJxv+fSOOQKOPbJxSfM6G5sWZjAyWhXiTIIAmQqnlLlh" crossorigin="anonymous"></script>
+<!-- Also see: https://github.com/KaTeX/KaTeX/tree/main/contrib/copy-tex -->
+<script src="https://cdn.jsdelivr.net/npm/katex@0.16.25/dist/contrib/copy-tex.min.js" integrity="sha384-HORx6nWi8j5/mYA+y57/9/CZc5z8HnEw4WUZWy5yOn9ToKBv1l58vJaufFAn9Zzi" crossorigin="anonymous"></script>
+
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    renderMathInElement(document.body, {
+      delimiters: [
+        { left: "$$", right: "$$", display: true },
+        { left: "$", right: "$", display: false },
+        { left: "\\(", right: "\\)", display: false },
+        { left: "\\[", right: "\\]", display: true },
+      ],
+      trust: true,
+      strict: false,
+      throwOnError: false,
+      minRuleThickness: 0.05,
+    });
+  });
+</script>
+<link rel="stylesheet" href="/main.css"><style>
+@media only screen and (min-width: 1000px) {
+  #grid-wrapper { grid-template-columns: var(--article-max-width) var(--toc-max-width); }
+  nav#toc { max-width: max-content; }
+}
+</style></head><body><header class="header"><nav class="nav"><div class="logo"><span class="cursor-pointer" onclick="window.location.href='/index.html'" title="单纯百科 Simplopedia">« 单纯百科 Simplopedia</span></div></nav></header><div id="grid-wrapper" style="grid-template-areas: 'article toc';" data-base-url="./"><nav id="toc" class="sticky-nav mobile-sticky-nav"><div id="theme-options"><style>
+  body:has(input[value="furina"]:checked) {
+    --article-max-width: 110ex; /* default: 90ex */
+
+    --color-Furina-deep-navy: #253085;
+    --color-Furina-royal-blue: #465BCF;
+    --color-Furina-aqua-cyan: #6AC6E8;
+    --color-Furina-frost-white: #FAFBFC;
+    --color-Furina-misty-blue: #C4D7ED;
+    --color-Furina-vivid-sapphire: #5670E9;
+    --color-Furina-luminous-hydro: #70DBFF;
+    --color-Furina-bright-periwinkle: #8DA4F1;
+    --color-Furina-vintage-gold: #BD9368;
+    --color-Furina-vintage-gold-light: #DDB368;
+    --color-Furina-vintage-gold-ultra-light: #FDF388;
+
+    --background-color: var(--color-Furina-frost-white);
+    --link-color: var(--color-Furina-vivid-sapphire);
+    --slug-color: var(--color-Furina-aqua-cyan);
+    --logo-color: var(--color-Furina-deep-navy);
+
+    --block-background-color: #FFFFFF;
+    --shadow-color: rgba(27, 63, 143, 0.06);
+    --radius: 5px;
+    --margin-left: 14px;
+
+    --hover-color-block: var(--block-background-color);
+    --logo-hover-color: #88d;
+    --span-tag-color: #88d;
+    --article-tag-color: #88d;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    body:has(input[value="furina"]:checked) {
+      --color-Furina-deep-navy: #B5C0F5;
+      --color-Furina-royal-blue: #D6EBFF;
+
+      --background-color: #2f2f2f;
+      --block-background-color: #3a3a3a;
+    }
+  }
+
+  .block {
+    /*2026-3-16 21:10 新增*/
+    padding: 15px;
+    margin-top: 6px;
+    margin-bottom: 6px;
+
+    border-radius: var(--radius);
+    background-color: var(--block-background-color);
+    box-shadow: 0 2px 12px var(--shadow-color);
+  }
+
+  .footnote-definition {
+    margin-left: var(--margin-left);
+  }
+
+  h5,
+  h6,
+  p {
+    margin: 5px;
+  }
+
+  tr {
+    border-bottom: 1px solid var(--color-Furina-bright-periwinkle);
+  }
+
+  /* 可选：去除表头下方的重复横线（如果表头需要特殊样式） */
+  thead tr {
+    border-bottom: 2px solid var(--color-Furina-deep-navy);
+  }
+
+  /* 去除最后一行的边框 */
+  tbody tr:last-child {
+    border-bottom: none;
+  }
+
+  .footnote-definition>p {
+    display: inline;
+    margin-left: 0;
+    color: var(--color-Furina-bright-periwinkle);
+    font-size: small;
+  }
+
+  article > section > details > summary > header > h1 {
+    font-weight: 600;
+    font-size: 1.75rem !important;
+  }
+
+  h2 {
+    font-weight: 500;
+    font-size: 1.5rem !important;
+    color: var(--color-Furina-deep-navy);
+    margin-bottom: 10px;
+    border-bottom: 1px solid #88d;
+    padding-bottom: 1px;
+    /* 增加底部内边距让横线和文字有间距 */
+  }
+
+  h2::before {
+    content: "\2726";
+    /* ✦ 的Unicode转义码 */
+    display: inline-block;
+    margin-right: 0.3em;
+    /*color: var(--color-Furina-vintage-gold-light);*/
+    /* 替换 color 属性，改为以下背景和裁剪属性 */
+    background: linear-gradient(150deg,
+        var(--color-Furina-vintage-gold-ultra-light) 30%,
+        var(--color-Furina-vintage-gold-light) 60%,
+        var(--color-Furina-vintage-gold) 90%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    /* 将文字颜色设为透明以显示背景 */
+    /* 组合径向渐变（中心高光）和线性渐变（基础色调） */
+    /*background: radial-gradient(
+      ellipse at center,
+      var(--color-Furina-vintage-gold-ultra-light) 20%,
+      transparent 70%
+    ),
+    linear-gradient(
+      to bottom,
+      var(--color-Furina-vintage-gold-light),
+      var(--color-Furina-vintage-gold)
+    );
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent; */
+    filter: drop-shadow(0px 1px 1px rgba(184, 150, 131, 0.5));
+    /* 可选：增加与主色呼应的柔和投影 */
+    font-weight: normal;
+  }
+
+
+  h3 {
+    font-weight: 700;
+    color: var(--color-Furina-royal-blue);
+    margin-bottom: 5px;
+  }
+
+  h3::before {
+    content: "\2726";
+    /* ✦ 的Unicode转义码 */
+    display: inline-block;
+    margin-left: 0.06em;
+    margin-right: 0.36em;
+    /*color: var(--color-Furina-vintage-gold-ultra-light);*/
+    background: linear-gradient(150deg,
+        var(--color-Furina-vintage-gold-ultra-light) 20%,
+        var(--color-Furina-vintage-gold-light) 90%,
+        var(--color-Furina-vintage-gold) 95%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    font-weight: normal;
+  }
+
+  h4 {
+    text-indent: var(--marginleft);
+    font-weight: 700;
+    color: #696cd9;
+    margin-bottom: 0;
+  }
+
+  h5 {
+    text-indent: var(--marginleft);
+    font-weight: 700;
+    color: #8a8ff4;
+    margin-bottom: 0;
+  }
+
+  h6 {
+    text-indent: var(--marginleft);
+    font-weight: 700;
+    color: #aaaff4;
+    margin-bottom: 0;
+  }
+
+  code, pre, .mono {
+    font-family: "Liberation Mono", "Courier New", monospace;
+    font-size: 0.9em; /* 可选微调尺寸 */
+  }
+
+  @media only screen and (max-width: 1000px) {
+    #grid-wrapper>nav {
+      display: none !important;
+    }
+  }
+
+  #toc,
+  #toc .block {
+    background: none !important;
+    box-shadow: none !important;
+  }
+
+  ul {
+    margin: 5px;
+    margin-left: calc(5px + 2em);
+    padding-left: 0;
+    list-style-type: none;
+  }
+
+  ul li {
+    margin-bottom: 5px;
+    position: relative;
+    padding-left: 0;
+    /*color: var(--text-secondary);*/
+  }
+
+  ul li::before {
+    content: '✦';
+    position: absolute;
+    left : -1em;
+    /*color: var(--color-Furina-vintage-gold-ultra-light);*/
+    font-size: 0.9em;
+  }
+
+  .metadata {
+    color: var(--article-tag-color);
+  }
+
+  .metadata ul {
+    margin : 0;
+  }
+
+  .metadata li::before {
+    content: none;
+  }
+
+  .music-player button {
+    text-decoration: none;
+  }
+
+  .music-player button:hover {
+    text-decoration: underline;
+    text-decoration-color: var(--color-Furina-vintage-gold-light);
+    /* 金色 */
+    text-underline-offset: 6px;
+    /* 调整下划线与文字距离 */
+    text-decoration-thickness: 1px;
+    /* 线条粗细 */
+  }
+</style>
+
+<theme-option name="furina" style="display: none;">furina</theme-option></div></nav>
+
+<article><section class="block" data-taxon=""><details open><summary id="谱"><header><h1><span class="taxon"></span>谱 (稳定同伦论) <a class="slug" href="/谱.html">[谱]</a><a class="edit" href="vscode://file/E:/Simplopedia_source/trees/%E8%B0%B1.md">[edit]</a></h1><div class="metadata"><ul><li class="meta-item">百科</li><li class="meta-item"><span class="link local"><a href="/稳定同伦论.html" title="稳定同伦论 [稳定同伦论]">稳定同伦论</a></span></li><li class="meta-item"><span class="link local"><a href="/SimplicialCat.html" title="单纯猫 [SimplicialCat]">SimplicialCat</a></span></li></ul></div></header></summary>
+<p>本页面讨论<span class="link local"><a href="/稳定同伦论.html" title="稳定同伦论 [稳定同伦论]">稳定同伦论</a></span>中的谱. 另一个无关的概念是<span class="link local"><a href="/代数-几何对偶.html" title="代数–几何对偶 [代数-几何对偶]">代数–几何对偶</a></span>中的<span class="link local"><a href="/谱(代数).html" title="谱 (代数–几何对偶) [谱(代数)]">谱</a></span>.</p>
+<h2>观念</h2>
+<p>带基点<span class="link local"><a href="/生象.html" title="生象, ∞-群胚 [生象]">生象</a></span> $X,Y$ 之间的<strong>稳定映射空间</strong>
+$$
+\operatorname{Hom}_s(X,Y) :=\operatorname{colim}_k \operatorname{Hom}(\Sigma^k X,\Sigma^k Y)
+$$
+具有自然的 <span class="link local"><a href="/E∞-群.html" title="E∞-群 [E∞-群]">$\mathbb E_\infty$-群</a></span>结构. 特别地, <span class="link local"><a href="/稳定同伦群.html" title=" [稳定同伦群]">稳定同伦群</a></span> $\pi_n^s(X)=\pi_0\operatorname{Hom}_s(S^n,X)$ 是 Abel 群.</p>
+<p>我们希望将<span class="link local"><a href="/生象.html" title="生象, ∞-群胚 [生象]">生象</a></span>的范畴<span class="link local"><a href="/稳定化.html" title="稳定化 [稳定化]">稳定化</a></span>, 使得稳定化后的映射空间是上述的余极限, 也即形式上令 $\Sigma$ 可逆. 参见<span class="link local"><a href="/形式取逆.html" title="“形式取逆” [形式取逆]">形式取逆</a></span>.</p>
+<p>对于具有有限极限和有限余极限的范畴, 存在伴随 $\Sigma \dashv \Omega$:
+$$
+\text{Map}(\Sigma X,Y)\simeq *\times_{\text{Map}(X,Y)}*\simeq \text{Map}(X,\Omega Y).
+$$</p>
+<p>谱的范畴 <span class="link local"><a href="/Sp.html" title="Sp [Sp]">$\mathsf{Sp}$</a></span> 是<span class="link local"><a href="/生象.html" title="生象, ∞-群胚 [生象]">生象</a></span>范畴的<span class="link local"><a href="/稳定化.html" title="稳定化 [稳定化]">稳定化</a></span>
+$$
+\mathsf{Sp} := \lim\Big(\cdots\overset{\Omega}{\longrightarrow} \mathsf{Ani}_*
+\overset{\Omega}{\longrightarrow} \mathsf{Ani}_*\Big)
+\in \mathsf{Cat}_{\infty}.
+$$
+其构造思路大致是: 从带基点<span class="link local"><a href="/生象.html" title="生象, ∞-群胚 [生象]">生象</a></span>范畴 $\mathsf{Ani}_*$ 开始, 强行让<span class="link local"><a href="/纬悬.html" title="纬悬 [纬悬]">纬悬</a></span> $\Sigma$ 变得可逆, 得到一个新的范畴.</p>
+<p>谱的<span class="link local"><a href="/数学对象的表现.html" title="数学对象的表现 [数学对象的表现]">表现</a></span>包括<span class="link local"><a href="/序列谱.html" title="序列谱 [序列谱]">序列谱</a></span>, <span class="link local"><a href="/坐标无关谱.html" title="“坐标无关谱” [坐标无关谱]">坐标无关谱</a></span>等.</p>
+<h2>定义</h2>
+<p>见<span class="link local"><a href="/序列谱.html" title="序列谱 [序列谱]">序列谱</a></span>.</p>
+<h2>例</h2>
+<h3>纬悬谱</h3>
+<p>设 $X$ 为带基点空间, $X$ 的<span class="link local"><a href="/纬悬谱.html" title="纬悬谱 [纬悬谱]">纬悬谱</a></span> $\Sigma^{\infty}X$ 可定义为<span class="link local"><a href="/序列谱.html" title="序列谱 [序列谱]">序列谱</a></span> $\{\Sigma^q X\}_{q\geq 0}$ 以及恒等映射 $\Sigma\Sigma^q X\to\Sigma^{q+1}X$.</p>
+<p>对于正整数 $n$, 定义 $\Sigma^{\infty -n}X$ 为如下<span class="link local"><a href="/序列谱.html" title="序列谱 [序列谱]">序列谱</a></span>: 第 $n$ 项以前为单点, 第 $q\geq n$ 项为 $\Sigma^{q-n}X$.</p>
+<p>特别地, 称 $X=S^0$ 的纬悬谱为<span class="link local"><a href="/球谱.html" title="“球谱” [球谱]">球谱</a></span> (sphere spectrum).</p>
+<h3>谱化</h3>
+<p>对于预谱 $T_\bullet$, 若 $T_q\to \Omega T_{q+1}$ 为嵌入, 可定义一个谱 $(LT)_\bullet$,
+$$
+(LT)_q:=\operatorname{colim}_{l}\Omega^l T_{q+l},
+$$
+称为 $T$ 的谱化 (spectrification). 谱化是谱到预谱的遗忘的左伴随.</p>
+<p>特别地, 对于 $T=\{\Sigma^q X\}_{q\geq 0}$, 有 $(LT)_0=\operatorname{colim}_l \Omega^l\Sigma^l X$, 记后者为 $QX$.</p>
+<h2>性质</h2>
+<p>谱的范畴 <span class="link local"><a href="/Sp.html" title="Sp [Sp]">$\mathsf{Sp}$</a></span> 是<span class="link local"><a href="/稳定无穷范畴.html" title="稳定范畴 [稳定无穷范畴]">稳定 ∞-范畴</a></span>.</p>
+<p>有<span class="link local"><a href="/对称幺半∞-范畴.html" title="对称幺半 ∞-范畴 [对称幺半∞-范畴]">对称幺半函子</a></span>
+$$
+(\mathsf{Set},\times) \to (\mathsf{Ani},\times) \overset{(-)_+}{\to} (\mathsf{Ani}_{*/},\wedge) \overset{\Sigma_{\infty}}{\to} (\mathsf{Sp},\wedge).
+$$</p>
+<h2>谱的同伦群与同调群</h2>
+<p>对于<span class="link local"><a href="/序列谱.html" title="序列谱 [序列谱]">序列谱</a></span> $T_\bullet$, 定义
+$$
+\pi_n(T_\bullet)=\operatorname{colim}_l \pi_{n+l}T_l,
+$$
+$$
+H_n(T_\bullet,R)=\operatorname{colim}_q\widetilde {H}_{n+q}(T_q,R).
+$$
+但这样无法定义上同调, 因为箭头的方向.</p>
+<h2>相关概念</h2>
+<p><span class="link local"><a href="/稳定化.html" title="稳定化 [稳定化]">稳定化</a></span>, <span class="link local"><a href="/稳定同伦范畴.html" title="“稳定同伦范畴” [稳定同伦范畴]">稳定同伦范畴</a></span>, <span class="link local"><a href="/E∞-空间.html" title="E∞-空间 [E∞-空间]">Abel ∞-群</a></span></p>
+</details></section><footer><section class="block link-list" id="backlinks"><details open><summary><header><h1>关联页面</h1></header></summary><section class="block" data-taxon=""><details ><summary id="Abel∞-群"><header><h1><span class="taxon"></span>E∞-群 <a class="slug" href="/Abel∞-群.html">[Abel∞-群]</a><a class="edit" href="vscode://file/E:/Simplopedia_source/trees/Abel%E2%88%9E-%E7%BE%A4.md">[edit]</a></h1><div class="metadata"><ul><li class="meta-item">百科</li><li class="meta-item"><span class="link local"><a href="/SimplicialCat.html" title="单纯猫 [SimplicialCat]">SimplicialCat</a></span></li></ul></div></header></summary>
+<h2>观念</h2>
+<p>$\mathbb E_{\infty}$-群又称 Abel $\infty$-群, 是<span class="link local"><a href="/算畴.html" title="算畴 [算畴]">算畴</a></span> <span class="link local"><a href="/E∞-算畴.html" title="E∞-算畴 [E∞-算畴]">$\mathbb E_\infty$</a></span>上的<span class="link local"><a href="/算畴上的代数.html" title="算畴上的代数 [算畴上的代数]">代数</a></span>.</p>
+<p>见 <span class="link local"><a href="/En-代数.html" title="En-代数 [En-代数]">$\mathbb E_n$-代数</a></span>.</p>
+<h2>例</h2>
+<p><span class="link local"><a href="/对称幺半∞-范畴.html" title="对称幺半 ∞-范畴 [对称幺半∞-范畴]">对称幺半 ∞-范畴</a></span>的<span class="link local"><a href="/对象的生象.html" title="对象的生象 [对象的生象]">对象的生象</a></span>具有 $\mathbb E_\infty$-代数结构.</p>
+<p>每个<span class="link local"><a href="/谱.html" title="谱 (稳定同伦论) [谱]">谱</a></span>通过函子 $\Omega^\infty$ 给出一个 $\mathbb E_\infty$-群, 直观上取出非负阶的同伦信息.</p>
+<h2>相关概念</h2>
+<p><span class="link local"><a href="/连合谱.html" title="连合谱 [连合谱]">连合谱</a></span></p>
+</details></section><section class="block" data-taxon=""><details ><summary id="Adams谱序列"><header><h1><span class="taxon"></span>“Adams 谱序列” <a class="slug" href="/Adams谱序列.html">[Adams谱序列]</a><a class="edit" href="vscode://file/E:/Simplopedia_source/trees/Adams%E8%B0%B1%E5%BA%8F%E5%88%97.md">[edit]</a></h1><div class="metadata"><ul><li class="meta-item">百科</li><li class="meta-item"><span class="link local"><a href="/SimplicialCat.html" title="单纯猫 [SimplicialCat]">SimplicialCat</a></span></li></ul></div></header></summary>
+<blockquote>
+<p>Adams 谱序列是计算<span class="link local"><a href="/配边.html" title="配边 [配边]">配边</a></span>不变量的一种方法, 另一种是指标定理. — 万喆彦, BIMSA 公开课 2023-09-18</p>
+</blockquote>
+<p>Adams 谱序列是计算<span class="link local"><a href="/谱.html" title="谱 (稳定同伦论) [谱]">谱</a></span>的同伦群的有力工具.</p>
+<p>$$
+\operatorname{Ext}_{\mathcal A_p}^{s,t}(H^*(X,\mathbb{Z}/p),\mathbb{Z}/p) \Rightarrow \pi_{t-s}(X)_p^\wedge
+$$
+其中 $\mathcal A$ 为对应素数 $p$ 的 <span class="link local"><a href="/Steenrod代数.html" title="“Steenrod 代数” [Steenrod代数]">Steenrod 代数</a></span>.</p>
+<p>一般而言, 对于<span class="link local"><a href="/环谱.html" title="环谱 [环谱]">环谱</a></span> $E$, 有 $E$-Adams 谱序列, 其第二页为 $E$-(上) 同调. 它是非稳定同伦论中 <span class="link local"><a href="/Bousfield–Kan谱序列.html" title="“Bousfield–Kan 谱序列” [Bousfield–Kan谱序列]">Bousfield–Kan 谱序列</a></span>的类比.</p>
+<blockquote>
+<p>For $E$ a ring spectrum, hence an E-∞ ring, the totalization of its Amitsur complex cosimplicial spectrum $E^{\wedge\bullet}$ is really the algebraic dual incarnation of the $1$-image factorization of the terminal morphism
+$$
+ \operatorname{Spec}E \to\operatorname{Spec}(\operatorname{Tot}(E^{\wedge\bullet})) \overset{p}{\to} \operatorname{Spec}\mathbb S.
+ $$
+Moreover, a spectrum $X$ is equivalently a quasicoherent sheaf on $\operatorname{Spec}(\mathbb S)$ and $E^{\wedge\bullet}\wedge X$ is accordingly the Sweedler coring that expresses the descent property of $X$ pullled back along the cover $p$, dually the $E$-localization of $X$ (<span class="link local"><a href="/Bousfield局部化.html" title="Bousfield 局部化 (稳定同伦论) [Bousfield局部化]">Bousfield 局部化</a></span>). The Adams spectral sequence may then be seen to be the computation of the homotopy groups of the $E$-localization of $X$ in terms of its restriction to that cover.
+In general, notably for $E=H\mathbb F_p$, the 1-image of $\operatorname{Spec}(E)\to \operatorname{Spec}(\mathbb S)$ is smaller than $\operatorname{Spec}(\mathbb S)$ and therefore this process computes not all of $X$, but just the restriction to that one image (for instance just the $p$-local component). Examples of ring spectra which are “complete” with respect to the sphere spectrum in that the above 1-image coincides with $\operatorname{Spec}(\mathbb S)$ notably includes the complex cobordism cohomology spectrum $E=\mathrm {MU}$. That explains the relevance of the Adams-Novikov spectral sequence (noticing that the wedge summands of $\mathrm MU(p)$ are the BP-spectra) and the close interplay between the ANSS and chromatic homotopy theory.</p>
+</blockquote>
+<h2>相关概念</h2>
+<p><span class="link local"><a href="/Adams消解.html" title="“Adams 消解” [Adams消解]">Adams 消解</a></span></p>
+</details></section><section class="block" data-taxon=""><details ><summary id="Bousfield局部化"><header><h1><span class="taxon"></span>Bousfield 局部化 (稳定同伦论) <a class="slug" href="/Bousfield局部化.html">[Bousfield局部化]</a><a class="edit" href="vscode://file/E:/Simplopedia_source/trees/Bousfield%E5%B1%80%E9%83%A8%E5%8C%96.md">[edit]</a></h1><div class="metadata"><ul><li class="meta-item">百科</li><li class="meta-item"><span class="link local"><a href="/稳定同伦论.html" title="稳定同伦论 [稳定同伦论]">稳定同伦论</a></span></li><li class="meta-item"><span class="link local"><a href="/SimplicialCat.html" title="单纯猫 [SimplicialCat]">SimplicialCat</a></span></li></ul></div></header></summary>
+<p>本页面介绍<span class="link local"><a href="/谱.html" title="谱 (稳定同伦论) [谱]">谱</a></span>的 Bousfield 局部化. 另见<span class="link local"><a href="/局部化(范畴论).html" title="局部化 (范畴论) [局部化(范畴论)]">局部化 (范畴论)</a></span>, <span class="link local"><a href="/局部化.html" title="局部化 (环) [局部化]">局部化 (环)</a></span>.</p>
+<h2>观念</h2>
+<p>固定一个<span class="link local"><a href="/谱.html" title="谱 (稳定同伦论) [谱]">谱</a></span> $E$. 关于 $E$ 的 Bousfield 局部化提取出 $E$ 表示的<span class="link local"><a href="/广义同调.html" title="广义同调 [广义同调]">同调理论</a></span>可见的同伦信息.
+Bousfield 局部化也可理解为谱的范畴 <span class="link local"><a href="/Sp.html" title="Sp [Sp]">$\mathsf{Sp}$</a></span> 关于 $E$-等价的 <span class="link local"><a href="/局部化(范畴论).html" title="局部化 (范畴论) [局部化(范畴论)]">(范畴论) 局部化</a></span>.</p>
+<h2>定义</h2>
+<p>为了定义 $E$-局部谱, 首先需要 $E$-无圈谱, $E$-等价的概念.</p>
+<ul>
+<li>称谱 $X$ 为 $E$-<strong>无圈谱</strong>是指 $E\wedge X = 0$.</li>
+<li>称谱的态射 $f\colon X\to Y$ 为 $E$-<strong>等价</strong>是指如下等价条件之一成立:
+<ul>
+<li>$E\wedge f\colon E\wedge X \to E\wedge Y$ 为等价 (换言之, $f$ 诱导 $E$-<span class="link local"><a href="/广义同调.html" title="广义同调 [广义同调]">同调</a></span>的同构);</li>
+<li>$f$ 的<span class="link local"><a href="/纤维列.html" title="纤维列 [纤维列]">纤维</a></span>为 $E$-无圈谱.</li>
+</ul>
+</li>
+<li>称谱 $X$ 为 $E$-<strong>局部谱</strong>是指如下等价条件之一成立:
+<ul>
+<li>对任意 $E$-等价 $f\colon A\to B$, $[f,X] \colon [B,X] \to [A,X]$ 为同构;</li>
+<li>对任意 $E$-无圈谱 $A$, $[A,X] \simeq 0$.</li>
+</ul>
+</li>
+</ul>
+<p><strong>命题</strong>. 对任意谱 $X$ 存在自然的 (余) <span class="link local"><a href="/纤维列.html" title="纤维列 [纤维列]">纤维列</a></span>
+$$
+{_E}X \to X \overset{\eta}{\to} X_E \to \Sigma ({_E}X),
+$$
+使得</p>
+<ul>
+<li>${_E}X$ 为 $E$-无圈谱,</li>
+<li>$X_E$ 为 $E$-局部谱,</li>
+<li>$\eta\colon X\to X_E$ 为 $E$-等价.</li>
+</ul>
+<p>$E$-局部化可视为 “将 $E$-等价变为等价” 的操作.</p>
+<h2>性质</h2>
+<p><strong>命题</strong>. 设 $E$ 为<span class="link local"><a href="/环谱.html" title="环谱 [环谱]">环谱</a></span>, $X$ 为 $E$-模, 则 $X$ 为 $E$-局部谱.</p>
+<p><strong>证明</strong>. 设 $A$ 为任意 $E$-无圈谱. 那么任意态射 $A\to X$ 可分解为
+$$
+A \overset{1}{\to}E\wedge A\overset{f}{\to}E\wedge X \to X,
+$$
+而 $A\wedge E=0$, 这说明 $[A,X] \simeq 0$.</p>
+<p>另一种说法是, 由于 $X$ 是 $E$-模, $X$ 是 $X\wedge E$ 的收缩, 而对任何谱 $X$, $X\wedge E$ 都是 $E$-局部谱. (好像 $E$-模是 $E$-局部谱这个结论更基本一些.)</p>
+<p><strong>命题</strong>. $E$-局部谱的子范畴关于平移, 收缩, 积 (直和), 余纤维封闭.</p>
+<p>注意, $E$-局部谱的<span class="link local"><a href="/压缩积.html" title="压缩积 [压缩积]">张量积</a></span>不一定是 $E$-局部谱.</p>
+</details></section><section class="block" data-taxon=""><details ><summary id="K-理论"><header><h1><span class="taxon"></span>“K-理论” <a class="slug" href="/K-理论.html">[K-理论]</a><a class="edit" href="vscode://file/E:/Simplopedia_source/trees/K-%E7%90%86%E8%AE%BA.md">[edit]</a></h1><div class="metadata"><ul><li class="meta-item">百科</li><li class="meta-item"><span class="link local"><a href="/SimplicialCat.html" title="单纯猫 [SimplicialCat]">SimplicialCat</a></span></li></ul></div></header></summary>
+<p>K-理论由 Grothendieck 在 <span class="link local"><a href="/Riemann--Roch定理.html" title="“Riemann–Roch 定理” [Riemann--Roch定理]">Riemann–Roch 定理</a></span>的推广工作中提出. Atiyah 和 Hirzebruch 发展了与之类似的<span class="link local"><a href="/拓扑K-理论.html" title="“拓扑 K-理论” [拓扑K-理论]">拓扑 K-理论</a></span>.</p>
+<p>设 $\mathcal C$ 为<span class="link local"><a href="/稳定无穷范畴.html" title="稳定范畴 [稳定无穷范畴]">稳定无穷范畴</a></span>, 其 K-理论是一个<span class="link local"><a href="/谱.html" title="谱 (稳定同伦论) [谱]">谱</a></span> $K(\mathcal C)$, $\pi_0K(\mathcal C)$ 是 $\mathcal C$ 的 Grothendieck 群.</p>
+<h2>例</h2>
+<h3>代数 K-理论</h3>
+<blockquote>
+<p>Historically, the <em>algebraic K-theory</em> of a commutative ring (what today is the <strong>“0th” algebraic K-theory group</strong>) was originally defined to be the Grothendieck group of its symmetric monoidal category of projective modules. Under the relation between modules and vector bundles, this is directly analogous to the basic definition of topological K-theory, whence the common term. (In fact when applied to the <strong>stack of vector bundles</strong> then algebraic K-theory subsumes topological K-theory and also differential K-theory.</p>
+</blockquote>
+<p>Quillen 定义了环 $R$ 的高阶 <span class="link local"><a href="/K-群.html" title=" [K-群]">K-群 (代数)</a></span>, 它是某个空间 $BGL(R)^+$ 的同伦群.</p>
+</details></section><section class="block" data-taxon=""><details ><summary id="Leray谱序列"><header><h1><span class="taxon"></span>Leray 谱序列 <a class="slug" href="/Leray谱序列.html">[Leray谱序列]</a><a class="edit" href="vscode://file/E:/Simplopedia_source/trees/Leray%E8%B0%B1%E5%BA%8F%E5%88%97.md">[edit]</a></h1><div class="metadata"><ul><li class="meta-item">百科</li><li class="meta-item"><span class="link local"><a href="/SimplicialCat.html" title="单纯猫 [SimplicialCat]">SimplicialCat</a></span></li></ul></div></header></summary>
+<h2>观念</h2>
+<p>设
+$$
+f = (f^*\dashv f_*)\colon \mathcal Y \to \mathcal X
+$$
+为 <span class="link local"><a href="/∞-意象.html" title="∞-意象 [∞-意象]">$\infty$-意象</a></span>之间的<span class="link local"><a href="/几何态射.html" title="几何态射 [几何态射]">几何态射</a></span>, 记 $\Gamma_{\mathcal X}$ 为 $\mathcal X \to\mathsf{Ani}$ 的直像部分, 即<span class="link local"><a href="/整体截面.html" title="整体截面 [整体截面]">整体截面</a></span>. 那么
+$$
+    \Gamma_{\mathcal Y} = \Gamma_{\mathcal X}\circ f_*.
+$$</p>
+<p>设 $F\in\mathsf{Sp}(\mathcal Y)$ 为 $\mathcal Y$ 的<span class="link local"><a href="/稳定化.html" title="稳定化 [稳定化]">稳定化</a></span>的对象. 考虑 $\mathsf{Sp}(\mathcal X)$ 的标准 <span class="link local"><a href="/t-结构.html" title="t-结构 [t-结构]">t-结构</a></span>给出的 $f_* F$ 的 <span class="link local"><a href="/Postnikov塔.html" title="Postnikov 塔 [Postnikov塔]">Postnikov 滤</a></span>, 再以 $\Gamma_{\mathcal X}$ 作用得到一个<span class="link local"><a href="/滤过.html" title="滤对象 [滤过]">滤过</a></span><span class="link local"><a href="/谱.html" title="谱 (稳定同伦论) [谱]">谱</a></span>
+$$
+\cdots\to
+\Gamma_{\mathcal X}(\tau_{\leq q-1}f_*F)
+\to
+\Gamma_{\mathcal X}(\tau_{\leq q}f_*F)
+\to\cdots.
+$$
+这个滤过谱对应的<span class="link local"><a href="/滤对象的谱序列.html" title="滤对象的谱序列 [滤对象的谱序列]">谱序列</a></span>称为 <strong>Leray 谱序列</strong>.</p>
+</details></section><section class="block" data-taxon=""><details ><summary id="Sp"><header><h1><span class="taxon"></span>Sp <a class="slug" href="/Sp.html">[Sp]</a><a class="edit" href="vscode://file/E:/Simplopedia_source/trees/Sp.md">[edit]</a></h1><div class="metadata"><ul><li class="meta-item">百科</li><li class="meta-item"><span class="link local"><a href="/稳定同伦论.html" title="稳定同伦论 [稳定同伦论]">稳定同伦论</a></span></li><li class="meta-item"><span class="link local"><a href="/SimplicialCat.html" title="单纯猫 [SimplicialCat]">SimplicialCat</a></span></li></ul></div></header></summary>
+<p><span class="link local"><a href="/谱.html" title="谱 (稳定同伦论) [谱]">谱</a></span>的范畴 $\mathsf{Sp}$ 是最基本的<span class="link local"><a href="/稳定无穷范畴.html" title="稳定范畴 [稳定无穷范畴]">稳定 $\infty$-范畴</a></span>, 是<span class="link local"><a href="/生象.html" title="生象, ∞-群胚 [生象]">生象</a></span>的范畴 <span class="link local"><a href="/Ani.html" title="生象的范畴 [Ani]">$\mathsf{Ani}$</a></span> 的<span class="link local"><a href="/稳定化.html" title="稳定化 [稳定化]">稳定化</a></span>
+$$
+\mathsf{Sp} := \lim\Big(\cdots\overset{\Omega}{\longrightarrow} \mathsf{Ani}_*
+\overset{\Omega}{\longrightarrow} \mathsf{Ani}_*\Big)
+\in \mathsf{Cat}_{\infty}.
+$$
+其构造思路大致是: 从带基点<span class="link local"><a href="/生象.html" title="生象, ∞-群胚 [生象]">生象</a></span>范畴 <span class="link local"><a href="/Ani_pt.html" title="带基点生象的范畴 [Ani_pt]">$\mathsf{Ani}_*$</a></span> 开始, 强行让<span class="link local"><a href="/纬悬.html" title="纬悬 [纬悬]">纬悬</a></span> $\Sigma$ 变得可逆, 得到一个新的范畴.</p>
+<h2>性质</h2>
+<p>$\mathsf{Sp}$ 上有<span class="link local"><a href="/压缩积.html" title="压缩积 [压缩积]">压缩积</a></span> $\wedge$ 与映射谱 $[-,-]$ 给出的<span class="link local"><a href="/闭范畴.html" title="闭范畴 [闭范畴]">闭</a></span><span class="link local"><a href="/对称幺半∞-范畴.html" title="对称幺半 ∞-范畴 [对称幺半∞-范畴]">对称幺半</a></span>结构. 有<span class="link local"><a href="/对称幺半∞-范畴.html" title="对称幺半 ∞-范畴 [对称幺半∞-范畴]">对称幺半函子</a></span>
+$$
+(\mathsf{Set},\times) \to (\mathsf{Ani},\times) \overset{(-)_+}{\to} (\mathsf{Ani}_{*/},\wedge) \overset{\Sigma_{\infty}}{\to} (\mathsf{Sp},\wedge).
+$$</p>
+</details></section><section class="block" data-taxon=""><details ><summary id="Spanier--Whitehead对偶"><header><h1><span class="taxon"></span>“Spanier–Whitehead 对偶” <a class="slug" href="/Spanier--Whitehead对偶.html">[Spanier--Whitehead对偶]</a><a class="edit" href="vscode://file/E:/Simplopedia_source/trees/Spanier--Whitehead%E5%AF%B9%E5%81%B6.md">[edit]</a></h1><div class="metadata"><ul><li class="meta-item">百科</li><li class="meta-item"><span class="link local"><a href="/SimplicialCat.html" title="单纯猫 [SimplicialCat]">SimplicialCat</a></span></li></ul></div></header></summary>
+<blockquote>
+<p>迷神: 在<span class="link local"><a href="/谱.html" title="谱 (稳定同伦论) [谱]">谱</a></span>的<span class="link local"><a href="/对称幺半范畴.html" title="对称幺半范畴 [对称幺半范畴]">对称幺半范畴</a></span>中 $\Sigma_+^\infty (M)$ 和 $\operatorname{Th}(-TM)$ 互为对偶.</p>
+</blockquote>
+</details></section><section class="block" data-taxon=""><details ><summary id="homalg-2-der-cat"><header><h1><span class="taxon"></span>导出范畴 <a class="slug" href="/homalg-2-der-cat.html">[homalg-2-der-cat]</a><a class="edit" href="vscode://file/E:/Simplopedia_source/trees/homalg-2-der-cat.md">[edit]</a></h1><div class="metadata"><ul><li class="meta-item">讲义</li><li class="meta-item"><span class="link local"><a href="/SimplicialCat.html" title="单纯猫 [SimplicialCat]">SimplicialCat</a></span></li></ul></div></header></summary>
+<p>设 $\mathcal A$ 为 <span class="link local"><a href="/Abel范畴.html" title="Abel 范畴 [Abel范畴]">Abel 范畴</a></span>.</p>
+<h2>导出范畴的泛性质</h2>
+<p><strong>命题</strong> (<span class="link local"><a href="/LurieHA.html" title="Higher Algebra [LurieHA]">Lurie HA</a></span> 定理 1.3.3.2). 设 $\mathcal A$ 为 <span class="link local"><a href="/Abel范畴.html" title="Abel 范畴 [Abel范畴]">Abel 范畴</a></span>, 其中<span class="link local"><a href="/投射对象.html" title="投射对象 [投射对象]">投射对象</a></span>充足. 对任意带有左完备 <span class="link local"><a href="/t-结构.html" title="t-结构 [t-结构]">t-结构</a></span>的<span class="link local"><a href="/稳定无穷范畴.html" title="稳定范畴 [稳定无穷范畴]">稳定范畴</a></span> $\mathcal C$, 右正合函子 $\mathcal A \to \mathcal C^{\heartsuit}$ 可唯一地延拓为右 t-正合函子 $\mathsf{D}^-(\mathcal A)\to \mathcal C$. 换言之, 导出范畴 $\mathsf{D}^-(\mathcal A)$ 是万有的以 $\mathcal A$ 为心的稳定范畴.</p>
+<p><strong>例</strong>. 对于两个如上的 Abel 范畴 $\mathcal A,\mathcal B$, 右正合函子 $f\colon \mathcal A\to\mathcal B$ 唯一地延拓为右 t-正合函子 $f\colon \mathsf{D}^-(\mathcal A) \to \mathsf{D}^-(\mathcal B)$, 这便是 $f$ 的<span class="link local"><a href="/导出函子.html" title="导出函子 [导出函子]">导出函子</a></span>.</p>
+<p><strong>例</strong>. <span class="link local"><a href="/谱.html" title="谱 (稳定同伦论) [谱]">谱</a></span>的范畴 <span class="link local"><a href="/Sp.html" title="Sp [Sp]">$\mathsf{Sp}$</a></span> 的心是 Abel 群的范畴 $\mathsf{Ab}$; 于是有右 t-正合函子 $\mathsf{D}^-(\mathsf{Ab}) \to \mathsf{Sp}$, 将 Abel 群链复形映射为对应的谱; 这称为广义 Eilenberg–Maclane 谱.</p>
+</details></section><section class="block" data-taxon=""><details ><summary id="t-结构"><header><h1><span class="taxon"></span>t-结构 <a class="slug" href="/t-结构.html">[t-结构]</a><a class="edit" href="vscode://file/E:/Simplopedia_source/trees/t-%E7%BB%93%E6%9E%84.md">[edit]</a></h1><div class="metadata"><ul><li class="meta-item">百科</li><li class="meta-item"><span class="link local"><a href="/SimplicialCat.html" title="单纯猫 [SimplicialCat]">SimplicialCat</a></span></li></ul></div></header></summary>
+<h2>定义</h2>
+<p>设 $\mathcal C$ 为<span class="link local"><a href="/三角范畴.html" title="“三角范畴” [三角范畴]">三角范畴</a></span>或<span class="link local"><a href="/稳定无穷范畴.html" title="稳定范畴 [稳定无穷范畴]">稳定无穷范畴</a></span>, 其上的一个 t-结构是一对子范畴 $(\mathcal C_{\geq 0},\mathcal C_{\leq 0})$, 记 $\mathcal C_{\geq n}=\mathcal C_{\geq 0}[n]$, $\mathcal C_{\leq n}=\mathcal C_{\leq 0}[n]$, 满足</p>
+<ul>
+<li>对任意 $X\in\mathcal C_{\geq 0}$, $Y\in\mathcal C_{\leq -1}$, $\operatorname{Hom}(X,Y)=0$.</li>
+<li>$\mathcal C_{\geq 1}\subset\mathcal C_{\geq 0}$, $\mathcal C_{\leq -1}\subset\mathcal C_{\leq 0}$.</li>
+<li>对任意 $X\in\mathcal C$ 存在<span class="link local"><a href="/纤维列.html" title="纤维列 [纤维列]">纤维列</a></span> $X'\to X\to X''$, $X'\in\mathcal C_{\geq 0}$, $X''\in\mathcal C_{\leq -1}$.</li>
+</ul>
+<p>$\mathcal C_{\geq 0}$ 的对象又称连合 (connective) 对象.</p>
+<p>注意另一种记号 “上同调记号”, $\mathcal C^{\geq n}$, 对应此处的 $\mathcal C_{\leq -n}$.</p>
+<p><span class="link local"><a href="/稳定∞-范畴.html" title=" [稳定∞-范畴]">稳定无穷范畴</a></span>上的 t-结构等同于其<span class="link local"><a href="/链复形范畴的同伦范畴.html" title="“链复形范畴的同伦范畴” [链复形范畴的同伦范畴]">链复形范畴的同伦范畴</a></span>上的 t-结构.</p>
+<p>t-结构的<strong>心</strong> (heart) 是 $\mathcal C_{\leq 0}\cap\mathcal C_{\geq 0}$.</p>
+<p>t-结构之间的正合函子是保持两个子范畴 $\mathcal C_{\geq 0},\mathcal C_{\leq 0}$ 的函子.</p>
+<h2>性质</h2>
+<p>对于 $m&lt;n$, 容易证明
+$$
+\mathcal C_{\leq m} \cap \mathcal C_{\geq n} \simeq \{0\}.
+$$
+在<span class="link local"><a href="/稳定无穷范畴.html" title="稳定范畴 [稳定无穷范畴]">稳定无穷范畴</a></span>的 t-结构中, 对于 $X\in\mathcal C_{\geq 0}$ 与 $Y\in\mathcal C_{\leq n}$, $\operatorname{Hom}(X,Y)$ 为 $n$-类型. 这是因为
+$$
+\Omega \operatorname{Hom}(X,Y)\simeq \operatorname{Hom}(X,\Omega Y).
+$$
+特别地, 对于 $X\in\mathcal C_{\geq 0}$ 与 $Y\in\mathcal C_{\leq 0}$, $\operatorname{Hom}(X,Y)$ 为集合 ($0$-类型).</p>
+<p>由此可知 t-结构的心为 $1$-范畴. 事实上, 它是 <span class="link local"><a href="/Abel范畴.html" title="Abel 范畴 [Abel范畴]">Abel 范畴</a></span>, 其中的短正合列正是 $\mathcal C$ 中的纤维列.</p>
+<p>注意 t-结构的心不能反过来决定 t-结构. 稳定无穷范畴一般也不等价于其上 t-结构的心的<span class="link local"><a href="/导出范畴.html" title="导出范畴 [导出范畴]">导出范畴</a></span>. 不是所有的 t-结构都来自导出范畴. 例如<span class="link local"><a href="/谱.html" title="谱 (稳定同伦论) [谱]">谱</a></span>的范畴不同于 $\mathsf {Ab}$ 的导出范畴 (否则稳定同伦论就没有意义了).</p>
+<h3>截断</h3>
+<p>嵌入 $\mathcal C_{\leq n}\to \mathcal C$ 有左伴随 $\tau_{\leq n}$, 嵌入 $\mathcal C_{\geq n}\to\mathcal C$ 有右伴随 $\tau_{\geq n}$.</p>
+<p>$X\in\mathcal C_{\geq 0}$ 当且仅当 $\operatorname{Hom}(X,Y)\simeq\operatorname{Hom}(\tau_{\leq -1}X,Y)\{0\}$ 对任意 $Y\in\mathcal C_{\leq -1}$ 成立.</p>
+<p>$X\in\mathcal C_{\leq 0}$ 当且仅当 $\operatorname{Hom}(Y,X)\simeq\operatorname{Hom}(Y,\tau_{\geq 1}X)\{0\}$ 对任意 $Y\in\mathcal C_{\geq 1}$ 成立.</p>
+<p>$\tau_{\leq m}\tau_{\leq n}\simeq\tau_{\leq\operatorname{min}(m,n)}$.</p>
+<p>$\tau_{\geq m}\tau_{\geq n}\simeq\tau_{\leq\operatorname{max}(m,n)}$.</p>
+<p>由 $\mathcal C$ 到 $\mathcal C_{\leq m}\cap\mathcal C_{\geq n}$ 的两种截断方式是等价的.</p>
+<p>对任意 $n$, $\mathcal C_{\leq n}\cap\mathcal C_{\geq n}\simeq \mathcal C^{\heartsuit}$. 一个对象截断到这个范畴中的像又称为它的第 $n$ 阶同调, 对于所有的 $n$ 这些同调形成长正合列.</p>
+<p>注意所有同调为 $0$ 不能推出这个对象为 $0$, 这个现象在许多场合是有趣的, 如无穷维表示论, 无限型代数几何.</p>
+<h3>(余) 极限封闭性</h3>
+<p>$\mathcal C_{\geq 0}$ 关于余极限封闭, $\mathcal C_{\leq 0}$ 关于极限封闭.</p>
+<h3>扩张封闭性</h3>
+<p>设 $X'\to X\to X''$ 为纤维列,</p>
+<ul>
+<li>若 $X',X''\in\mathcal C_{\geq 0}$, 则 $X\in\mathcal C_{\geq 0}$.</li>
+<li>若 $X\in\mathcal C_{\geq 0}$, $X''\in\mathcal C_{\geq 1}$, 则 $X'\in\mathcal C_{\geq 0}$.</li>
+<li>若 $X\in\mathcal C_{\geq 0}$, $X'\in\mathcal C_{\geq -1}$, 则 $X''\in\mathcal C_{\geq 0}$.</li>
+</ul>
+<p>(后两条可通过第一条旋转三角形得到.)</p>
+<h3>分离性</h3>
+<p>称 t-结构右分离 (因为给我讲这个概念的人使用上同调记号) 是指 $\mathcal C_{\leq-\infty}=\bigcap_n\mathcal C_{\leq n}\simeq\{0\}$, 左分离是指 $\mathcal C_{\geq \infty}=\bigcap_n\mathcal C_{\geq n}\simeq\{0\}$.</p>
+<h3>完备性与完备化</h3>
+<p>t-结构的完备化为
+$$
+\widehat {\mathcal C} =\operatorname{lim} (\cdots \overset{\tau_{\leq 2}}{\to}\mathcal C_{\leq 2}\overset{\tau_{\leq 1}}{\to}\mathcal C_{\leq 1}\overset{\tau_{\leq 0}}{\to}\mathcal C_{\leq 0}\overset{\tau_{\leq -1}}{\to}\cdots).
+$$
+注意此图的右边是不重要的, 可从任意一处截断只保留其左边. 这个极限的一个对象是一个 <span class="link local"><a href="/Postnikov塔.html" title="Postnikov 塔 [Postnikov塔]">Postnikov 塔</a></span>. 由定义有自然的函子 $\mathcal C\to\widehat {\mathcal C}$, 当这个函子为同构时, 称 $\mathcal C$ 左完备.</p>
+<p>左完备 t-结构是左分离的, 反之不一定.</p>
+<h2>例</h2>
+<h3>谱范畴</h3>
+<p>无穷范畴的<span class="link local"><a href="/稳定化.html" title="稳定化 [稳定化]">稳定化</a></span>上有典范的 t-结构:</p>
+<ul>
+<li>$\operatorname{Sp}(\mathcal C)_{\geq 0}$ 是 $\Sigma^{\infty}$ 的像在扩张和余极限之下生成的子范畴.</li>
+<li>$\operatorname{Sp}(\mathcal C)_{\leq -1}$ 是 $\Omega^{\infty}$ 为 $0$ 的子范畴.</li>
+</ul>
+<p><span class="link local"><a href="/谱.html" title="谱 (稳定同伦论) [谱]">谱</a></span>范畴的心与 $\mathsf {Ab}$ 的同构由 <span class="link local"><a href="/Eilenberg–MacLane谱.html" title="Eilenberg–MacLane 谱 [Eilenberg–MacLane谱]">Eilenberg–MacLane 谱</a></span>给出. 此时同调是谱的同伦群.</p>
+<p><span class="link local"><a href="/偏屈t-结构.html" title="偏屈 t-结构 [偏屈t-结构]">偏屈 t-结构</a></span></p>
+</details></section><section class="block" data-taxon=""><details ><summary id="tutorial-stable-homotopy"><header><h1><span class="taxon"></span>稳定同伦论 <a class="slug" href="/tutorial-stable-homotopy.html">[tutorial-stable-homotopy]</a><a class="edit" href="vscode://file/E:/Simplopedia_source/trees/tutorial-stable-homotopy.md">[edit]</a></h1><div class="metadata"><ul><li class="meta-item">教程</li><li class="meta-item"><span class="link local"><a href="/SimplicialCat.html" title="单纯猫 [SimplicialCat]">SimplicialCat</a></span></li></ul></div></header></summary>
+<p>本文的目的是, 以尽可能少的前置知识, 解释<span class="link local"><a href="/谱.html" title="谱 (稳定同伦论) [谱]">谱</a></span> (<span class="link local"><a href="/稳定无穷范畴.html" title="稳定范畴 [稳定无穷范畴]">稳定 $\infty$-范畴</a></span>) 这一概念的意义和必要性, 从而使读者能够接受其抽象定义. 为此我试图解释<span class="link local"><a href="/稳定化.html" title="稳定化 [稳定化]">稳定化</a></span>的动机, 也即为什么要将<span class="link local"><a href="/纬悬.html" title="纬悬 [纬悬]">纬悬</a></span> $\Sigma$ 变为可逆函子.</p>
+<p>前置知识: <span class="link local"><a href="/motivation-homotopy-theory.html" title="同伦论的动机 [motivation-homotopy-theory]">同伦论的动机</a></span>.</p>
+<p>同伦论中的最基本对象是球面 $S^0, S^1, S^2, \cdots$; 其具有如下递推关系:
+$$
+S^{n+1} = \Sigma S^n.
+$$</p>
+<p>球面在同伦论中的特殊地位在于, 球面到其它空间 $X$ 的映射等价类可以<span class="link local"><a href="/探测.html" title="探测 [探测]">探测</a></span>出 $X$ 的逐阶同伦信息. 例如 $S^0\to X$ 探测 $X$ 的连通分支, $S^1\to X$ 探测环路空间 $\Omega X$ 的连通分支, $S^2\to X$ 探测环路空间的环路空间 $\Omega^2 X$ 的连通分支, 等等.</p>
+</details></section><section class="block" data-taxon=""><details ><summary id="压缩积"><header><h1><span class="taxon"></span>压缩积 <a class="slug" href="/压缩积.html">[压缩积]</a><a class="edit" href="vscode://file/E:/Simplopedia_source/trees/%E5%8E%8B%E7%BC%A9%E7%A7%AF.md">[edit]</a></h1><div class="metadata"><ul><li class="meta-item">百科</li><li class="meta-item"><span class="link local"><a href="/SimplicialCat.html" title="单纯猫 [SimplicialCat]">SimplicialCat</a></span></li></ul></div></header></summary>
+<p>压缩积是<span class="link local"><a href="/谱.html" title="谱 (稳定同伦论) [谱]">谱</a></span>的范畴 <span class="link local"><a href="/Sp.html" title="Sp [Sp]">$\mathsf{Sp}$</a></span> 的<span class="link local"><a href="/幺半范畴.html" title="幺半范畴 [幺半范畴]">幺半结构</a></span>.</p>
+<h2>性质</h2>
+<p>压缩积与映射谱构成 <span class="link local"><a href="/Sp.html" title="Sp [Sp]">$\mathsf{Sp}$</a></span> 上的<span class="link local"><a href="/闭范畴.html" title="闭范畴 [闭范畴]">闭</a></span>对称幺半范畴结构.</p>
+<p>如下函子均为对称幺半函子:
+$$
+(\mathsf{Ani},\times)\overset{(-)_+}{\to}(\mathsf{Ani}_*,\wedge)
+\overset{\Sigma^\infty}{\to}(\mathsf{Sp},\wedge).
+$$</p>
+</details></section><section class="block" data-taxon=""><details ><summary id="同伦群(稳定同伦论)"><header><h1><span class="taxon"></span>同伦群 (稳定同伦论) <a class="slug" href="/同伦群(稳定同伦论).html">[同伦群(稳定同伦论)]</a><a class="edit" href="vscode://file/E:/Simplopedia_source/trees/%E5%90%8C%E4%BC%A6%E7%BE%A4(%E7%A8%B3%E5%AE%9A%E5%90%8C%E4%BC%A6%E8%AE%BA).md">[edit]</a></h1><div class="metadata"><ul><li class="meta-item">百科</li><li class="meta-item"><span class="link local"><a href="/稳定同伦论.html" title="稳定同伦论 [稳定同伦论]">稳定同伦论</a></span></li><li class="meta-item"><span class="link local"><a href="/SimplicialCat.html" title="单纯猫 [SimplicialCat]">SimplicialCat</a></span></li></ul></div></header></summary>
+<h2>观念</h2>
+<p>在<span class="link local"><a href="/稳定同伦论.html" title="稳定同伦论 [稳定同伦论]">稳定同伦论</a></span>中, 由于每个对象都是任意阶的环路空间, 对象的 “<span class="link local"><a href="/同伦群.html" title="同伦群 [同伦群]">同伦群</a></span>” 都是 $\mathbb E_\infty$-代数 (<span class="link local"><a href="/交换代数.html" title="交换代数 [交换代数]">交换群</a></span>); 对整个<span class="link local"><a href="/稳定无穷范畴.html" title="稳定范畴 [稳定无穷范畴]">稳定 $\infty$-范畴</a></span>而言, 各阶同伦群的地位相同, 仅相差平移.</p>
+<h2>定义</h2>
+<h3>通过 t-结构</h3>
+<p>设<span class="link local"><a href="/稳定无穷范畴.html" title="稳定范畴 [稳定无穷范畴]">稳定 $\infty$-范畴</a></span> $\mathcal C$ 带有 <span class="link local"><a href="/t-结构.html" title="t-结构 [t-结构]">t-结构</a></span> $(\mathcal C_{\geq 0},\mathcal C_{\leq 0})$, 其心为 $\mathcal C^\heartsuit = \mathcal C_{\geq 0}\cap\mathcal C_{\leq 0}$. 定义函子
+$\pi_0\colon \mathcal C\to\mathcal C$ 为 $\tau_{\geq 0}\tau_{\leq 0} = \tau_{\leq 0}\tau_{\geq 0}$. 对整数 $n$ 定义 $\pi_n (X) = \pi_0 (X[-n])$.</p>
+<h3>通过余极限</h3>
+<p>对于来自<span class="link local"><a href="/稳定化.html" title="稳定化 [稳定化]">稳定化</a></span>过程的<span class="link local"><a href="/稳定无穷范畴.html" title="稳定范畴 [稳定无穷范畴]">稳定 $\infty$-范畴</a></span>, 例如<span class="link local"><a href="/谱.html" title="谱 (稳定同伦论) [谱]">谱</a></span>的范畴 <span class="link local"><a href="/Sp.html" title="Sp [Sp]">$\mathsf{Sp}$</a></span>, 其中对象的同伦群可定义为逼近它的一列对象的同伦群的<span class="link local"><a href="/余极限.html" title="余极限 [余极限]">余极限</a></span>: 若
+$$
+X = \operatorname{colim}_k \Sigma^{\infty-k} X_k,
+$$
+则
+$$
+\pi_n(X) = \operatorname{colim}_k \pi_{n+k} X_k.
+$$</p>
+</details></section><section class="block" data-taxon=""><details ><summary id="坐标无关谱"><header><h1><span class="taxon"></span>“坐标无关谱” <a class="slug" href="/坐标无关谱.html">[坐标无关谱]</a><a class="edit" href="vscode://file/E:/Simplopedia_source/trees/%E5%9D%90%E6%A0%87%E6%97%A0%E5%85%B3%E8%B0%B1.md">[edit]</a></h1><div class="metadata"><ul><li class="meta-item">百科</li><li class="meta-item"><span class="link local"><a href="/SimplicialCat.html" title="单纯猫 [SimplicialCat]">SimplicialCat</a></span></li></ul></div></header></summary>
+<p>坐标无关谱 (coordinate-free sprctrum) 是 (序列) <span class="link local"><a href="/谱.html" title="谱 (稳定同伦论) [谱]">谱</a></span>的一种改进.</p>
+</details></section><section class="block" data-taxon=""><details ><summary id="广义上同调"><header><h1><span class="taxon"></span>广义上同调 <a class="slug" href="/广义上同调.html">[广义上同调]</a><a class="edit" href="vscode://file/E:/Simplopedia_source/trees/%E5%B9%BF%E4%B9%89%E4%B8%8A%E5%90%8C%E8%B0%83.md">[edit]</a></h1><div class="metadata"><ul><li class="meta-item">百科</li><li class="meta-item"><span class="link local"><a href="/SimplicialCat.html" title="单纯猫 [SimplicialCat]">SimplicialCat</a></span></li></ul></div></header></summary>
+<h2>观念</h2>
+<p><strong>广义上同调</strong> (generalized cohomology) 是空间范畴上满足与普通<span class="link local"><a href="/上同调.html" title="上同调 [上同调]">上同调</a></span>类似的性质的某种反变函子. 每个广义上同调都由一个<span class="link local"><a href="/谱.html" title="谱 (稳定同伦论) [谱]">谱</a></span>表示:
+$$
+E^*X = \pi_{-*}[\Sigma^\infty_+ X,E].
+$$</p>
+</details></section><section class="block" data-taxon=""><details ><summary id="广义同调"><header><h1><span class="taxon"></span>广义同调 <a class="slug" href="/广义同调.html">[广义同调]</a><a class="edit" href="vscode://file/E:/Simplopedia_source/trees/%E5%B9%BF%E4%B9%89%E5%90%8C%E8%B0%83.md">[edit]</a></h1><div class="metadata"><ul><li class="meta-item">百科</li><li class="meta-item"><span class="link local"><a href="/SimplicialCat.html" title="单纯猫 [SimplicialCat]">SimplicialCat</a></span></li></ul></div></header></summary>
+<h2>观念</h2>
+<p>广义同调一般是指空间范畴 (或<span class="link local"><a href="/生象.html" title="生象, ∞-群胚 [生象]">生象</a></span>的范畴) 到 Abel 群范畴 (或<span class="link local"><a href="/链复形无穷范畴.html" title="链复形无穷范畴 [链复形无穷范畴]">链复形范畴</a></span>, <span class="link local"><a href="/谱.html" title="谱 (稳定同伦论) [谱]">谱</a></span>范畴) 的满足某些同调公理的函子, 在空间较好的情形可由<span class="link local"><a href="/谱.html" title="谱 (稳定同伦论) [谱]">谱</a></span>表现:
+$$
+E_n(X) = \pi_n(X\wedge E).
+$$</p>
+<p>除了用谱表示的广义同调外, 还有其它一些概念可作为同调的推广, 如<span class="link local"><a href="/分解同调.html" title="分解同调 [分解同调]">分解同调</a></span>. 详见<span class="link local"><a href="/同调.html" title="同调 [同调]">同调</a></span>.</p>
+<h2>定义</h2>
+<h3>初等定义</h3>
+<p>定义<strong>同调理论</strong>为满足如下条件 (Eilenberg–Steenrod 公理) 的函子
+$$
+H\colon \mathsf{Top}\to\mathsf{Chain}(\mathbb{Z})
+$$
+(这里 $\mathsf{Chain}(\mathbb{Z})$ 是 $\mathbb{Z}$-模链复形构成的 $1$-范畴):</p>
+<ul>
+<li>$H$ 将同伦变为链同伦; (这是说 $H$ 表现了 $\infty$-范畴之间的函子 $\mathsf{Ani}\to\mathsf{Chain}(\mathbb{Z})$, 这里 $\mathsf{Chain}(\mathbb{Z})$ 是关于链同伦等价局部化得到的 $\infty$-范畴, 见<span class="link local"><a href="/链复形无穷范畴.html" title="链复形无穷范畴 [链复形无穷范畴]">链复形 $\infty$-范畴</a></span>.)</li>
+<li>$H$ 将无交并变为直和; (这是说 $H$ 保持余积)</li>
+<li>(切除法则, 或称 Mayer–Vietoris 法则) 设 $Z\to X$, $Z\to Y$ 为闭 CW 子复形, 则 $H(X\cup_Z Y)\simeq \operatorname{Cone}(H(Z)\to H(X)\oplus H(Y))$. (这基本上就是说 $H$ 保持 $\infty$-范畴意义下的推出, 因为映射锥表现的正是 $\infty$-范畴中的推出.)</li>
+</ul>
+<p>对任意 Abel 群 $G$, 存在 (同伦等价意义下) 唯一的同调理论 $H$ 使得 $H(*)\simeq G$.</p>
+</details></section><section class="block" data-taxon=""><details ><summary id="张量积"><header><h1><span class="taxon"></span>张量积 <a class="slug" href="/张量积.html">[张量积]</a><a class="edit" href="vscode://file/E:/Simplopedia_source/trees/%E5%BC%A0%E9%87%8F%E7%A7%AF.md">[edit]</a></h1><div class="metadata"><ul><li class="meta-item">百科</li><li class="meta-item"><span class="link local"><a href="/SimplicialCat.html" title="单纯猫 [SimplicialCat]">SimplicialCat</a></span></li></ul></div></header></summary>
+<h2>定义</h2>
+<p>这里所说的<strong>张量积</strong>特指如下概念: 对于范畴 $\mathcal C$ 的对象 $X$, 以及<span class="link local"><a href="/生象.html" title="生象, ∞-群胚 [生象]">生象</a></span> $A$, <strong>张量积</strong> $A\cdot X$ 给出自然同构
+$$
+\operatorname{Hom}_{\mathcal C}(A\cdot X,-)
+\simeq \operatorname{Hom}_{\mathsf{Ani}}(A,\operatorname{Hom}_{\mathcal C}(X,-)),
+$$
+也即有<span class="link local"><a href="/伴随.html" title="伴随 [伴随]">伴随</a></span>
+$$
+(-)\cdot X \dashv \operatorname{Hom}_{\mathcal C}(X,-).
+$$
+张量积 $A\cdot X$ 也是 $A$ 形状, 取值于 $X$ 的常值图表的余极限 $\operatorname{colim}_A X$.</p>
+<p>当然, <span class="link local"><a href="/充实范畴.html" title="充实范畴 [充实范畴]">充实范畴</a></span>的对象也有类似的张量积的概念.</p>
+<h2>例</h2>
+<p>给定一个<span class="link local"><a href="/谱.html" title="谱 (稳定同伦论) [谱]">谱</a></span> $E$, <span class="link local"><a href="/生象.html" title="生象, ∞-群胚 [生象]">生象</a></span> $X$ 的 $E$-值<span class="link local"><a href="/广义同调.html" title="广义同调 [广义同调]">广义同调</a></span>为
+$$
+	E_*X = \pi_*(X_+\wedge E).
+$$
+其中 $X_+\wedge E$ 又可理解为 $\mathsf{Sp}$ 的对象 $E$ 与生象 $X$ 的张量积, 也即有<span class="link local"><a href="/伴随.html" title="伴随 [伴随]">伴随</a></span>
+$$
+    (-)_+\wedge E \dashv \operatorname{Hom}_{\mathsf{Sp}}(E,-).
+$$</p>
+<p>函子 $(-)_+\wedge E\colon \mathsf{Ani} \to \mathsf{Sp}$ 保持余极限, 因而被它在一个点上的取值完全决定.</p>
+</details></section><section class="block" data-taxon=""><details ><summary id="环谱"><header><h1><span class="taxon"></span>环谱 <a class="slug" href="/环谱.html">[环谱]</a><a class="edit" href="vscode://file/E:/Simplopedia_source/trees/%E7%8E%AF%E8%B0%B1.md">[edit]</a></h1><div class="metadata"><ul><li class="meta-item">百科</li><li class="meta-item"><span class="link local"><a href="/SimplicialCat.html" title="单纯猫 [SimplicialCat]">SimplicialCat</a></span></li></ul></div></header></summary>
+<h2>观念</h2>
+<p>环谱是 <span class="link local"><a href="/谱.html" title="谱 (稳定同伦论) [谱]">$(\mathsf{Sp},\wedge)$</a></span> 中的<span class="link local"><a href="/交换代数.html" title="交换代数 [交换代数]">交换代数</a></span>或<span class="link local"><a href="/结合代数.html" title="结合代数 [结合代数]">结合代数</a></span>.</p>
+</details></section><section class="block" data-taxon=""><details ><summary id="稳定化"><header><h1><span class="taxon"></span>稳定化 <a class="slug" href="/稳定化.html">[稳定化]</a><a class="edit" href="vscode://file/E:/Simplopedia_source/trees/%E7%A8%B3%E5%AE%9A%E5%8C%96.md">[edit]</a></h1><div class="metadata"><ul><li class="meta-item">百科</li><li class="meta-item"><span class="link local"><a href="/SimplicialCat.html" title="单纯猫 [SimplicialCat]">SimplicialCat</a></span></li></ul></div></header></summary>
+<h2>观念</h2>
+<p>以下的范畴默认为 <span class="link local"><a href="/无穷范畴.html" title="无穷范畴 [无穷范畴]">$(\infty,1)$-范畴</a></span>.</p>
+<p>每个具有有限极限的范畴都存在稳定化, 即自由地变成<span class="link local"><a href="/稳定无穷范畴.html" title="稳定范畴 [稳定无穷范畴]">稳定范畴</a></span>. 稳定化可以构造为<span class="link local"><a href="/谱对象.html" title="谱对象 [谱对象]">谱对象</a></span>的范畴.</p>
+<h2>定义</h2>
+<p><span class="link local"><a href="/可表现范畴.html" title="可表现范畴 [可表现范畴]">可表现</a></span>带基点范畴 $\mathcal C$ 的稳定化是 <span class="link local"><a href="/可表现范畴.html" title="可表现范畴 [可表现范畴]">$\mathrm {Pr}^{\mathrm L}$</a></span> 中的<span class="link local"><a href="/余极限.html" title="余极限 [余极限]">余极限</a></span>
+$$
+\operatorname{Stab}\mathcal C =\operatorname{colim}(\mathcal C\overset{\Sigma}{\to}\mathcal C\overset{\Sigma}{\to}\cdots),
+$$
+即形式上令 $\Sigma$ 可逆得到的范畴 (参见<span class="link local"><a href="/形式取逆.html" title="“形式取逆” [形式取逆]">形式取逆</a></span>). 为了计算该余极限, 注意到它等价于 $\mathrm {Pr}^{\mathrm R}\simeq (\mathrm {Pr}^{\mathrm L})^{\mathrm {op}}$ 中的极限
+$$
+\operatorname{lim}(\cdots\overset{\Omega}{\to}\mathcal C_*\overset{\Omega}{\to}\mathcal C_*).
+$$
+$\mathrm{Pr}^{\mathrm{R}}$ 中的极限可在 $\mathsf{Cat}_{\infty}$ 中计算. 记上述极限到各个分量的投影为 $\Omega^{\infty -n}$, 那么 $\operatorname{Stab}\mathcal C$ 的一个对象 $X$, 有一列空间 $X_n :=\Omega^{\infty -n}X$ 以及一族等价
+$$
+X_{n}\simeq\Omega X_{n+1}.
+$$
+这是传统的<span class="link local"><a href="/谱.html" title="谱 (稳定同伦论) [谱]">谱</a></span>的定义.</p>
+<h2>性质</h2>
+<p>稳定化 $\operatorname{Stab}\mathcal C$ 继承 $\mathcal C$ 中的有限极限.</p>
+<p>$\mathcal C$ 与 $\operatorname{Stab}\mathcal C$ 之间有伴随 $\Sigma^\infty \dashv \Omega^\infty$ 以及更一般的 $\Sigma^{\infty -n}\dashv\Omega^{\infty -n}$. 对于 $X\in\operatorname{Stab}\mathcal C$ 有
+$$
+X\simeq\operatorname{colim}\Sigma^{\infty -n}\Omega^{\infty-n}X.
+$$</p>
+</details></section><section class="block" data-taxon=""><details ><summary id="稳定同伦范畴"><header><h1><span class="taxon"></span>“稳定同伦范畴” <a class="slug" href="/稳定同伦范畴.html">[稳定同伦范畴]</a><a class="edit" href="vscode://file/E:/Simplopedia_source/trees/%E7%A8%B3%E5%AE%9A%E5%90%8C%E4%BC%A6%E8%8C%83%E7%95%B4.md">[edit]</a></h1><div class="metadata"><ul><li class="meta-item">百科</li><li class="meta-item"><span class="link local"><a href="/SimplicialCat.html" title="单纯猫 [SimplicialCat]">SimplicialCat</a></span></li></ul></div></header></summary>
+<p>#稳定同伦论</p>
+<p>稳定同伦范畴是<span class="link local"><a href="/谱.html" title="谱 (稳定同伦论) [谱]">谱</a></span>的<span class="link local"><a href="/无穷范畴.html" title="无穷范畴 [无穷范畴]">无穷范畴</a></span>的<span class="link local"><a href="/同伦范畴.html" title="“同伦范畴” [同伦范畴]">同伦范畴</a></span>.</p>
+<p>对于稳定同伦范畴中的对象 $X,Y$, 有分次态射对象 $[X,Y]_\bullet\in\mathsf {Ab}^{\mathbb{Z}}$,
+$$
+[X,Y]_n := [X,\Sigma^{-n}Y].
+$$</p>
+<h2>相关概念</h2>
+<p><span class="link local"><a href="/稳定∞-范畴.html" title=" [稳定∞-范畴]">稳定无穷范畴</a></span></p>
+</details></section><section class="block" data-taxon=""><details ><summary id="稳定无穷范畴"><header><h1><span class="taxon"></span>稳定范畴 <a class="slug" href="/稳定无穷范畴.html">[稳定无穷范畴]</a><a class="edit" href="vscode://file/E:/Simplopedia_source/trees/%E7%A8%B3%E5%AE%9A%E6%97%A0%E7%A9%B7%E8%8C%83%E7%95%B4.md">[edit]</a></h1><div class="metadata"><ul><li class="meta-item">百科</li><li class="meta-item"><span class="link local"><a href="/SimplicialCat.html" title="单纯猫 [SimplicialCat]">SimplicialCat</a></span></li></ul></div></header></summary>
+<h2>观念</h2>
+<p>以下的范畴均默认为 $(\infty,1)$-范畴.</p>
+<p>稳定范畴是类似于<span class="link local"><a href="/谱.html" title="谱 (稳定同伦论) [谱]">谱</a></span>范畴 <span class="link local"><a href="/Sp.html" title="Sp [Sp]">$\mathsf{Sp}$</a></span> 的, 具有一对互逆的<span class="link local"><a href="/环路空间.html" title="环路空间 [环路空间]">环路空间</a></span>和<span class="link local"><a href="/逆环路空间.html" title="逆环路空间 [逆环路空间]">逆环路空间</a></span> (<span class="link local"><a href="/纬悬.html" title="纬悬 [纬悬]">纬悬</a></span>) 函子的范畴.</p>
+<h2>定义</h2>
+<p><strong>稳定范畴</strong>是满足如下条件的范畴 $\mathcal C$:</p>
+<ul>
+<li>$\mathcal C$ 具有有限极限和有限余极限; 特别地, 具有零对象 $0$, 以及态射的纤维, 余纤维;</li>
+<li>$\mathcal C$ 中的拉回方块等同于推出方块; 特别地, <span class="link local"><a href="/纤维列.html" title="纤维列 [纤维列]">纤维列</a></span>等同于<span class="link local"><a href="/余纤维列.html" title="“余纤维列” [余纤维列]">余纤维列</a></span>;</li>
+<li><span class="link local"><a href="/纬悬.html" title="纬悬 [纬悬]">纬悬</a></span>函子 $\Sigma\colon \mathcal C\to\mathcal C$ 与<span class="link local"><a href="/环路空间.html" title="环路空间 [环路空间]">环路空间</a></span>函子 $\Omega\colon \mathcal C\to \mathcal C$ 构成一对互逆的范畴等价.</li>
+</ul>
+<p><strong>记号</strong>. 对稳定范畴的对象 $X$ 以及整数 $n$, 记
+$$
+    X[n] = \Sigma^n X,
+$$
+$$
+    X[-n] = \Omega^n X.
+$$</p>
+<h2>性质</h2>
+<h3>稳定化</h3>
+<p>具有有限极限的范畴都有<span class="link local"><a href="/稳定化.html" title="稳定化 [稳定化]">稳定化</a></span>.</p>
+<h3>谱充实</h3>
+<p>稳定范畴自然地<span class="link local"><a href="/充实.html" title=" [充实]">充实</a></span>于<span class="link local"><a href="/谱.html" title="谱 (稳定同伦论) [谱]">谱</a></span>的范畴. 对于稳定范畴 $\mathcal C$ 中的对象 $X,Y$, 映射谱 $\underline{\operatorname{Hom}}(X,Y)$ 可如下定义:
+$$
+\underline{\operatorname{Hom}}(X,Y)_n = \operatorname{Hom}(X,Y[n]).
+$$</p>
+<h3>同伦范畴</h3>
+<p>稳定范畴的<span class="link local"><a href="/同伦范畴.html" title="“同伦范畴” [同伦范畴]">同伦范畴</a></span>是<span class="link local"><a href="/三角范畴.html" title="“三角范畴” [三角范畴]">三角范畴</a></span>. 例如两个对象 $X,Y$ 的直和 $X\oplus Y$ 既为范畴论和 $X+Y$, 又为范畴论积 $X\times Y$, 两者同构.</p>
+<h3>对偶对称性</h3>
+<p>稳定范畴的对偶仍是稳定范畴.</p>
+<h2>例</h2>
+<p>$1$-范畴不可能是稳定范畴, 除非它是平凡的 (等价于终范畴 $1$).</p>
+<p><span class="link local"><a href="/谱.html" title="谱 (稳定同伦论) [谱]">谱</a></span>的范畴是最基本的稳定范畴, 它是<span class="link local"><a href="/∞Grpd.html" title=" [∞Grpd]">生象</a></span>范畴的<span class="link local"><a href="/稳定化.html" title="稳定化 [稳定化]">稳定化</a></span>.</p>
+<p>对于 <span class="link local"><a href="/Abel范畴.html" title="Abel 范畴 [Abel范畴]">Abel 范畴</a></span> $\mathcal A$, 其上的有界链复形范畴 $\operatorname{Ch}^{\text{b}}(\mathcal A)$ 构成稳定无穷范畴. 见<span class="link local"><a href="/链复形无穷范畴.html" title="链复形无穷范畴 [链复形无穷范畴]">链复形无穷范畴</a></span>.</p>
+<h2>相关概念</h2>
+<p><span class="link local"><a href="/K-理论.html" title="“K-理论” [K-理论]">K-理论</a></span>, <span class="link local"><a href="/t-结构.html" title="t-结构 [t-结构]">t-结构</a></span></p>
+</details></section><section class="block" data-taxon=""><details ><summary id="纬悬谱"><header><h1><span class="taxon"></span>纬悬谱 <a class="slug" href="/纬悬谱.html">[纬悬谱]</a><a class="edit" href="vscode://file/E:/Simplopedia_source/trees/%E7%BA%AC%E6%82%AC%E8%B0%B1.md">[edit]</a></h1><div class="metadata"><ul><li class="meta-item">百科</li><li class="meta-item"><span class="link local"><a href="/SimplicialCat.html" title="单纯猫 [SimplicialCat]">SimplicialCat</a></span></li></ul></div></header></summary>
+<h2>观念</h2>
+<p><span class="link local"><a href="/生象.html" title="生象, ∞-群胚 [生象]">生象</a></span> $X$ 的纬悬谱是其自由生成的 $\mathbb S$-模.</p>
+<h2>定义</h2>
+<p>定义见<span class="link local"><a href="/谱.html" title="谱 (稳定同伦论) [谱]">谱</a></span>.</p>
+</details></section><section class="block" data-taxon=""><details ><summary id="谱(代数)"><header><h1><span class="taxon"></span>谱 (代数–几何对偶) <a class="slug" href="/谱(代数).html">[谱(代数)]</a><a class="edit" href="vscode://file/E:/Simplopedia_source/trees/%E8%B0%B1(%E4%BB%A3%E6%95%B0).md">[edit]</a></h1><div class="metadata"><ul><li class="meta-item">观念</li><li class="meta-item"><span class="link local"><a href="/SimplicialCat.html" title="单纯猫 [SimplicialCat]">SimplicialCat</a></span></li></ul></div></header></summary>
+<p>本页面谈论<span class="link local"><a href="/代数-几何对偶.html" title="代数–几何对偶 [代数-几何对偶]">代数–几何对偶</a></span>中的 “谱” 的广泛概念. 同伦论中的<span class="link local"><a href="/谱.html" title="谱 (稳定同伦论) [谱]">谱</a></span>与这个概念没有从属关系, 只是不幸地占有同一个名称. (更不幸的是, 谱代数几何要讨论<span class="link local"><a href="/环谱.html" title="环谱 [环谱]">环谱</a></span>的谱…)</p>
+<hr />
+<p>谱是一种与代数<span class="link local"><a href="/代数-几何对偶.html" title="代数–几何对偶 [代数-几何对偶]">对偶</a></span>的对象. 这里的 “代数” 是非常广泛的概念, 不限于<span class="link local"><a href="/结合代数.html" title="结合代数 [结合代数]">结合代数</a></span>. 通常, 某种代数的谱 $\operatorname{Spec}A$ 满足这样的性质:</p>
+<ul>
+<li>代数同态 $A \to B$ 对应于谱的映射 $\operatorname{Spec}B\to \operatorname{Spec} A$. (这一事实有时可直接作为函子 $\operatorname{Spec}$ 的定义.)</li>
+<li>特别地, 若 $\operatorname{Spec}B$ 是一个类似于 “点” 的几何对象, 也就是其中没有 “更小” 的部分 (意味着 $B$ 是一个不能 “更小” 的代数), 那么代数同态 $A\to B$ 给出了 $\operatorname{Spec}A$ 的一个 “点”. 这个事实有时是 $\operatorname{Spec}A$ 的定义.</li>
+</ul>
+<h2>例</h2>
+<h3>交换代数</h3>
+<ul>
+<li>交换环的谱是<span class="link local"><a href="/仿射概形.html" title="仿射概形 [仿射概形]">仿射概形</a></span>.</li>
+<li>交换 <span class="link local"><a href="/C-星代数.html" title="C*-代数 [C-星代数]">C*-代数</a></span>的谱是<span class="link local"><a href="/紧Hausdorff空间.html" title="紧 Hausdorff 空间 [紧Hausdorff空间]">紧 Hausdorff 空间</a></span>.</li>
+</ul>
+<h3>逻辑学中的代数</h3>
+<ul>
+<li><span class="link local"><a href="/Boole代数.html" title="Boole 代数 [Boole代数]">Boole 代数</a></span>的谱是其 <span class="link local"><a href="/Stone对偶.html" title="Stone 对偶 [Stone对偶]">Stone 对偶</a></span>.</li>
+<li><span class="link local"><a href="/位象.html" title="位象 [位象]">位象</a></span> …</li>
+</ul>
+<h3>综合代数几何</h3>
+<p>…</p>
+</details></section><section class="block" data-taxon=""><details ><summary id="连合谱"><header><h1><span class="taxon"></span>连合谱 <a class="slug" href="/连合谱.html">[连合谱]</a><a class="edit" href="vscode://file/E:/Simplopedia_source/trees/%E8%BF%9E%E5%90%88%E8%B0%B1.md">[edit]</a></h1><div class="metadata"><ul><li class="meta-item">百科</li><li class="meta-item"><span class="link local"><a href="/SimplicialCat.html" title="单纯猫 [SimplicialCat]">SimplicialCat</a></span></li></ul></div></header></summary>
+<p>连合谱是指负数阶同伦群平凡的<span class="link local"><a href="/谱.html" title="谱 (稳定同伦论) [谱]">谱</a></span>.</p>
+<p>连合谱等同于 <span class="link local"><a href="/Abel∞-群.html" title="E∞-群 [Abel∞-群]">Abel ∞-群</a></span>, 或<span class="link local"><a href="/无穷环路空间.html" title="“无穷环路空间” [无穷环路空间]">无穷环路空间</a></span>.</p>
+</details></section><section class="block" data-taxon=""><details ><summary id="配边"><header><h1><span class="taxon"></span>配边 <a class="slug" href="/配边.html">[配边]</a><a class="edit" href="vscode://file/E:/Simplopedia_source/trees/%E9%85%8D%E8%BE%B9.md">[edit]</a></h1><div class="metadata"><ul><li class="meta-item">百科</li><li class="meta-item"><span class="link local"><a href="/SimplicialCat.html" title="单纯猫 [SimplicialCat]">SimplicialCat</a></span></li></ul></div></header></summary>
+<h2>观念</h2>
+<h3>作为广义同调 / 上同调理论</h3>
+<p>对一个空间 $X$, 类似于奇异同调考虑 $\Delta^n$ 到 $X$ 的映射, <strong>配边</strong>则考虑一般的 $n$-维紧流形到 $X$ 的映射.</p>
+<h3>配边范畴与拓扑量子场论</h3>
+<p><span class="link local"><a href="/拓扑量子场论.html" title=" [拓扑量子场论]">拓扑量子场论</a></span>是<span class="link local"><a href="/配边范畴.html" title="配边范畴 [配边范畴]">配边范畴</a></span>到向量空间范畴 (或<span class="link local"><a href="/高阶模.html" title="高阶模 [高阶模]">高阶向量空间</a></span>范畴) 的幺半函子.</p>
+<h2>定义</h2>
+<p>对于拓扑空间 $X$, 记 $\Omega_n(X)$ 为 $(N,f)$ 的等价类的集合, 其中 $N$ 为 $n$-维紧 (无边界) 光滑流形, $f\colon N\to X$ 为光滑映射. <span class="link local"><a href="/等价关系.html" title="等价关系 [等价关系]">等价关系</a></span> $\sim$ 如下: $(N,f)\sim (N',f')$ 当且仅当存在 $(n+1)$-维带边流形 $M$ 使得 $\partial M = N \sqcup N'$, 以及映射 $g\colon M\to X$ 限制为 $f,f'$.</p>
+<p>配边关系的另一种 (似乎等价的?) 定义是, 两个映射 $X\to Y,Z\to Y$ 配边是指存在<span class="link local"><a href="/紧合映射.html" title="紧合映射 [紧合映射]">紧合映射</a></span> $W\to Y \times\mathbb{R}$ 使得如下两个方块为横截拉回图.
+$$
+\begin{array}
+	{ccccc}
+	X &amp; \to &amp; W &amp; \leftarrow &amp; Z\\
+	\downarrow &amp;&amp; \downarrow &amp;&amp; \downarrow\\
+	Y &amp; \to &amp; Y\times\mathbb{R} &amp; \leftarrow &amp; Y
+\end{array}
+$$</p>
+<p>上面定义的集合也记作 $\Omega_n^O(X)$.</p>
+<p>此外还有<span class="link local"><a href="/定向配边.html" title="定向配边 [定向配边]">定向配边</a></span> $\Omega_n^{SO}(X)$, <span class="link local"><a href="/复配边.html" title=" [复配边]">复配边</a></span>, <span class="link local"><a href="/标架配边.html" title="标架配边 [标架配边]">标架配边</a></span> 等.</p>
+<h3>带结构的配边</h3>
+<p>设 $G\to\mathrm{GL}_n$ 为群同态. 我们可以定义 (<span class="link local"><a href="/稳定法丛.html" title="稳定法丛 [稳定法丛]">稳定法丛</a></span>上) 带 <span class="link local"><a href="/切结构.html" title="切结构 [切结构]">$G$-结构</a></span>的流形的配边.</p>
+<h3>群结构</h3>
+<p>配边类关于无交并 (即定义域的无交并) 构成 Abel 群.</p>
+<p>无结构配边类的每个元素为 $2$ 阶元.</p>
+<h3>前推与拉回</h3>
+<p>映射 $f \colon X\to Y$ 诱导了前推 $f_* \colon N(X)\to N(Y)$.</p>
+<p>若 $f$ 与 $g\colon Z \to Y$ <span class="link local"><a href="/横截.html" title=" [横截]">横截</a></span>, 那么可定义 $f^* g \colon X\times_Y Z \to X$.</p>
+<h2>性质</h2>
+<h3>Thom 定理</h3>
+<p>Thom 证明了 (一个点的) 无定向配边环同构于 $\mathbb Z/2\mathbb Z[x_n: n\in\mathbb Z_+, n\neq 2^k-1]$, 即 $n=2,4,5,6,8,9,\cdots$, 且当 $n$ 为偶数时 $x_n$ 可取为 $\mathbb RP^n$.</p>
+<p>Thom 证明了 (一个点的) <span class="link local"><a href="/定向配边.html" title="定向配边 [定向配边]">定向配边</a></span>环 $\Omega$ 与 $\mathbb Q$ 的张量积 (“抹去挠元”) 同构于 $\mathbb{Q}[x_{4k}: k\in\mathbb Z_+]$, $x_{4k}$ 可取为 $\mathbb CP^{2k}$.</p>
+<p>对所有序列 $I=(i_1,\cdots,i_k)$, $\mathbb CP^{i_1}\times\cdots\times \mathbb CP^{i_k}$ 构成 $\Omega\otimes\mathbb Q$ 的 $\mathbb Q$-基.</p>
+<p>两个流形在 $\Omega\otimes\mathbb Q$ 中相等当且仅当其所有 <span class="link local"><a href="/Pontryagin数.html" title="“Pontryagin 数” [Pontryagin数]">Pontryagin 数</a></span>都相同.</p>
+<h3>与余同伦的关系</h3>
+<h3>配边谱</h3>
+<p>配边是一种<span class="link local"><a href="/广义上同调.html" title="广义上同调 [广义上同调]">广义上同调</a></span>, 配边群是一个<span class="link local"><a href="/谱.html" title="谱 (稳定同伦论) [谱]">谱</a></span>的<span class="link local"><a href="/稳定同伦群.html" title=" [稳定同伦群]">稳定同伦群</a></span>, 称为 <span class="link local"><a href="/Thom谱.html" title="Thom 谱 [Thom谱]">Thom 谱</a></span>.</p>
+</details></section></details></section></footer></article></div></body></html>

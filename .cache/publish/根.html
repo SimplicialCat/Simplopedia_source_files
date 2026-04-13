@@ -1,0 +1,1006 @@
+<!DOCTYPE html>
+<html lang="en-US"><head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<meta name="viewport" content="width=device-width"><title>根</title><link rel="icon" href="/assets/favicon.ico" /><style>
+  @font-face {
+    font-family: 'NewCM10';
+    src: url(assets/NewCM10-Book.otf) format('opentype');
+    font-weight: 400;
+    font-style: normal;
+  }
+
+  @font-face {
+    font-family: 'NewCM10';
+    src: url(assets/NewCM10-Italic.otf) format('opentype');
+    font-weight: 400;
+    font-style: italic;
+  }
+
+  @font-face {
+    font-family: 'NewCM10';
+    src: url(assets/NewCM10-Bold.otf) format('opentype');
+    font-weight: 700;
+    font-style: normal;
+  }
+
+  body {
+    --text-font-family: "NewCM10", serif !important;
+  }
+</style><template id="inline-section">
+  <section class="inline block" data-taxon="">
+    <details open="">
+      <summary>
+        <header>
+          <h1>
+            <span class="taxon"></span>
+            <div id="title"></div>
+          </h1>
+        </header>
+      </summary>
+      <div id="content"></div>
+    </details>
+  </section>
+</template>
+
+<script>
+  function inlineSection(template, section, taxon, title) {
+    taxon = taxon || section.getAttribute("taxon") || null;
+    title = title || section.getAttribute("title") || "";
+
+    const clone = template.content.cloneNode(true);
+    clone.querySelector("section").dataset.taxon = taxon;
+    clone.querySelector(".taxon").textContent = taxon ? `${taxon}. ` : "";
+    clone.querySelector("#title").replaceWith(title);
+    clone.querySelector("#content").replaceWith(...section.childNodes);
+
+    if (section.hasAttribute("close")) {
+      clone.querySelector("details").removeAttribute("open");
+    }
+    
+    section.replaceWith(clone);
+  }
+
+  const tagTaxonTable = {
+    "exegesis": "Exegesis",
+    "definition": "Definition",
+    "proposition": "Proposition",
+    "remark": "Remark",
+    "conjecture": "Conjecture",
+    "postulate": "Postulate",
+    "claim": "Claim",
+    "observation": "Observation",
+    "fact": "Fact",
+    "hypothesis": "Hypothesis",
+    "axiom": "Axiom",
+    "lemma": "Lemma",
+    "theorem": "Theorem",
+    "corollary": "Corollary",
+    "example": "Example", 
+    "proof": "Proof",
+  };
+
+  document.addEventListener("DOMContentLoaded", () => {
+    const template = document.getElementById("inline-section");
+
+    [...document.getElementsByTagName("block")].forEach(section => inlineSection(template, section));
+
+    Object.entries(tagTaxonTable).forEach(([tag, taxon]) => {
+      [...document.getElementsByTagName(tag)].forEach(section => inlineSection(template, section, taxon));
+    });
+  });
+</script><script>
+  function toggleDetailsOpen() {
+    const details = document.querySelector("#toc>div>details");
+    if (!details) return;
+
+    if (window.matchMedia("(max-width: 1000px)").matches) {
+      details.removeAttribute("open");
+    } else {
+      details.setAttribute("open", "");
+    }
+  }
+
+  document.addEventListener("DOMContentLoaded", toggleDetailsOpen);
+  window.addEventListener("resize", toggleDetailsOpen);
+</script><style>
+  theme-option {
+    display: inline-block;
+  }
+
+  theme-option>input {
+    display: none;
+  }
+
+  theme-option>label {
+    color: var(--slug-color);
+  }
+
+  theme-option>label:hover {
+    background-color: var(--hover-color-link);
+  }
+
+  theme-option:has(input:checked)>label {
+    color: var(--link-color);
+  }
+
+  theme-option>label::before {
+    content: "[";
+    color: rgba(0, 0, 0, 0);
+  }
+
+  theme-option>label::after {
+    content: "]";
+    color: rgba(0, 0, 0, 0);
+  }
+
+  theme-option:has(input:checked)>label::before {
+    color: var(--link-color);
+  }
+
+  theme-option:has(input:checked)>label::after {
+    color: var(--link-color);
+  }
+</style>
+
+<template id="theme-option-template">
+  <input type="radio" name="theme" />
+  <label></label>
+</template>
+
+<script>
+  const THEME_KEY = `kodama-theme`;
+
+  function storeSelectedTheme(name) {
+    localStorage.setItem(THEME_KEY, name);
+  }
+
+  function getCurrentTheme() {
+    return localStorage.getItem(THEME_KEY) || window.primaryTheme;
+  }
+
+  function selectTheme(themeName) {
+    storeSelectedTheme(themeName);
+    requestAnimationFrame(applyDynamicColorInvert);
+  }
+
+  function applyFavorTheme() {
+    const favoredTheme = getCurrentTheme();
+    if (favoredTheme) {
+      const selector = `input[type='radio'][id='${favoredTheme}']`;
+      const favoredOption = window.themeOptions.querySelector(selector);
+
+      if (favoredOption) {
+        favoredOption.checked = true;
+      } else if (window.primaryOption) {
+        // Fallback to primary theme, if the favored theme is not found
+        // e.g., when the theme options have changed, and the stored theme is no longer available.
+        window.primaryOption.checked = true;
+      }
+    }
+    applyDynamicColorInvert();
+  }
+
+  document.addEventListener("DOMContentLoaded", function () {
+    window.themeOptions = document.getElementById("theme-options");
+    const templateContent = document.getElementById("theme-option-template").content;
+
+    customElements.define(
+      "theme-option",
+      class extends HTMLElement {
+        constructor() {
+          super();
+
+          const node = templateContent.cloneNode(true);
+          const themeName = this.getAttribute("name");
+
+          const input = node.querySelector("input");
+          input.setAttribute("id", themeName);
+          input.setAttribute("value", themeName);
+
+          const label = node.querySelector("label");
+          label.setAttribute("for", themeName);
+          label.addEventListener("click", () => selectTheme(themeName));
+
+          while (this.firstChild) {
+            label.appendChild(this.firstChild);
+          }
+          this.appendChild(node);
+        }
+      },
+    );
+
+    window.primaryOption = window.themeOptions.querySelector("input[type='radio']");
+    window.primaryTheme = primaryOption?.value;
+
+    applyFavorTheme();
+  });
+</script>
+
+<script>
+  const clamp = (value) => Math.max(0, Math.min(255, value));
+
+  const multiply = ([r, g, b], matrix) => {
+    const nr = clamp(r * matrix[0] + g * matrix[1] + b * matrix[2]);
+    const ng = clamp(r * matrix[3] + g * matrix[4] + b * matrix[5]);
+    const nb = clamp(r * matrix[6] + g * matrix[7] + b * matrix[8]);
+    return [nr, ng, nb];
+  };
+
+  const hueRotate = ([r, g, b], angle = 0) => {
+    const rad = (angle / 180) * Math.PI;
+    const sin = Math.sin(rad);
+    const cos = Math.cos(rad);
+    const matrix = [
+      0.213 + cos * 0.787 - sin * 0.213,
+      0.715 - cos * 0.715 - sin * 0.715,
+      0.072 - cos * 0.072 + sin * 0.928,
+      0.213 - cos * 0.213 + sin * 0.143,
+      0.715 + cos * 0.285 + sin * 0.140,
+      0.072 - cos * 0.072 - sin * 0.283,
+      0.213 - cos * 0.213 - sin * 0.787,
+      0.715 - cos * 0.715 + sin * 0.715,
+      0.072 + cos * 0.928 + sin * 0.072,
+    ];
+    return multiply([r, g, b], matrix);
+  };
+
+  const grayscale = ([r, g, b], value = 1) => {
+    const matrix = [
+      0.2126 + 0.7874 * (1 - value),
+      0.7152 - 0.7152 * (1 - value),
+      0.0722 - 0.0722 * (1 - value),
+      0.2126 - 0.2126 * (1 - value),
+      0.7152 + 0.2848 * (1 - value),
+      0.0722 - 0.0722 * (1 - value),
+      0.2126 - 0.2126 * (1 - value),
+      0.7152 - 0.7152 * (1 - value),
+      0.0722 + 0.9278 * (1 - value),
+    ];
+    return multiply([r, g, b], matrix);
+  };
+
+  const sepia = ([r, g, b], value = 1) => {
+    const matrix = [
+      0.393 + 0.607 * (1 - value),
+      0.769 - 0.769 * (1 - value),
+      0.189 - 0.189 * (1 - value),
+      0.349 - 0.349 * (1 - value),
+      0.686 + 0.314 * (1 - value),
+      0.168 - 0.168 * (1 - value),
+      0.272 - 0.272 * (1 - value),
+      0.534 - 0.534 * (1 - value),
+      0.131 + 0.869 * (1 - value),
+    ];
+    return multiply([r, g, b], matrix);
+  };
+
+  const saturate = ([r, g, b], value = 1) => {
+    const matrix = [
+      0.213 + 0.787 * value,
+      0.715 - 0.715 * value,
+      0.072 - 0.072 * value,
+      0.213 - 0.213 * value,
+      0.715 + 0.285 * value,
+      0.072 - 0.072 * value,
+      0.213 - 0.213 * value,
+      0.715 - 0.715 * value,
+      0.072 + 0.928 * value,
+    ];
+    return multiply([r, g, b], matrix);
+  };
+
+  const linear = ([r, g, b], slope = 1, intercept = 0) => {
+    const scale = 255;
+    return [
+      clamp(r * slope + intercept * scale),
+      clamp(g * slope + intercept * scale),
+      clamp(b * slope + intercept * scale),
+    ];
+  };
+
+  const brightness = (rgb, value = 1) => linear(rgb, value);
+  const contrast = (rgb, value = 1) => linear(rgb, value, -0.5 * value + 0.5);
+
+  const invert = ([r, g, b], value = 1) => {
+    const nr = (value + r / 255 * (1 - 2 * value)) * 255;
+    const ng = (value + g / 255 * (1 - 2 * value)) * 255;
+    const nb = (value + b / 255 * (1 - 2 * value)) * 255;
+    return [clamp(nr), clamp(ng), clamp(nb)];
+  };
+
+  // Code taken from https://stackoverflow.com/a/9493060/2688027, licensed under CC BY-SA.
+  const rgbToHsl = (r, g, b) => {
+    r /= 255; g /= 255; b /= 255;
+    const max = Math.max(r, g, b);
+    const min = Math.min(r, g, b);
+    let h, s, l = (max + min) / 2;
+    if (max === min) {
+      h = s = 0;
+    } else {
+      const d = max - min;
+      s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
+      switch (max) {
+        case r: h = (g - b) / d + (g < b ? 6 : 0); break;
+        case g: h = (b - r) / d + 2; break;
+        case b: h = (r - g) / d + 4; break;
+      }
+      h /= 6;
+    }
+    return { h: h * 100, s: s * 100, l: l * 100 };
+  };
+
+  const applyFilters = (rgb, [inv, sep, sat, hue, bri, con]) => {
+    let color = [...rgb];
+    color = invert(color, inv / 100);
+    color = sepia(color, sep / 100);
+    color = saturate(color, sat / 100);
+    color = hueRotate(color, hue * 3.6);
+    color = brightness(color, bri / 100);
+    color = contrast(color, con / 100);
+    return color;
+  };
+
+  const lossFn = (targetRgb, filters) => {
+    const resultRgb = applyFilters([0, 0, 0], filters);
+    const targetHsl = rgbToHsl(...targetRgb);
+    const resultHsl = rgbToHsl(...resultRgb);
+    return (
+      Math.abs(resultRgb[0] - targetRgb[0]) +
+      Math.abs(resultRgb[1] - targetRgb[1]) +
+      Math.abs(resultRgb[2] - targetRgb[2]) +
+      Math.abs(resultHsl.h - targetHsl.h) +
+      Math.abs(resultHsl.s - targetHsl.s) +
+      Math.abs(resultHsl.l - targetHsl.l)
+    );
+  };
+
+  const fix = (value, idx) => {
+    let max = 100;
+    if (idx === 2) max = 7500;                  // saturate
+    else if (idx === 4 || idx === 5) max = 200; // brightness, contrast
+    if (idx === 3) { // hue-rotate
+      if (value > max) return value % max;
+      if (value < 0) return max + (value % max);
+      return value;
+    }
+    return Math.max(0, Math.min(max, value));
+  };
+
+  const spsa = (targetRgb, A, a, c, initial, iters) => {
+    const alpha = 1;
+    const gamma = 1 / 6;
+    let values = [...initial];
+    let best = [...values];
+    let bestLoss = Infinity;
+
+    for (let k = 0; k < iters; k++) {
+      const ck = c / Math.pow(k + 1, gamma);
+      const deltas = Array(6).fill().map(() => (Math.random() > 0.5 ? 1 : -1));
+      const highArgs = values.map((v, i) => v + ck * deltas[i]);
+      const lowArgs = values.map((v, i) => v - ck * deltas[i]);
+      const lossDiff = lossFn(targetRgb, highArgs) - lossFn(targetRgb, lowArgs);
+
+      values = values.map((v, i) => {
+        const g = (lossDiff / (2 * ck)) * deltas[i];
+        const ak = a[i] / Math.pow(A + k + 1, alpha);
+        return fix(v - ak * g, i);
+      });
+
+      const loss = lossFn(targetRgb, values);
+      if (loss < bestLoss) {
+        best = [...values];
+        bestLoss = loss;
+      }
+    }
+    return { values: best, loss: bestLoss };
+  };
+
+  // Threshold for acceptable color loss. This value determines when the SPSA algorithm stops early.
+  // A loss below this value is considered visually indistinguishable for most use cases.
+  // The value 25 was determined empirically to balance performance and color accuracy.
+  const ACCEPTABLE_COLOR_LOSS = 25;
+
+  const solveWide = (targetRgb) => {
+    const A = 5;
+    const c = 15;
+    const a = [60, 180, 18000, 600, 1.2, 1.2];
+    let best = { loss: Infinity, values: null };
+    for (let i = 0; best.loss > ACCEPTABLE_COLOR_LOSS && i < 3; i++) {
+      const initial = [50, 20, 3750, 50, 100, 100];
+      const result = spsa(targetRgb, A, a, c, initial, 1000);
+      if (result.loss < best.loss) best = result;
+    }
+    return best;
+  };
+
+  const solveNarrow = (targetRgb, wideResult) => {
+    const A = wideResult.loss;
+    const c = 2;
+    const A1 = A + 1;
+    const a = [0.25 * A1, 0.25 * A1, A1, 0.25 * A1, 0.2 * A1, 0.2 * A1];
+    return spsa(targetRgb, A, a, c, wideResult.values, 500);
+  };
+
+  const cssFilterString = (filters) => {
+    const [inv, sep, sat, hue, bri, con] = filters.map(Math.round);
+    const hueDeg = Math.round(hue * 3.6);
+    return `filter: invert(${inv}%) sepia(${sep}%) saturate(${sat}%) hue-rotate(${hueDeg}deg) brightness(${bri}%) contrast(${con}%);`;
+  };
+
+  const solveColor = (targetRgb) => {
+    const wide = solveWide(targetRgb);
+    const narrow = solveNarrow(targetRgb, wide);
+    return {
+      values: narrow.values,
+      loss: narrow.loss,
+      filter: cssFilterString(narrow.values),
+    };
+  };
+
+  // Reuse a single canvas / context to avoid memory leaks
+  const colorParseCanvas = document.createElement('canvas');
+  colorParseCanvas.width = 1;
+  colorParseCanvas.height = 1;
+  const colorParseContext = colorParseCanvas.getContext('2d');
+
+  const toRGBArray = (cssColor) => {
+    colorParseContext.fillStyle = cssColor;
+    colorParseContext.fillRect(0, 0, 1, 1);
+
+    // The `getImageData().data` returns a Uint8ClampedArray with 4 values per pixel (RGBA). 
+    // also see: https://developer.mozilla.org/zh-CN/docs/Web/API/ImageData/data
+    const rgba = colorParseContext.getImageData(0, 0, 1, 1).data;
+    return Array.from(rgba.slice(0, 3));
+  };
+
+  const DYNAMIC_STYLE_ID = 'dynamic-color-invert-style';
+  const SOLVED_COLOR_KEY = "solved-";
+
+  function memorizedSolvedFilter(color) {
+    const colorKey = SOLVED_COLOR_KEY + color;
+    const storedFilterOption = localStorage.getItem(colorKey);
+    if (storedFilterOption) {
+      return storedFilterOption;
+    } else {
+      const filter = solveColor(color).filter;
+      localStorage.setItem(colorKey, filter);
+      return filter;
+    }
+  }
+
+  function applyDynamicColorInvert() {
+    const textColor = getComputedStyle(document.body).getPropertyValue('--text-color');
+    if (textColor && textColor.length > 0) {
+      const rgb = toRGBArray(textColor);
+      const filter = memorizedSolvedFilter(rgb);
+
+      const existingStyle = document.getElementById(DYNAMIC_STYLE_ID);
+      if (existingStyle) {
+        existingStyle.textContent = `.color-invert {${filter}}`;
+      } else {
+        const style = document.createElement('style');
+        style.id = DYNAMIC_STYLE_ID;
+        style.textContent = `.color-invert {${filter}}`;
+        document.head.appendChild(style);
+      }
+    }
+  }
+</script><script>
+  (() => {
+    const url = "/kodama.json";
+    const interval = 1000; // 1 second
+
+    let lastModified = null;
+
+    async function check() {
+      try {
+        const res = await fetch(url + "?t=" + Date.now(), {
+          method: "HEAD",
+          cache: "no-store",
+        });
+
+        const lm = res.headers.get("last-modified");
+
+        if (lastModified && lm && lm !== lastModified) {
+          location.reload();
+          return;
+        }
+
+        lastModified = lm || lastModified;
+      } catch (e) {
+        // Ignore
+        console.warn("Reload check failed:", e);
+      }
+
+      setTimeout(check, interval);
+    }
+
+    check();
+  })();
+</script><!-- Also see: https://katex.org/docs/autorender -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.25/dist/katex.min.css" integrity="sha384-WcoG4HRXMzYzfCgiyfrySxx90XSl2rxY5mnVY5TwtWE6KLrArNKn0T/mOgNL0Mmi" crossorigin="anonymous">
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.25/dist/katex.min.js" integrity="sha384-J+9dG2KMoiR9hqcFao0IBLwxt6zpcyN68IgwzsCSkbreXUjmNVRhPFTssqdSGjwQ" crossorigin="anonymous"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.25/dist/contrib/auto-render.min.js" integrity="sha384-hCXGrW6PitJEwbkoStFjeJxv+fSOOQKOPbJxSfM6G5sWZjAyWhXiTIIAmQqnlLlh" crossorigin="anonymous"></script>
+<!-- Also see: https://github.com/KaTeX/KaTeX/tree/main/contrib/copy-tex -->
+<script src="https://cdn.jsdelivr.net/npm/katex@0.16.25/dist/contrib/copy-tex.min.js" integrity="sha384-HORx6nWi8j5/mYA+y57/9/CZc5z8HnEw4WUZWy5yOn9ToKBv1l58vJaufFAn9Zzi" crossorigin="anonymous"></script>
+
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    renderMathInElement(document.body, {
+      delimiters: [
+        { left: "$$", right: "$$", display: true },
+        { left: "$", right: "$", display: false },
+        { left: "\\(", right: "\\)", display: false },
+        { left: "\\[", right: "\\]", display: true },
+      ],
+      trust: true,
+      strict: false,
+      throwOnError: false,
+      minRuleThickness: 0.05,
+    });
+  });
+</script>
+<link rel="stylesheet" href="/main.css"><style>
+@media only screen and (min-width: 1000px) {
+  #grid-wrapper { grid-template-columns: var(--article-max-width) var(--toc-max-width); }
+  nav#toc { max-width: max-content; }
+}
+</style></head><body><header class="header"><nav class="nav"><div class="logo"><span class="cursor-pointer" onclick="window.location.href='/index.html'" title="单纯百科 Simplopedia">« 单纯百科 Simplopedia</span></div></nav></header><div id="grid-wrapper" style="grid-template-areas: 'article toc';" data-base-url="./"><nav id="toc" class="sticky-nav mobile-sticky-nav"><div id="theme-options"><style>
+  body:has(input[value="furina"]:checked) {
+    --article-max-width: 110ex; /* default: 90ex */
+
+    --color-Furina-deep-navy: #253085;
+    --color-Furina-royal-blue: #465BCF;
+    --color-Furina-aqua-cyan: #6AC6E8;
+    --color-Furina-frost-white: #FAFBFC;
+    --color-Furina-misty-blue: #C4D7ED;
+    --color-Furina-vivid-sapphire: #5670E9;
+    --color-Furina-luminous-hydro: #70DBFF;
+    --color-Furina-bright-periwinkle: #8DA4F1;
+    --color-Furina-vintage-gold: #BD9368;
+    --color-Furina-vintage-gold-light: #DDB368;
+    --color-Furina-vintage-gold-ultra-light: #FDF388;
+
+    --background-color: var(--color-Furina-frost-white);
+    --link-color: var(--color-Furina-vivid-sapphire);
+    --slug-color: var(--color-Furina-aqua-cyan);
+    --logo-color: var(--color-Furina-deep-navy);
+
+    --block-background-color: #FFFFFF;
+    --shadow-color: rgba(27, 63, 143, 0.06);
+    --radius: 5px;
+    --margin-left: 14px;
+
+    --hover-color-block: var(--block-background-color);
+    --logo-hover-color: #88d;
+    --span-tag-color: #88d;
+    --article-tag-color: #88d;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    body:has(input[value="furina"]:checked) {
+      --color-Furina-deep-navy: #B5C0F5;
+      --color-Furina-royal-blue: #D6EBFF;
+
+      --background-color: #2f2f2f;
+      --block-background-color: #3a3a3a;
+    }
+  }
+
+  .block {
+    /*2026-3-16 21:10 新增*/
+    padding: 15px;
+    margin-top: 6px;
+    margin-bottom: 6px;
+
+    border-radius: var(--radius);
+    background-color: var(--block-background-color);
+    box-shadow: 0 2px 12px var(--shadow-color);
+  }
+
+  .footnote-definition {
+    margin-left: var(--margin-left);
+  }
+
+  h5,
+  h6,
+  p {
+    margin: 5px;
+  }
+
+  tr {
+    border-bottom: 1px solid var(--color-Furina-bright-periwinkle);
+  }
+
+  /* 可选：去除表头下方的重复横线（如果表头需要特殊样式） */
+  thead tr {
+    border-bottom: 2px solid var(--color-Furina-deep-navy);
+  }
+
+  /* 去除最后一行的边框 */
+  tbody tr:last-child {
+    border-bottom: none;
+  }
+
+  .footnote-definition>p {
+    display: inline;
+    margin-left: 0;
+    color: var(--color-Furina-bright-periwinkle);
+    font-size: small;
+  }
+
+  article > section > details > summary > header > h1 {
+    font-weight: 600;
+    font-size: 1.75rem !important;
+  }
+
+  h2 {
+    font-weight: 500;
+    font-size: 1.5rem !important;
+    color: var(--color-Furina-deep-navy);
+    margin-bottom: 10px;
+    border-bottom: 1px solid #88d;
+    padding-bottom: 1px;
+    /* 增加底部内边距让横线和文字有间距 */
+  }
+
+  h2::before {
+    content: "\2726";
+    /* ✦ 的Unicode转义码 */
+    display: inline-block;
+    margin-right: 0.3em;
+    /*color: var(--color-Furina-vintage-gold-light);*/
+    /* 替换 color 属性，改为以下背景和裁剪属性 */
+    background: linear-gradient(150deg,
+        var(--color-Furina-vintage-gold-ultra-light) 30%,
+        var(--color-Furina-vintage-gold-light) 60%,
+        var(--color-Furina-vintage-gold) 90%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    /* 将文字颜色设为透明以显示背景 */
+    /* 组合径向渐变（中心高光）和线性渐变（基础色调） */
+    /*background: radial-gradient(
+      ellipse at center,
+      var(--color-Furina-vintage-gold-ultra-light) 20%,
+      transparent 70%
+    ),
+    linear-gradient(
+      to bottom,
+      var(--color-Furina-vintage-gold-light),
+      var(--color-Furina-vintage-gold)
+    );
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent; */
+    filter: drop-shadow(0px 1px 1px rgba(184, 150, 131, 0.5));
+    /* 可选：增加与主色呼应的柔和投影 */
+    font-weight: normal;
+  }
+
+
+  h3 {
+    font-weight: 700;
+    color: var(--color-Furina-royal-blue);
+    margin-bottom: 5px;
+  }
+
+  h3::before {
+    content: "\2726";
+    /* ✦ 的Unicode转义码 */
+    display: inline-block;
+    margin-left: 0.06em;
+    margin-right: 0.36em;
+    /*color: var(--color-Furina-vintage-gold-ultra-light);*/
+    background: linear-gradient(150deg,
+        var(--color-Furina-vintage-gold-ultra-light) 20%,
+        var(--color-Furina-vintage-gold-light) 90%,
+        var(--color-Furina-vintage-gold) 95%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    font-weight: normal;
+  }
+
+  h4 {
+    text-indent: var(--marginleft);
+    font-weight: 700;
+    color: #696cd9;
+    margin-bottom: 0;
+  }
+
+  h5 {
+    text-indent: var(--marginleft);
+    font-weight: 700;
+    color: #8a8ff4;
+    margin-bottom: 0;
+  }
+
+  h6 {
+    text-indent: var(--marginleft);
+    font-weight: 700;
+    color: #aaaff4;
+    margin-bottom: 0;
+  }
+
+  code, pre, .mono {
+    font-family: "Liberation Mono", "Courier New", monospace;
+    font-size: 0.9em; /* 可选微调尺寸 */
+  }
+
+  @media only screen and (max-width: 1000px) {
+    #grid-wrapper>nav {
+      display: none !important;
+    }
+  }
+
+  #toc,
+  #toc .block {
+    background: none !important;
+    box-shadow: none !important;
+  }
+
+  ul {
+    margin: 5px;
+    margin-left: calc(5px + 2em);
+    padding-left: 0;
+    list-style-type: none;
+  }
+
+  ul li {
+    margin-bottom: 5px;
+    position: relative;
+    padding-left: 0;
+    /*color: var(--text-secondary);*/
+  }
+
+  ul li::before {
+    content: '✦';
+    position: absolute;
+    left : -1em;
+    /*color: var(--color-Furina-vintage-gold-ultra-light);*/
+    font-size: 0.9em;
+  }
+
+  .metadata {
+    color: var(--article-tag-color);
+  }
+
+  .metadata ul {
+    margin : 0;
+  }
+
+  .metadata li::before {
+    content: none;
+  }
+
+  .music-player button {
+    text-decoration: none;
+  }
+
+  .music-player button:hover {
+    text-decoration: underline;
+    text-decoration-color: var(--color-Furina-vintage-gold-light);
+    /* 金色 */
+    text-underline-offset: 6px;
+    /* 调整下划线与文字距离 */
+    text-decoration-thickness: 1px;
+    /* 线条粗细 */
+  }
+</style>
+
+<theme-option name="furina" style="display: none;">furina</theme-option></div></nav>
+
+<article><section class="block" data-taxon=""><details open><summary id="根"><header><h1><span class="taxon"></span>根 <a class="slug" href="/根.html">[根]</a><a class="edit" href="vscode://file/E:/Simplopedia_source/trees/%E6%A0%B9.md">[edit]</a></h1><div class="metadata"><ul><li class="meta-item">百科</li><li class="meta-item"><span class="link local"><a href="/SimplicialCat.html" title="单纯猫 [SimplicialCat]">SimplicialCat</a></span></li></ul></div></header></summary>
+<p>Lie 代数的根系 (root system) 最早由 W. Killing 约 1889 年为了研究<span class="link local"><a href="/单Lie代数.html" title="“单 Lie 代数” [单Lie代数]">单 Lie 代数</a></span>的分类提出.</p>
+<p>注意区分<span class="link local"><a href="/根(Lie代数).html" title="“根 (Lie 代数)” [根(Lie代数)]">根 (Lie 代数)</a></span> (radical).</p>
+<h2>定义</h2>
+<h3>Lie 代数的根系</h3>
+<p>设 Lie 代数 $\mathfrak g$ 有 <span class="link local"><a href="/Cartan子代数.html" title="“Cartan 子代数” [Cartan子代数]">Cartan 子代数</a></span> $\mathfrak h$, 称 $\operatorname{ad}\mathfrak h$ 在 $\mathfrak g$ 上的权为 $\mathfrak g$ 关于 $\mathfrak h$ 的根. 具体地, $\mathfrak g$ 关于 $\mathfrak h$ 的根 $\alpha\in\mathfrak h^*$ 满足存在 $X\in\mathfrak g$,
+$$
+[H,X]=\alpha(H)X,\,\forall H\in\mathfrak h.
+$$
+记根的集合为 $\Phi$.</p>
+<p>对于复半单 Lie 代数, 根系给出了 Lie 代数的分解
+$$
+\mathfrak g = \mathfrak h \oplus \bigoplus_{\alpha\in\Phi} \mathfrak g_{\alpha},
+$$
+其中 $\mathfrak g_\alpha = \{X\in\mathfrak g\mid [H,X]=\alpha(H)X\,\forall H\in\mathfrak h\}$. 该分解具有如下性质.</p>
+<ul>
+<li>$\dim \mathfrak g_\alpha = 1$.</li>
+<li>$[\mathfrak g_\alpha,\mathfrak g_{\beta}]=\mathfrak g_{\alpha + \beta}$.</li>
+<li>存在 $h_\alpha\in\mathfrak h$ 使得 $\mathfrak g_{\alpha}\oplus \mathbb{C} h_\alpha \oplus \mathfrak g_{-\alpha}$ 是同构于 $\mathfrak {sl}(2,\mathbb{C})$ 的子 Lie 代数.</li>
+</ul>
+<p><span class="link local"><a href="/Weyl群.html" title="Weyl 群 (极大环面) [Weyl群]">Weyl 群</a></span> $W\subset GL(\mathfrak h^*)$ 由 $\{s_\alpha: \alpha\in\Phi\}$ 生成, 其中 $s_\alpha$ 是关于根 $\alpha$ 的正交补空间的反射.</p>
+<p>注意到, 半单 Lie 代数的 <span class="link local"><a href="/Killing形式.html" title="“Killing 形式” [Killing形式]">Killing 形式</a></span> $B$ 满足</p>
+<ul>
+<li>对 $\alpha,\beta\in\Phi\cup\{0\}$, 若 $\alpha+\beta\neq 0$, 则 $B(\mathfrak g_\alpha,\mathfrak g_\beta)=0$.</li>
+<li>$B$ 限制为 $\mathfrak h$ 上的非退化双线性型.</li>
+</ul>
+<p>从而 $B$ 也给出 $\mathfrak h^*$ 上的一个非退化双线性型, 从而 Lie 代数的根系给出下文的抽象根系.</p>
+<h3>抽象根系</h3>
+<p>内积空间 $V$ 中的<strong>抽象根系</strong>是一个有限子集 $\Delta\subset V\setminus\{0\}$, 满足</p>
+<ul>
+<li>$\operatorname{span}\Delta = V$;</li>
+<li>对任意 $\alpha\in\Delta$, 关于 $\alpha$ 的正交补空间的反射 $s_\alpha$ 将 $\Delta$ 变为自身;</li>
+<li>对任意 $\alpha,\beta\in\Delta$, $\dfrac{2\langle\beta,\alpha\rangle}{|\alpha|^2}$ 为整数.</li>
+</ul>
+<p>称其既约 (reduced) 是指 $\alpha\in\Delta\Rightarrow 2\alpha\notin\Delta$.</p>
+<h3>余根</h3>
+<p>抽象根系中, 根 $\alpha$ 的余根 (coroot) 定义为
+$$
+\alpha^\vee = \frac{2\alpha}{\langle\alpha,\alpha\rangle}.
+$$</p>
+<h3>根数据</h3>
+<p><span class="link local"><a href="/根数据.html" title="根数据 [根数据]">根数据</a></span></p>
+<h3>正性</h3>
+<p>任取 $V$ 作为向量空间的一组基, 以字典序规定正性: 称一个向量为正, 是指其第一个非零坐标为正.</p>
+<blockquote>
+<p>我们事实上只需要正性满足如下条件: 两个正向量之和为正, 正向量乘以正数为正.</p>
+</blockquote>
+<p>若一个正根无法表示为两个正根之和, 则称之为<strong>单根</strong> (simple root).</p>
+<h3>Dynkin 图与 Cartan 矩阵</h3>
+<p>对于单根的系统 $\Pi=\{\alpha_1,\cdots,\alpha_l\}$ ($l=\dim V$), 整数矩阵
+$$
+A_{ij} = \frac{2 \langle \alpha_i , \alpha_j \rangle}{|\alpha_i|^2}
+$$
+称为 $\Pi$ 的 <strong>Cartan 矩阵</strong>. 它满足</p>
+<ul>
+<li>$A_{ii}=2$,</li>
+<li>$A_{ij}\leq 0$ ($i\neq j$).</li>
+</ul>
+<p>对于单根的系统 $\Pi=\{\alpha_1,\cdots,\alpha_l\}$ ($l=\dim V$), 其 <strong>Dynkin 图</strong>是以这些单根为顶点的一个图, 两点 $\alpha_i,\alpha_j (i\neq j)$ 之间连的边数等于 $A_{ij}A_{ji}=\frac{4\langle \alpha_i,\alpha_j\rangle^2}{|\alpha_i|^2|\alpha_j|^2}$. 令每个顶点 $\alpha_i$ 的权为 $|\alpha_i|^2$.</p>
+<p>一个根系不可约当且仅当其 Dynkin 图连通.</p>
+<h2>例</h2>
+<h3>$\mathfrak {sl}_3(\mathbb{C})$</h3>
+<p>$\mathfrak {sl}_3(\mathbb{C})$ 的 Cartan 子代数为 $\mathfrak h=\{\operatorname{diag}(h_1,h_2,h_3)\mid h_1+h_2+h_3=0\}$.</p>
+<p>令 $e_i\in\mathfrak h^*$ 将 $\operatorname{diag}(h_1,h_2,h_3)$ 映射到 $h_i$. 那么 $e_1+e_2+e_3=0$, $\mathfrak {sl}_3$ 的一组单根为 $\alpha_1=e_1-e_2$, $\alpha_2=e_2-e_3$. 另一个根为 $\alpha_1+\alpha_2=e_1-e_3$.
+根 $\alpha_1,\alpha_2,\alpha_1+\alpha_2$ 对应的根子空间分别为
+$$
+\operatorname{span}\begin{pmatrix}0&amp;1&amp;\\&amp;0&amp;\\&amp;&amp;0\end{pmatrix},\operatorname{span}\begin{pmatrix}0&amp;&amp;\\&amp;0&amp;1\\&amp;&amp;0\end{pmatrix},\operatorname{span}\begin{pmatrix}0&amp;&amp;1\\&amp;0&amp;\\&amp;&amp;0\end{pmatrix}.$$
+正根和的一半为 $\rho = \alpha_1+\alpha_2$.</p>
+<p>$\mathfrak {sl}_3$ 的 <span class="link local"><a href="/Killing形式.html" title="“Killing 形式” [Killing形式]">Killing 形式</a></span>为 $B(X,Y)=6\operatorname{tr}(XY)$, 乘以一个常数, 使得 $\mathfrak h^*$ 上对应的内积满足 $\langle\alpha_1,\alpha_1\rangle = \langle\alpha_2,\alpha_2\rangle=2$. 此时 $\langle\alpha_1,\alpha_2\rangle = -1$.</p>
+<h3>$\mathfrak {so}_{2n}(\mathbb{C})$</h3>
+<p>$\mathfrak {so}(2n,\mathbb{C})$ 可视为 $\mathfrak {gl}(2n,\mathbb{C})$ 的子 Lie 代数 $\{y\in\mathfrak {gl}(2n,\mathbb{C}) \mid Ky+y^TK=0\}$, 其中 $K=\begin{pmatrix}0&amp; I_n\\ I_n&amp;0\end{pmatrix}$.</p>
+<p>在这种描述中, 一个 Cartan 子代数为 $\mathfrak h=\{\operatorname{diag}(h_1,\cdots,h_n,-h_1,\cdots,-h_n)\}$.</p>
+<p>令 $e_i\in\mathfrak h^*$ 将 $\operatorname{diag}(h_1,\cdots,h_n,-h_1,\cdots,-h_n)$ 映射到 $h_i$. 那么 $\mathfrak {so}(2n,\mathbb{C})$ 的根为 $\pm e_i \pm e_j$ (正负号独立选取). 其一组单根为 $e_1-e_2,e_2-e_3,\cdots,e_{n-1}-e_n,e_{n-1}+e_n$, Dynkin 图为 $D_n$.</p>
+</details></section><footer><section class="block link-list" id="backlinks"><details open><summary><header><h1>关联页面</h1></header></summary><section class="block" data-taxon=""><details ><summary id="BGG定理"><header><h1><span class="taxon"></span>“BGG 定理” <a class="slug" href="/BGG定理.html">[BGG定理]</a><a class="edit" href="vscode://file/E:/Simplopedia_source/trees/BGG%E5%AE%9A%E7%90%86.md">[edit]</a></h1><div class="metadata"><ul><li class="meta-item">百科</li><li class="meta-item"><span class="link local"><a href="/SimplicialCat.html" title="单纯猫 [SimplicialCat]">SimplicialCat</a></span></li></ul></div></header></summary>
+<p>#几何表示论</p>
+<h2>陈述</h2>
+<p>定义 $\mathfrak h^*$ 上的偏序 $\leq_\subset$: 对于 $\lambda ,\mu \in\mathfrak h^*$, 若
+$$
+\mu\leq s_{\alpha_1}\cdot \mu \leq s_{\alpha_2}s_{\alpha_1}\cdot \mu\leq\cdots\leq \lambda,
+$$
+(其中 $s_\alpha$ 是关于正<span class="link local"><a href="/根.html" title="根 [根]">根</a></span> $\alpha$) 则 $\mu\leq_\subset \lambda$.</p>
+<p>记 $M_\lambda$ 为最高权 $\lambda$ 的 <span class="link local"><a href="/Verma模.html" title="“Verma 模” [Verma模]">Verma 模</a></span>, $L_\mu$ 为 $M_\mu$ 的唯一不可约商.</p>
+<p>BGG 定理是说, (在 $M_\lambda$ 的 <span class="link local"><a href="/Jordan–Holder分解.html" title="“Jordan–Holder 分解” [Jordan–Holder分解]">Jordan–Holder 分解</a></span>中) $[M_\lambda : L_\mu]\neq 0$ 当且仅当 $\mu\leq_{\subset} \lambda$.</p>
+</details></section><section class="block" data-taxon=""><details ><summary id="Lie代数"><header><h1><span class="taxon"></span>Lie 代数 <a class="slug" href="/Lie代数.html">[Lie代数]</a><a class="edit" href="vscode://file/E:/Simplopedia_source/trees/Lie%E4%BB%A3%E6%95%B0.md">[edit]</a></h1><div class="metadata"><ul><li class="meta-item">百科</li><li class="meta-item"><span class="link local"><a href="/SimplicialCat.html" title="单纯猫 [SimplicialCat]">SimplicialCat</a></span></li></ul></div></header></summary>
+<h2>定义</h2>
+<h3>作为 Lawvere 理论</h3>
+<p>Lie 代数的理论是一种 <span class="link local"><a href="/Lawvere理论.html" title="Lawvere 理论 [Lawvere理论]">Lawvere 理论</a></span>.</p>
+<h3>通过算畴</h3>
+<p>Lie 代数是 <span class="link local"><a href="/Lie算畴.html" title="Lie 算畴 [Lie算畴]">Lie 算畴</a></span>上的代数.</p>
+<h2>相关概念</h2>
+<p><span class="link local"><a href="/Cartan子代数.html" title="“Cartan 子代数” [Cartan子代数]">Cartan 子代数</a></span>, <span class="link local"><a href="/根.html" title="根 [根]">根</a></span>, <span class="link local"><a href="/微分分次Lie代数.html" title="微分分次 Lie 代数 [微分分次Lie代数]">微分分次 Lie 代数</a></span></p>
+</details></section><section class="block" data-taxon=""><details ><summary id="Verma模"><header><h1><span class="taxon"></span>“Verma 模” <a class="slug" href="/Verma模.html">[Verma模]</a><a class="edit" href="vscode://file/E:/Simplopedia_source/trees/Verma%E6%A8%A1.md">[edit]</a></h1><div class="metadata"><ul><li class="meta-item">百科</li><li class="meta-item"><span class="link local"><a href="/SimplicialCat.html" title="单纯猫 [SimplicialCat]">SimplicialCat</a></span></li></ul></div></header></summary>
+<p>#几何表示论</p>
+<p>Verma 模 $M_\lambda$ 是最大的以 $\lambda\in\mathfrak h^*$ 为最高权的<span class="link local"><a href="/最高权模.html" title=" [最高权模]">极大权模</a></span>.</p>
+<p>Verma 模是<span class="link local"><a href="/范畴O.html" title="“范畴 O” [范畴O]">范畴 O</a></span> 中比较 “简单” 的对象. (注意到正则表示不属于<span class="link local"><a href="/范畴O.html" title="“范畴 O” [范畴O]">范畴 O</a></span>.)</p>
+<h2>定义</h2>
+<p>权 $\lambda\in\mathfrak h^*$ 给出了 $\mathfrak h$ 的一维表示 $\mathbb{C}_\lambda$. 考虑短正合列 $0 \to \mathfrak n \to \mathfrak b \overset{\pi}{\to} \mathfrak h \to 0$, (见 <span class="link local"><a href="/Borel子代数.html" title="“Borel 子代数” [Borel子代数]">Borel 子代数</a></span>), 将 $\mathfrak h$ 视为 $\mathfrak b$ 的商, 从而 $\mathbb{C}_\lambda$ 可通过 “拉回” 视为 $\mathfrak b$-表示. 定义 Verma 模 $M_\lambda$ 为这个 $\mathfrak b$-表示沿 $\mathfrak b\hookrightarrow\mathfrak g$ 的推前
+$$
+M_\lambda = \mathcal U\mathfrak g \otimes_{\mathcal U\mathfrak b} \mathbb{C}_\lambda.
+$$
+换言之, $M_\lambda$ 是由一个最高权向量 $v$ (即上述张量积定义中的 $1\otimes 1$) 根据关系 $hv=\lambda(h)v$ 生成的 $\mathcal U\mathfrak g$-模. 另一个等价的定义是, 令 $I_\lambda$ 为 $h-\lambda (h)$ ($h\in\mathfrak h$) 以及所有正根生成的 $\mathcal U\mathfrak g$ 的左理想, 定义
+$$
+M_\lambda = \mathcal U_{\mathfrak g} / I_\lambda.
+$$</p>
+<h2>性质</h2>
+<p><span class="link local"><a href="/极大权模.html" title="“极大权模” [极大权模]">极大权模</a></span>都是某个 Verma 模的商. 故 Verma 模又称泛极大权模.</p>
+<p>Verma 模 $M_\lambda$ 的<span class="link local"><a href="/特征.html" title="特征, 余特征 [特征]">形式特征</a></span>为
+$$
+\frac{e^{\lambda}}{\prod_{\alpha\in R^+}(1-e^{-\alpha})}.
+$$
+其中 $R^+$ 表示正<span class="link local"><a href="/根.html" title="根 [根]">根</a></span>的集合.</p>
+<h3>唯一的不可约商</h3>
+<p>Verma 模 $M_\lambda$ 有一个唯一的不可约商 $L_\lambda$. 这是因为, 任何真子模 $N\hookrightarrow M_\lambda$ 的权都不可能包含 $\lambda$, 所以存在最大的真子模, 也即所有真子模的并 (张成的子模).</p>
+<p>$L_\lambda$ 是<span class="link local"><a href="/范畴O.html" title="“范畴 O” [范畴O]">范畴 O</a></span> 中所有的不可约对象.</p>
+<h3>Jordan–Holder 分解</h3>
+<p>Verma 模具有 <span class="link local"><a href="/Jordan–Holder分解.html" title="“Jordan–Holder 分解” [Jordan–Holder分解]">Jordan–Holder 分解</a></span>. 事实上, <span class="link local"><a href="/范畴O.html" title="“范畴 O” [范畴O]">范畴 O</a></span> 的对象均为 <span class="link local"><a href="/Artin对象.html" title="“Artin 对象” [Artin对象]">Artin 对象</a></span>.</p>
+<p>人们想要计算 $[M_\lambda : L_\mu]$. <span class="link local"><a href="/BGG定理.html" title="“BGG 定理” [BGG定理]">BGG 定理</a></span>给出了 $[M_\lambda : L_\mu]\neq 0$ 的条件. 另见 <span class="link local"><a href="/Kazhdan–Lusztig猜想.html" title="“Kazhdan–Lusztig 猜想” [Kazhdan–Lusztig猜想]">Kazhdan–Lusztig 猜想</a></span>.</p>
+</details></section><section class="block" data-taxon=""><details ><summary id="Weyl群"><header><h1><span class="taxon"></span>Weyl 群 (极大环面) <a class="slug" href="/Weyl群.html">[Weyl群]</a><a class="edit" href="vscode://file/E:/Simplopedia_source/trees/Weyl%E7%BE%A4.md">[edit]</a></h1><div class="metadata"><ul><li class="meta-item">百科</li><li class="meta-item"><span class="link local"><a href="/SimplicialCat.html" title="单纯猫 [SimplicialCat]">SimplicialCat</a></span></li></ul></div></header></summary>
+<h2>定义</h2>
+<h3>极大环面的 Weyl 群</h3>
+<p>紧 Lie 群的 Weyl 群是其<span class="link local"><a href="/极大环面.html" title="极大环面 [极大环面]">极大环面</a></span> $H$ 的<span class="link local"><a href="/正规化子.html" title="正规化子 [正规化子]">正规化子</a></span> $N(H)$ 的商群
+$$
+W = N(H)/H.
+$$</p>
+<p>一个重要的观察是 Weyl 群共轭作用在<span class="link local"><a href="/极大环面.html" title="极大环面 [极大环面]">极大环面</a></span> $T$ 上, 且这个作用有效 (effective), 即单位元素外每个元素的作用非平凡.</p>
+<h3>一般子群的 Weyl 群</h3>
+<p>对任意的子群 $H\subset G$ 也可以定义 Weyl 群 $W_GH := N(H)/H$.
+那么 Weyl 群是能够典范地作用于一个 $G$-作用的 $H$-<span class="link local"><a href="/不动点.html" title="不动点 [不动点]">不动点</a></span>的最大群.</p>
+<p><strong>例</strong>. 紧 Lie 群 $G$ 的<span class="link local"><a href="/极大环面.html" title="极大环面 [极大环面]">极大环面</a></span> $T$ 是 $T$ 在 $G$ 上的<span class="link local"><a href="/共轭作用.html" title="共轭作用 [共轭作用]">共轭作用</a></span>的<span class="link local"><a href="/不动点.html" title="不动点 [不动点]">不动点</a></span>, 因而 Weyl 群 $W$ 作用于其上.</p>
+<p>Weyl 群也是陪集空间 $G/H$ 在 $G$ 的<span class="link local"><a href="/轨道范畴.html" title="轨道范畴 [轨道范畴]">轨道范畴</a></span>中的自同构群. 详见 <span class="link local"><a href="/Weyl群(一般子群).html" title="Weyl 群 (一般子群) [Weyl群(一般子群)]">Weyl 群 (一般子群)</a></span></p>
+<h3>Lie 代数 Cartan 子代数的 Weyl 群</h3>
+<p>设 $\mathfrak g$ 为 Lie 代数, $\mathfrak h$ 为 <span class="link local"><a href="/Cartan子代数.html" title="“Cartan 子代数” [Cartan子代数]">Cartan 子代数</a></span>, Weyl 群 $W\subset GL(\mathfrak h^*)$ 由 $\{s_\alpha: \alpha\in\Phi\}$ 生成, 其中 $s_\alpha$ 是关于<span class="link local"><a href="/根.html" title="根 [根]">根</a></span> $\alpha$ 的正交补空间的反射.</p>
+<h2>例</h2>
+<p>$\mathrm {U}(n)$ 的极大环面是 $T=\{\operatorname{diag}(e^{i\theta_1},\cdots,e^{i\theta_n})\}$, 其 Weyl 群通过置换特征值作用在 $T$ 上, 故 Weyl 群为<span class="link local"><a href="/对称群.html" title="对称群 [对称群]">置换群</a></span> $S_n$.</p>
+<p>$\mathrm {SU}(n)$ 的 Weyl 群亦为置换群 $S_n$.</p>
+<p>$\mathrm {SO}(2n+1)$ 的 Weyl 群为 $(\mathbb{Z}/2)^n \rtimes S_n$.</p>
+</details></section><section class="block" data-taxon=""><details ><summary id="半单Lie代数"><header><h1><span class="taxon"></span>“半单 Lie 代数” <a class="slug" href="/半单Lie代数.html">[半单Lie代数]</a><a class="edit" href="vscode://file/E:/Simplopedia_source/trees/%E5%8D%8A%E5%8D%95Lie%E4%BB%A3%E6%95%B0.md">[edit]</a></h1><div class="metadata"><ul><li class="meta-item">百科</li><li class="meta-item"><span class="link local"><a href="/SimplicialCat.html" title="单纯猫 [SimplicialCat]">SimplicialCat</a></span></li></ul></div></header></summary>
+<h2>定义</h2>
+<p>设 $\mathfrak g$ 为有限维 Lie 代数. 若 $\mathfrak g$ 没有非零的<span class="link local"><a href="/可解.html" title=" [可解]">可解 Lie 代数</a></span>理想, 即 $\operatorname{rad}\mathfrak g = 0$ ($\operatorname{rad}\mathfrak g$ 是 $\mathfrak g$ 的<span class="link local"><a href="/根.html" title="根 [根]">根 (Lie 代数)</a></span>), 则称之为<strong>半单 Lie 代数</strong>.</p>
+<h2>性质</h2>
+<p>半单 Lie 代数是<span class="link local"><a href="/单Lie代数.html" title="“单 Lie 代数” [单Lie代数]">单 Lie 代数</a></span>的直和.</p>
+</details></section><section class="block" data-taxon=""><details ><summary id="权"><header><h1><span class="taxon"></span>权 <a class="slug" href="/权.html">[权]</a><a class="edit" href="vscode://file/E:/Simplopedia_source/trees/%E6%9D%83.md">[edit]</a></h1><div class="metadata"><ul><li class="meta-item">百科</li><li class="meta-item"><span class="link local"><a href="/SimplicialCat.html" title="单纯猫 [SimplicialCat]">SimplicialCat</a></span></li></ul></div></header></summary>
+<h2>定义</h2>
+<p>设 $V$ 是 Lie 代数 $\mathfrak g$ 的表示, $\lambda$ 是 <span class="link local"><a href="/Cartan子代数.html" title="“Cartan 子代数” [Cartan子代数]">Cartan 子代数</a></span> $\mathfrak h$ 上的线性泛函.</p>
+<p>$V$ 关于<strong>权</strong> (weight) $\lambda$ 的权空间定义为
+$$
+V_\lambda = \{ v\in V \colon  \forall H\in \mathfrak h, Hv=\lambda (H) v\}.
+$$</p>
+<h2>根</h2>
+<p>若 $V$ 是 $\mathfrak g$ 的伴随表示, 此时的权称为<span class="link local"><a href="/根.html" title="根 [根]">根</a></span> (root).</p>
+</details></section><section class="block" data-taxon=""><details ><summary id="根(Lie代数)"><header><h1><span class="taxon"></span>“根 (Lie 代数)” <a class="slug" href="/根(Lie代数).html">[根(Lie代数)]</a><a class="edit" href="vscode://file/E:/Simplopedia_source/trees/%E6%A0%B9(Lie%E4%BB%A3%E6%95%B0).md">[edit]</a></h1><div class="metadata"><ul><li class="meta-item">百科</li><li class="meta-item"><span class="link local"><a href="/SimplicialCat.html" title="单纯猫 [SimplicialCat]">SimplicialCat</a></span></li></ul></div></header></summary>
+<p>注意区分<span class="link local"><a href="/根.html" title="根 [根]">根</a></span> (root).</p>
+<h2>定义</h2>
+<p>设 $\mathfrak g$ 为有限维 Lie 代数, 那么存在一个<span class="link local"><a href="/可解.html" title=" [可解]">可解 Lie 代数</a></span>理想 $\mathfrak r$ 包含所有的可解理想, 称之为 $\mathfrak g$ 的根 (radical).</p>
+<h2>相关概念</h2>
+<p><span class="link local"><a href="/半单Lie代数.html" title="“半单 Lie 代数” [半单Lie代数]">半单 Lie 代数</a></span></p>
+</details></section><section class="block" data-taxon=""><details ><summary id="根数据"><header><h1><span class="taxon"></span>根数据 <a class="slug" href="/根数据.html">[根数据]</a><a class="edit" href="vscode://file/E:/Simplopedia_source/trees/%E6%A0%B9%E6%95%B0%E6%8D%AE.md">[edit]</a></h1><div class="metadata"><ul><li class="meta-item">百科</li><li class="meta-item"><span class="link local"><a href="/SimplicialCat.html" title="单纯猫 [SimplicialCat]">SimplicialCat</a></span></li></ul></div></header></summary>
+<p>对于连通<span class="link local"><a href="/约化群.html" title="约化群 [约化群]">约化群</a></span> $G$, 有四个关键资料
+$$
+(X^*, X_*, \Phi, \Phi^\vee),
+$$</p>
+<ul>
+<li>$X^* = \operatorname{Hom}(T,\mathbb G_m)$ 称为<strong>权格</strong>, 其中 $T$ 为抽象 Cartan 子群;</li>
+<li>$X_* = \operatorname{Hom}(\mathbb G_m,T)$ 称为<strong>余权格</strong>, 有完美配对 $X^*\times X_* \to\mathbb{Z}$;</li>
+<li>$\Phi\subset X^*$ 为<span class="link local"><a href="/根.html" title="根 [根]">根</a></span>的集合;</li>
+<li>$\Phi^\vee\subset X_*$ 为余根的集合;</li>
+</ul>
+<p>总称为 $G$ 的<strong>根数据</strong> (root data).</p>
+<p>代数闭域上的约化群完全由这些资料确定. 有趣的是, 若 $(X^*, X_*, \Phi, \Phi^\vee)$ 是约化群 $G$ 的根数据, 则 $(X_*, X^*, \Phi^\vee, \Phi)$ 是另一个约化群 $G^\vee$ (或记为 $\widehat G$) 的根数据, 称为 <span class="link local"><a href="/Langlands对偶.html" title="Langlands 对偶群 [Langlands对偶]">Langlands 对偶</a></span>.</p>
+</details></section><section class="block" data-taxon=""><details ><summary id="特征"><header><h1><span class="taxon"></span>特征, 余特征 <a class="slug" href="/特征.html">[特征]</a><a class="edit" href="vscode://file/E:/Simplopedia_source/trees/%E7%89%B9%E5%BE%81.md">[edit]</a></h1><div class="metadata"><ul><li class="meta-item">百科</li><li class="meta-item"><span class="link local"><a href="/SimplicialCat.html" title="单纯猫 [SimplicialCat]">SimplicialCat</a></span></li></ul></div></header></summary>
+<h2>定义</h2>
+<h3>Lie 群</h3>
+<p>Lie 群 $G$ 的<strong>特征</strong> (character) 是 $G$ 到 $S^1$ (或 $\mathbb{C}^\times$) 的同态, <strong>余特征</strong> (cocharacter) 是 $S^1$ 到 $G$ 的同态.</p>
+<p>紧 Lie 群 $G$ 的特征 $G \to U(1)$ 由其在任意一个<span class="link local"><a href="/极大环面.html" title="极大环面 [极大环面]">极大环面</a></span> $T\subset G$ 上的取值完全决定. 因此也称极大环面 $T$ 的特征为 $G$ 的特征.</p>
+<p><span class="link local"><a href="/Weyl群.html" title="Weyl 群 (极大环面) [Weyl群]">Weyl 群</a></span> $W$ 作用于特征晶格上, 由关于<span class="link local"><a href="/根.html" title="根 [根]">根</a></span>的反射生成.</p>
+<h3>代数群</h3>
+<p>代数群 $G$ 的<strong>特征</strong>是 $G$ 到 <span class="link local"><a href="/乘法群概形.html" title="乘法群概形 [乘法群概形]">$\mathbb G_m$</a></span> 的同态, 余特征是 $\mathbb{G}_m$ 到 $G$ 的同态..</p>
+<h2>例</h2>
+<p>$\mathrm{SL}_3$ 的特征晶格是秩为 $2$ 的自由 $\mathbb{Z}$-模.</p>
+</details></section><section class="block" data-taxon=""><details ><summary id="约化群"><header><h1><span class="taxon"></span>约化群 <a class="slug" href="/约化群.html">[约化群]</a><a class="edit" href="vscode://file/E:/Simplopedia_source/trees/%E7%BA%A6%E5%8C%96%E7%BE%A4.md">[edit]</a></h1><div class="metadata"><ul><li class="meta-item">百科</li><li class="meta-item"><span class="link local"><a href="/SimplicialCat.html" title="单纯猫 [SimplicialCat]">SimplicialCat</a></span></li></ul></div></header></summary>
+<h2>观念</h2>
+<p>约化群的结构由<span class="link local"><a href="/根.html" title="根 [根]">根</a></span>控制.</p>
+<h2>定义</h2>
+<p>设 $G$ 是域 $F$ 上的线性代数群, 定义其<strong>幂幺根</strong> (unipotent radical) $R_u(G)$ 为其最大正规连通幂幺子群. 若 $R_u(G)$ 平凡, 则称 $G$ 为约化群.</p>
+<h2>例</h2>
+<ul>
+<li>$\mathrm{GL}_n$</li>
+<li>$\mathrm{SL}_n$</li>
+<li>$\mathrm{Sp}_{2n}$</li>
+<li>环面 $T_n$</li>
+<li>$\mathrm{PGL}_n$</li>
+</ul>
+<h3>非约化群的例子</h3>
+<p>如下代数群<strong>不是</strong>约化群:</p>
+<ul>
+<li>可逆上三角矩阵群 $B_n$, 其幂幺根为对角线全为 $1$ 的上三角矩阵的子群.</li>
+<li>抛物子群
+$$
+  P = \Big\{\begin{pmatrix}
+  A &amp; * \\ 0 &amp; B
+  \end{pmatrix}\Bigm| A\in\mathrm{GL}_r,B\in\mathrm{GL}_s\Big\}
+  $$
+其幂幺根为
+$$
+      U_P= \Big\{\begin{pmatrix}
+  I_r &amp; * \\ 0 &amp; I_s
+  \end{pmatrix}\Big\}.
+  $$
+此时有分裂<span class="link local"><a href="/群短正合列.html" title="群的短正合列 [群短正合列]">短正合列</a></span> $U_P \hookrightarrow P \to \mathrm{GL}_r\times\mathrm{GL}_s$. 这是 <span class="link local"><a href="/Levi分解.html" title="Levi 分解 [Levi分解]">Levi 分解</a></span>的例子.</li>
+</ul>
+<h2>相关概念</h2>
+<p><span class="link local"><a href="/半单群.html" title="半单群 [半单群]">半单群</a></span></p>
+</details></section></details></section></footer></article></div></body></html>

@@ -1,0 +1,1146 @@
+<!DOCTYPE html>
+<html lang="en-US"><head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<meta name="viewport" content="width=device-width"><title>平展上同调</title><link rel="icon" href="/assets/favicon.ico" /><style>
+  @font-face {
+    font-family: 'NewCM10';
+    src: url(assets/NewCM10-Book.otf) format('opentype');
+    font-weight: 400;
+    font-style: normal;
+  }
+
+  @font-face {
+    font-family: 'NewCM10';
+    src: url(assets/NewCM10-Italic.otf) format('opentype');
+    font-weight: 400;
+    font-style: italic;
+  }
+
+  @font-face {
+    font-family: 'NewCM10';
+    src: url(assets/NewCM10-Bold.otf) format('opentype');
+    font-weight: 700;
+    font-style: normal;
+  }
+
+  body {
+    --text-font-family: "NewCM10", serif !important;
+  }
+</style><template id="inline-section">
+  <section class="inline block" data-taxon="">
+    <details open="">
+      <summary>
+        <header>
+          <h1>
+            <span class="taxon"></span>
+            <div id="title"></div>
+          </h1>
+        </header>
+      </summary>
+      <div id="content"></div>
+    </details>
+  </section>
+</template>
+
+<script>
+  function inlineSection(template, section, taxon, title) {
+    taxon = taxon || section.getAttribute("taxon") || null;
+    title = title || section.getAttribute("title") || "";
+
+    const clone = template.content.cloneNode(true);
+    clone.querySelector("section").dataset.taxon = taxon;
+    clone.querySelector(".taxon").textContent = taxon ? `${taxon}. ` : "";
+    clone.querySelector("#title").replaceWith(title);
+    clone.querySelector("#content").replaceWith(...section.childNodes);
+
+    if (section.hasAttribute("close")) {
+      clone.querySelector("details").removeAttribute("open");
+    }
+    
+    section.replaceWith(clone);
+  }
+
+  const tagTaxonTable = {
+    "exegesis": "Exegesis",
+    "definition": "Definition",
+    "proposition": "Proposition",
+    "remark": "Remark",
+    "conjecture": "Conjecture",
+    "postulate": "Postulate",
+    "claim": "Claim",
+    "observation": "Observation",
+    "fact": "Fact",
+    "hypothesis": "Hypothesis",
+    "axiom": "Axiom",
+    "lemma": "Lemma",
+    "theorem": "Theorem",
+    "corollary": "Corollary",
+    "example": "Example", 
+    "proof": "Proof",
+  };
+
+  document.addEventListener("DOMContentLoaded", () => {
+    const template = document.getElementById("inline-section");
+
+    [...document.getElementsByTagName("block")].forEach(section => inlineSection(template, section));
+
+    Object.entries(tagTaxonTable).forEach(([tag, taxon]) => {
+      [...document.getElementsByTagName(tag)].forEach(section => inlineSection(template, section, taxon));
+    });
+  });
+</script><script>
+  function toggleDetailsOpen() {
+    const details = document.querySelector("#toc>div>details");
+    if (!details) return;
+
+    if (window.matchMedia("(max-width: 1000px)").matches) {
+      details.removeAttribute("open");
+    } else {
+      details.setAttribute("open", "");
+    }
+  }
+
+  document.addEventListener("DOMContentLoaded", toggleDetailsOpen);
+  window.addEventListener("resize", toggleDetailsOpen);
+</script><style>
+  theme-option {
+    display: inline-block;
+  }
+
+  theme-option>input {
+    display: none;
+  }
+
+  theme-option>label {
+    color: var(--slug-color);
+  }
+
+  theme-option>label:hover {
+    background-color: var(--hover-color-link);
+  }
+
+  theme-option:has(input:checked)>label {
+    color: var(--link-color);
+  }
+
+  theme-option>label::before {
+    content: "[";
+    color: rgba(0, 0, 0, 0);
+  }
+
+  theme-option>label::after {
+    content: "]";
+    color: rgba(0, 0, 0, 0);
+  }
+
+  theme-option:has(input:checked)>label::before {
+    color: var(--link-color);
+  }
+
+  theme-option:has(input:checked)>label::after {
+    color: var(--link-color);
+  }
+</style>
+
+<template id="theme-option-template">
+  <input type="radio" name="theme" />
+  <label></label>
+</template>
+
+<script>
+  const THEME_KEY = `kodama-theme`;
+
+  function storeSelectedTheme(name) {
+    localStorage.setItem(THEME_KEY, name);
+  }
+
+  function getCurrentTheme() {
+    return localStorage.getItem(THEME_KEY) || window.primaryTheme;
+  }
+
+  function selectTheme(themeName) {
+    storeSelectedTheme(themeName);
+    requestAnimationFrame(applyDynamicColorInvert);
+  }
+
+  function applyFavorTheme() {
+    const favoredTheme = getCurrentTheme();
+    if (favoredTheme) {
+      const selector = `input[type='radio'][id='${favoredTheme}']`;
+      const favoredOption = window.themeOptions.querySelector(selector);
+
+      if (favoredOption) {
+        favoredOption.checked = true;
+      } else if (window.primaryOption) {
+        // Fallback to primary theme, if the favored theme is not found
+        // e.g., when the theme options have changed, and the stored theme is no longer available.
+        window.primaryOption.checked = true;
+      }
+    }
+    applyDynamicColorInvert();
+  }
+
+  document.addEventListener("DOMContentLoaded", function () {
+    window.themeOptions = document.getElementById("theme-options");
+    const templateContent = document.getElementById("theme-option-template").content;
+
+    customElements.define(
+      "theme-option",
+      class extends HTMLElement {
+        constructor() {
+          super();
+
+          const node = templateContent.cloneNode(true);
+          const themeName = this.getAttribute("name");
+
+          const input = node.querySelector("input");
+          input.setAttribute("id", themeName);
+          input.setAttribute("value", themeName);
+
+          const label = node.querySelector("label");
+          label.setAttribute("for", themeName);
+          label.addEventListener("click", () => selectTheme(themeName));
+
+          while (this.firstChild) {
+            label.appendChild(this.firstChild);
+          }
+          this.appendChild(node);
+        }
+      },
+    );
+
+    window.primaryOption = window.themeOptions.querySelector("input[type='radio']");
+    window.primaryTheme = primaryOption?.value;
+
+    applyFavorTheme();
+  });
+</script>
+
+<script>
+  const clamp = (value) => Math.max(0, Math.min(255, value));
+
+  const multiply = ([r, g, b], matrix) => {
+    const nr = clamp(r * matrix[0] + g * matrix[1] + b * matrix[2]);
+    const ng = clamp(r * matrix[3] + g * matrix[4] + b * matrix[5]);
+    const nb = clamp(r * matrix[6] + g * matrix[7] + b * matrix[8]);
+    return [nr, ng, nb];
+  };
+
+  const hueRotate = ([r, g, b], angle = 0) => {
+    const rad = (angle / 180) * Math.PI;
+    const sin = Math.sin(rad);
+    const cos = Math.cos(rad);
+    const matrix = [
+      0.213 + cos * 0.787 - sin * 0.213,
+      0.715 - cos * 0.715 - sin * 0.715,
+      0.072 - cos * 0.072 + sin * 0.928,
+      0.213 - cos * 0.213 + sin * 0.143,
+      0.715 + cos * 0.285 + sin * 0.140,
+      0.072 - cos * 0.072 - sin * 0.283,
+      0.213 - cos * 0.213 - sin * 0.787,
+      0.715 - cos * 0.715 + sin * 0.715,
+      0.072 + cos * 0.928 + sin * 0.072,
+    ];
+    return multiply([r, g, b], matrix);
+  };
+
+  const grayscale = ([r, g, b], value = 1) => {
+    const matrix = [
+      0.2126 + 0.7874 * (1 - value),
+      0.7152 - 0.7152 * (1 - value),
+      0.0722 - 0.0722 * (1 - value),
+      0.2126 - 0.2126 * (1 - value),
+      0.7152 + 0.2848 * (1 - value),
+      0.0722 - 0.0722 * (1 - value),
+      0.2126 - 0.2126 * (1 - value),
+      0.7152 - 0.7152 * (1 - value),
+      0.0722 + 0.9278 * (1 - value),
+    ];
+    return multiply([r, g, b], matrix);
+  };
+
+  const sepia = ([r, g, b], value = 1) => {
+    const matrix = [
+      0.393 + 0.607 * (1 - value),
+      0.769 - 0.769 * (1 - value),
+      0.189 - 0.189 * (1 - value),
+      0.349 - 0.349 * (1 - value),
+      0.686 + 0.314 * (1 - value),
+      0.168 - 0.168 * (1 - value),
+      0.272 - 0.272 * (1 - value),
+      0.534 - 0.534 * (1 - value),
+      0.131 + 0.869 * (1 - value),
+    ];
+    return multiply([r, g, b], matrix);
+  };
+
+  const saturate = ([r, g, b], value = 1) => {
+    const matrix = [
+      0.213 + 0.787 * value,
+      0.715 - 0.715 * value,
+      0.072 - 0.072 * value,
+      0.213 - 0.213 * value,
+      0.715 + 0.285 * value,
+      0.072 - 0.072 * value,
+      0.213 - 0.213 * value,
+      0.715 - 0.715 * value,
+      0.072 + 0.928 * value,
+    ];
+    return multiply([r, g, b], matrix);
+  };
+
+  const linear = ([r, g, b], slope = 1, intercept = 0) => {
+    const scale = 255;
+    return [
+      clamp(r * slope + intercept * scale),
+      clamp(g * slope + intercept * scale),
+      clamp(b * slope + intercept * scale),
+    ];
+  };
+
+  const brightness = (rgb, value = 1) => linear(rgb, value);
+  const contrast = (rgb, value = 1) => linear(rgb, value, -0.5 * value + 0.5);
+
+  const invert = ([r, g, b], value = 1) => {
+    const nr = (value + r / 255 * (1 - 2 * value)) * 255;
+    const ng = (value + g / 255 * (1 - 2 * value)) * 255;
+    const nb = (value + b / 255 * (1 - 2 * value)) * 255;
+    return [clamp(nr), clamp(ng), clamp(nb)];
+  };
+
+  // Code taken from https://stackoverflow.com/a/9493060/2688027, licensed under CC BY-SA.
+  const rgbToHsl = (r, g, b) => {
+    r /= 255; g /= 255; b /= 255;
+    const max = Math.max(r, g, b);
+    const min = Math.min(r, g, b);
+    let h, s, l = (max + min) / 2;
+    if (max === min) {
+      h = s = 0;
+    } else {
+      const d = max - min;
+      s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
+      switch (max) {
+        case r: h = (g - b) / d + (g < b ? 6 : 0); break;
+        case g: h = (b - r) / d + 2; break;
+        case b: h = (r - g) / d + 4; break;
+      }
+      h /= 6;
+    }
+    return { h: h * 100, s: s * 100, l: l * 100 };
+  };
+
+  const applyFilters = (rgb, [inv, sep, sat, hue, bri, con]) => {
+    let color = [...rgb];
+    color = invert(color, inv / 100);
+    color = sepia(color, sep / 100);
+    color = saturate(color, sat / 100);
+    color = hueRotate(color, hue * 3.6);
+    color = brightness(color, bri / 100);
+    color = contrast(color, con / 100);
+    return color;
+  };
+
+  const lossFn = (targetRgb, filters) => {
+    const resultRgb = applyFilters([0, 0, 0], filters);
+    const targetHsl = rgbToHsl(...targetRgb);
+    const resultHsl = rgbToHsl(...resultRgb);
+    return (
+      Math.abs(resultRgb[0] - targetRgb[0]) +
+      Math.abs(resultRgb[1] - targetRgb[1]) +
+      Math.abs(resultRgb[2] - targetRgb[2]) +
+      Math.abs(resultHsl.h - targetHsl.h) +
+      Math.abs(resultHsl.s - targetHsl.s) +
+      Math.abs(resultHsl.l - targetHsl.l)
+    );
+  };
+
+  const fix = (value, idx) => {
+    let max = 100;
+    if (idx === 2) max = 7500;                  // saturate
+    else if (idx === 4 || idx === 5) max = 200; // brightness, contrast
+    if (idx === 3) { // hue-rotate
+      if (value > max) return value % max;
+      if (value < 0) return max + (value % max);
+      return value;
+    }
+    return Math.max(0, Math.min(max, value));
+  };
+
+  const spsa = (targetRgb, A, a, c, initial, iters) => {
+    const alpha = 1;
+    const gamma = 1 / 6;
+    let values = [...initial];
+    let best = [...values];
+    let bestLoss = Infinity;
+
+    for (let k = 0; k < iters; k++) {
+      const ck = c / Math.pow(k + 1, gamma);
+      const deltas = Array(6).fill().map(() => (Math.random() > 0.5 ? 1 : -1));
+      const highArgs = values.map((v, i) => v + ck * deltas[i]);
+      const lowArgs = values.map((v, i) => v - ck * deltas[i]);
+      const lossDiff = lossFn(targetRgb, highArgs) - lossFn(targetRgb, lowArgs);
+
+      values = values.map((v, i) => {
+        const g = (lossDiff / (2 * ck)) * deltas[i];
+        const ak = a[i] / Math.pow(A + k + 1, alpha);
+        return fix(v - ak * g, i);
+      });
+
+      const loss = lossFn(targetRgb, values);
+      if (loss < bestLoss) {
+        best = [...values];
+        bestLoss = loss;
+      }
+    }
+    return { values: best, loss: bestLoss };
+  };
+
+  // Threshold for acceptable color loss. This value determines when the SPSA algorithm stops early.
+  // A loss below this value is considered visually indistinguishable for most use cases.
+  // The value 25 was determined empirically to balance performance and color accuracy.
+  const ACCEPTABLE_COLOR_LOSS = 25;
+
+  const solveWide = (targetRgb) => {
+    const A = 5;
+    const c = 15;
+    const a = [60, 180, 18000, 600, 1.2, 1.2];
+    let best = { loss: Infinity, values: null };
+    for (let i = 0; best.loss > ACCEPTABLE_COLOR_LOSS && i < 3; i++) {
+      const initial = [50, 20, 3750, 50, 100, 100];
+      const result = spsa(targetRgb, A, a, c, initial, 1000);
+      if (result.loss < best.loss) best = result;
+    }
+    return best;
+  };
+
+  const solveNarrow = (targetRgb, wideResult) => {
+    const A = wideResult.loss;
+    const c = 2;
+    const A1 = A + 1;
+    const a = [0.25 * A1, 0.25 * A1, A1, 0.25 * A1, 0.2 * A1, 0.2 * A1];
+    return spsa(targetRgb, A, a, c, wideResult.values, 500);
+  };
+
+  const cssFilterString = (filters) => {
+    const [inv, sep, sat, hue, bri, con] = filters.map(Math.round);
+    const hueDeg = Math.round(hue * 3.6);
+    return `filter: invert(${inv}%) sepia(${sep}%) saturate(${sat}%) hue-rotate(${hueDeg}deg) brightness(${bri}%) contrast(${con}%);`;
+  };
+
+  const solveColor = (targetRgb) => {
+    const wide = solveWide(targetRgb);
+    const narrow = solveNarrow(targetRgb, wide);
+    return {
+      values: narrow.values,
+      loss: narrow.loss,
+      filter: cssFilterString(narrow.values),
+    };
+  };
+
+  // Reuse a single canvas / context to avoid memory leaks
+  const colorParseCanvas = document.createElement('canvas');
+  colorParseCanvas.width = 1;
+  colorParseCanvas.height = 1;
+  const colorParseContext = colorParseCanvas.getContext('2d');
+
+  const toRGBArray = (cssColor) => {
+    colorParseContext.fillStyle = cssColor;
+    colorParseContext.fillRect(0, 0, 1, 1);
+
+    // The `getImageData().data` returns a Uint8ClampedArray with 4 values per pixel (RGBA). 
+    // also see: https://developer.mozilla.org/zh-CN/docs/Web/API/ImageData/data
+    const rgba = colorParseContext.getImageData(0, 0, 1, 1).data;
+    return Array.from(rgba.slice(0, 3));
+  };
+
+  const DYNAMIC_STYLE_ID = 'dynamic-color-invert-style';
+  const SOLVED_COLOR_KEY = "solved-";
+
+  function memorizedSolvedFilter(color) {
+    const colorKey = SOLVED_COLOR_KEY + color;
+    const storedFilterOption = localStorage.getItem(colorKey);
+    if (storedFilterOption) {
+      return storedFilterOption;
+    } else {
+      const filter = solveColor(color).filter;
+      localStorage.setItem(colorKey, filter);
+      return filter;
+    }
+  }
+
+  function applyDynamicColorInvert() {
+    const textColor = getComputedStyle(document.body).getPropertyValue('--text-color');
+    if (textColor && textColor.length > 0) {
+      const rgb = toRGBArray(textColor);
+      const filter = memorizedSolvedFilter(rgb);
+
+      const existingStyle = document.getElementById(DYNAMIC_STYLE_ID);
+      if (existingStyle) {
+        existingStyle.textContent = `.color-invert {${filter}}`;
+      } else {
+        const style = document.createElement('style');
+        style.id = DYNAMIC_STYLE_ID;
+        style.textContent = `.color-invert {${filter}}`;
+        document.head.appendChild(style);
+      }
+    }
+  }
+</script><script>
+  (() => {
+    const url = "/kodama.json";
+    const interval = 1000; // 1 second
+
+    let lastModified = null;
+
+    async function check() {
+      try {
+        const res = await fetch(url + "?t=" + Date.now(), {
+          method: "HEAD",
+          cache: "no-store",
+        });
+
+        const lm = res.headers.get("last-modified");
+
+        if (lastModified && lm && lm !== lastModified) {
+          location.reload();
+          return;
+        }
+
+        lastModified = lm || lastModified;
+      } catch (e) {
+        // Ignore
+        console.warn("Reload check failed:", e);
+      }
+
+      setTimeout(check, interval);
+    }
+
+    check();
+  })();
+</script><!-- Also see: https://katex.org/docs/autorender -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.25/dist/katex.min.css" integrity="sha384-WcoG4HRXMzYzfCgiyfrySxx90XSl2rxY5mnVY5TwtWE6KLrArNKn0T/mOgNL0Mmi" crossorigin="anonymous">
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.25/dist/katex.min.js" integrity="sha384-J+9dG2KMoiR9hqcFao0IBLwxt6zpcyN68IgwzsCSkbreXUjmNVRhPFTssqdSGjwQ" crossorigin="anonymous"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.25/dist/contrib/auto-render.min.js" integrity="sha384-hCXGrW6PitJEwbkoStFjeJxv+fSOOQKOPbJxSfM6G5sWZjAyWhXiTIIAmQqnlLlh" crossorigin="anonymous"></script>
+<!-- Also see: https://github.com/KaTeX/KaTeX/tree/main/contrib/copy-tex -->
+<script src="https://cdn.jsdelivr.net/npm/katex@0.16.25/dist/contrib/copy-tex.min.js" integrity="sha384-HORx6nWi8j5/mYA+y57/9/CZc5z8HnEw4WUZWy5yOn9ToKBv1l58vJaufFAn9Zzi" crossorigin="anonymous"></script>
+
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    renderMathInElement(document.body, {
+      delimiters: [
+        { left: "$$", right: "$$", display: true },
+        { left: "$", right: "$", display: false },
+        { left: "\\(", right: "\\)", display: false },
+        { left: "\\[", right: "\\]", display: true },
+      ],
+      trust: true,
+      strict: false,
+      throwOnError: false,
+      minRuleThickness: 0.05,
+    });
+  });
+</script>
+<link rel="stylesheet" href="/main.css"><style>
+@media only screen and (min-width: 1000px) {
+  #grid-wrapper { grid-template-columns: var(--article-max-width) var(--toc-max-width); }
+  nav#toc { max-width: max-content; }
+}
+</style></head><body><header class="header"><nav class="nav"><div class="logo"><span class="cursor-pointer" onclick="window.location.href='/index.html'" title="单纯百科 Simplopedia">« 单纯百科 Simplopedia</span></div></nav></header><div id="grid-wrapper" style="grid-template-areas: 'article toc';" data-base-url="./"><nav id="toc" class="sticky-nav mobile-sticky-nav"><div id="theme-options"><style>
+  body:has(input[value="furina"]:checked) {
+    --article-max-width: 110ex; /* default: 90ex */
+
+    --color-Furina-deep-navy: #253085;
+    --color-Furina-royal-blue: #465BCF;
+    --color-Furina-aqua-cyan: #6AC6E8;
+    --color-Furina-frost-white: #FAFBFC;
+    --color-Furina-misty-blue: #C4D7ED;
+    --color-Furina-vivid-sapphire: #5670E9;
+    --color-Furina-luminous-hydro: #70DBFF;
+    --color-Furina-bright-periwinkle: #8DA4F1;
+    --color-Furina-vintage-gold: #BD9368;
+    --color-Furina-vintage-gold-light: #DDB368;
+    --color-Furina-vintage-gold-ultra-light: #FDF388;
+
+    --background-color: var(--color-Furina-frost-white);
+    --link-color: var(--color-Furina-vivid-sapphire);
+    --slug-color: var(--color-Furina-aqua-cyan);
+    --logo-color: var(--color-Furina-deep-navy);
+
+    --block-background-color: #FFFFFF;
+    --shadow-color: rgba(27, 63, 143, 0.06);
+    --radius: 5px;
+    --margin-left: 14px;
+
+    --hover-color-block: var(--block-background-color);
+    --logo-hover-color: #88d;
+    --span-tag-color: #88d;
+    --article-tag-color: #88d;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    body:has(input[value="furina"]:checked) {
+      --color-Furina-deep-navy: #B5C0F5;
+      --color-Furina-royal-blue: #D6EBFF;
+
+      --background-color: #2f2f2f;
+      --block-background-color: #3a3a3a;
+    }
+  }
+
+  .block {
+    /*2026-3-16 21:10 新增*/
+    padding: 15px;
+    margin-top: 6px;
+    margin-bottom: 6px;
+
+    border-radius: var(--radius);
+    background-color: var(--block-background-color);
+    box-shadow: 0 2px 12px var(--shadow-color);
+  }
+
+  .footnote-definition {
+    margin-left: var(--margin-left);
+  }
+
+  h5,
+  h6,
+  p {
+    margin: 5px;
+  }
+
+  tr {
+    border-bottom: 1px solid var(--color-Furina-bright-periwinkle);
+  }
+
+  /* 可选：去除表头下方的重复横线（如果表头需要特殊样式） */
+  thead tr {
+    border-bottom: 2px solid var(--color-Furina-deep-navy);
+  }
+
+  /* 去除最后一行的边框 */
+  tbody tr:last-child {
+    border-bottom: none;
+  }
+
+  .footnote-definition>p {
+    display: inline;
+    margin-left: 0;
+    color: var(--color-Furina-bright-periwinkle);
+    font-size: small;
+  }
+
+  article > section > details > summary > header > h1 {
+    font-weight: 600;
+    font-size: 1.75rem !important;
+  }
+
+  h2 {
+    font-weight: 500;
+    font-size: 1.5rem !important;
+    color: var(--color-Furina-deep-navy);
+    margin-bottom: 10px;
+    border-bottom: 1px solid #88d;
+    padding-bottom: 1px;
+    /* 增加底部内边距让横线和文字有间距 */
+  }
+
+  h2::before {
+    content: "\2726";
+    /* ✦ 的Unicode转义码 */
+    display: inline-block;
+    margin-right: 0.3em;
+    /*color: var(--color-Furina-vintage-gold-light);*/
+    /* 替换 color 属性，改为以下背景和裁剪属性 */
+    background: linear-gradient(150deg,
+        var(--color-Furina-vintage-gold-ultra-light) 30%,
+        var(--color-Furina-vintage-gold-light) 60%,
+        var(--color-Furina-vintage-gold) 90%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    /* 将文字颜色设为透明以显示背景 */
+    /* 组合径向渐变（中心高光）和线性渐变（基础色调） */
+    /*background: radial-gradient(
+      ellipse at center,
+      var(--color-Furina-vintage-gold-ultra-light) 20%,
+      transparent 70%
+    ),
+    linear-gradient(
+      to bottom,
+      var(--color-Furina-vintage-gold-light),
+      var(--color-Furina-vintage-gold)
+    );
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent; */
+    filter: drop-shadow(0px 1px 1px rgba(184, 150, 131, 0.5));
+    /* 可选：增加与主色呼应的柔和投影 */
+    font-weight: normal;
+  }
+
+
+  h3 {
+    font-weight: 700;
+    color: var(--color-Furina-royal-blue);
+    margin-bottom: 5px;
+  }
+
+  h3::before {
+    content: "\2726";
+    /* ✦ 的Unicode转义码 */
+    display: inline-block;
+    margin-left: 0.06em;
+    margin-right: 0.36em;
+    /*color: var(--color-Furina-vintage-gold-ultra-light);*/
+    background: linear-gradient(150deg,
+        var(--color-Furina-vintage-gold-ultra-light) 20%,
+        var(--color-Furina-vintage-gold-light) 90%,
+        var(--color-Furina-vintage-gold) 95%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    font-weight: normal;
+  }
+
+  h4 {
+    text-indent: var(--marginleft);
+    font-weight: 700;
+    color: #696cd9;
+    margin-bottom: 0;
+  }
+
+  h5 {
+    text-indent: var(--marginleft);
+    font-weight: 700;
+    color: #8a8ff4;
+    margin-bottom: 0;
+  }
+
+  h6 {
+    text-indent: var(--marginleft);
+    font-weight: 700;
+    color: #aaaff4;
+    margin-bottom: 0;
+  }
+
+  code, pre, .mono {
+    font-family: "Liberation Mono", "Courier New", monospace;
+    font-size: 0.9em; /* 可选微调尺寸 */
+  }
+
+  @media only screen and (max-width: 1000px) {
+    #grid-wrapper>nav {
+      display: none !important;
+    }
+  }
+
+  #toc,
+  #toc .block {
+    background: none !important;
+    box-shadow: none !important;
+  }
+
+  ul {
+    margin: 5px;
+    margin-left: calc(5px + 2em);
+    padding-left: 0;
+    list-style-type: none;
+  }
+
+  ul li {
+    margin-bottom: 5px;
+    position: relative;
+    padding-left: 0;
+    /*color: var(--text-secondary);*/
+  }
+
+  ul li::before {
+    content: '✦';
+    position: absolute;
+    left : -1em;
+    /*color: var(--color-Furina-vintage-gold-ultra-light);*/
+    font-size: 0.9em;
+  }
+
+  .metadata {
+    color: var(--article-tag-color);
+  }
+
+  .metadata ul {
+    margin : 0;
+  }
+
+  .metadata li::before {
+    content: none;
+  }
+
+  .music-player button {
+    text-decoration: none;
+  }
+
+  .music-player button:hover {
+    text-decoration: underline;
+    text-decoration-color: var(--color-Furina-vintage-gold-light);
+    /* 金色 */
+    text-underline-offset: 6px;
+    /* 调整下划线与文字距离 */
+    text-decoration-thickness: 1px;
+    /* 线条粗细 */
+  }
+</style>
+
+<theme-option name="furina" style="display: none;">furina</theme-option></div></nav>
+
+<article><section class="block" data-taxon=""><details open><summary id="平展上同调"><header><h1><span class="taxon"></span>平展上同调 <a class="slug" href="/平展上同调.html">[平展上同调]</a><a class="edit" href="vscode://file/E:/Simplopedia_source/trees/%E5%B9%B3%E5%B1%95%E4%B8%8A%E5%90%8C%E8%B0%83.md">[edit]</a></h1><div class="metadata"><ul><li class="meta-item">百科</li><li class="meta-item"><span class="link local"><a href="/SimplicialCat.html" title="单纯猫 [SimplicialCat]">SimplicialCat</a></span></li></ul></div></header></summary>
+<p><span class="link local"><a href="/平展景.html" title="平展景 [平展景]">平展景</a></span>上的<span class="link local"><a href="/上同调.html" title="上同调 [上同调]">上同调</a></span>.</p>
+</details></section><footer><section class="block link-list" id="backlinks"><details open><summary><header><h1>关联页面</h1></header></summary><section class="block" data-taxon=""><details ><summary id="Artin–Schreier理论"><header><h1><span class="taxon"></span>Artin–Schreier 理论 <a class="slug" href="/Artin–Schreier理论.html">[Artin–Schreier理论]</a><a class="edit" href="vscode://file/E:/Simplopedia_source/trees/Artin%E2%80%93Schreier%E7%90%86%E8%AE%BA.md">[edit]</a></h1><div class="metadata"><ul><li class="meta-item">百科</li><li class="meta-item"><span class="link local"><a href="/SimplicialCat.html" title="单纯猫 [SimplicialCat]">SimplicialCat</a></span></li></ul></div></header></summary>
+<p>设 $X$ 为 $\mathbb F_p$-<span class="link local"><a href="/概形.html" title="概形 [概形]">概形</a></span>, 则有 $X$ 的<span class="link local"><a href="/平展意象.html" title="平展意象 [平展意象]">平展意象</a></span>中的 Abel 群的正合列
+$$
+0\to \mathbb{Z}/p\to \mathbb A^1 \overset{\mathrm{Frob}-1}{\to} \mathbb A^1\to 0,
+$$
+其中 $\mathrm{Frob}$ 为 <span class="link local"><a href="/Frobenius态射.html" title="Frobenius 态射 [Frobenius态射]">Frobenius 态射</a></span>.
+它给出 (<span class="link local"><a href="/平展上同调.html" title="平展上同调 [平展上同调]">平展</a></span>) <span class="link local"><a href="/上同调.html" title="上同调 [上同调]">上同调</a></span>的长正合列
+$$
+\begin{aligned}
+    0 &amp;\to \mathbb{Z}/p\to \mathcal O(X) \overset{\mathrm{Frob}-1}{\to} \mathcal O(X) \\
+    &amp;\to H^1(X,\mathbb{Z}/p) \to H^1(X,\mathbb A^1) \overset{\mathrm{Frob}-1}{\to} H^1(X,\mathbb A^1)\\
+    &amp;\to\cdots.
+\end{aligned}
+$$</p>
+<p>对应于 $a\in\mathcal O(X)$ 的 $\mathbb{Z}/p$-<span class="link local"><a href="/主丛.html" title="主齐性空间, 主丛 [主丛]">主丛</a></span>为拉回
+$$
+\begin{array}
+    {ccc}
+    ? &amp; \to &amp; \mathbb A^1\\
+    \downarrow &amp; &amp; \downarrow \mathclap{\hspace{2.5em}\scriptsize \operatorname{Frob} - 1}\\
+    X &amp; \underset{a}{\to} &amp; \mathbb A^1,
+\end{array}
+$$
+即
+$$
+\begin{aligned}
+    X' &amp;= \{(x,t)\in X\times\mathbb A^1\mid t^p-t= a(x)\}
+    \\&amp;=\underline{\operatorname{Spec}}_X (\mathcal O_X [t]/(t^p-t-a)).
+\end{aligned}
+$$</p>
+<h2>例</h2>
+<p>设 $X=\operatorname{Spec} A$, $A$ 为 $\mathbb F_p$-代数. 此时 $H^1(X,\mathbb A^1)=0$, 故 $X$ 上的所有 $\mathbb{Z}/p$-<span class="link local"><a href="/主丛.html" title="主齐性空间, 主丛 [主丛]">主丛</a></span>均形如 $\operatorname{Spec} A[t]/(t^p-t-a)$, 而这个主丛平凡当且仅当 $a$ 形如 $b^p-b\,(b\in A)$.</p>
+</details></section><section class="block" data-taxon=""><details ><summary id="Brauer群"><header><h1><span class="taxon"></span>Brauer 群 <a class="slug" href="/Brauer群.html">[Brauer群]</a><a class="edit" href="vscode://file/E:/Simplopedia_source/trees/Brauer%E7%BE%A4.md">[edit]</a></h1><div class="metadata"><ul><li class="meta-item">百科</li><li class="meta-item"><span class="link local"><a href="/SimplicialCat.html" title="单纯猫 [SimplicialCat]">SimplicialCat</a></span></li></ul></div></header></summary>
+<h2>观念</h2>
+<p>概形的 <strong>Brauer 群</strong>是其上 <span class="link local"><a href="/Azumaya代数.html" title="Azumaya 代数 [Azumaya代数]">Azumaya 代数</a></span>的相似类在张量积下构成的群; Azumaya 代数 $A$ 在 <span class="link local"><a href="/Morita范畴.html" title="Morita 范畴 [Morita范畴]">Morita 范畴</a></span>中可逆; 因此其上的模范畴 $\mathsf{Mod}(A)$ 是可逆线性范畴.</p>
+<p><span class="link local"><a href="/向量丛.html" title="向量丛 [向量丛]">向量丛</a></span>的自同态丛是 Azumaya 代数, 其对应的 Brauer 类平凡.</p>
+<blockquote>
+<p>Brauer groups and Azumaya algebras play an important role in many areas of mathematics, but especially in arithmetic geometry, algebraic geometry, and applications to mathematical physics. In arithmetic geometry, they are closely related to Tate’s conjecture on l-adic cohomology of schemes over finite fields, and they play a critical role in studying rational points of varieties through, for example, the Brauer Manin obstructions to the Hasse principle. In algebraic geometry, Azumaya algebras arise naturally when studying moduli spaces of vector bundles, and Brauer classes appear when considering certain constructions motivated from physics in homological mirror symmetry. The Brauer group was also used by Artin-Mumford (AM72) to construct one of the first examples of a non-rational unirational complex variety.</p>
+</blockquote>
+<h2>定义</h2>
+<h3>域</h3>
+<p>域 $K$ 的 Brauer 群 $\mathrm{Br}(K)$ 是其上的<span class="link local"><a href="/中心单代数.html" title="中心单代数 [中心单代数]">中心单代数</a></span>的相似类关于张量积构成的群, 也即上同调
+$$
+H^2(\operatorname{Gal}(K_{\mathrm{sep}}/K),K^*_{\mathrm{sep}}) = H^2(\operatorname{Spec}K_{\mathrm{et}},\mathbb G_{\mathrm{m}}).
+$$</p>
+<p>设 $A,B$ 为 $K$ 上的有限维中心单代数, 若存在 $n,m\in\mathbb{Z}_+$ 使得 $M_n(A)\simeq M_m(B)$ (作为 $K$-代数), 则称 $A$ 与 $B$ 相似.</p>
+<p>$A$ 与 $B$ 相似当且仅当存在可除代数 $D$ 使得 $A,B$ 均为 $D$ 上的矩阵代数.</p>
+<p><strong>例</strong>. $\mathrm{Br}(\mathbb{R})\simeq \{[\mathbb{R}],[\mathbb H]\}$. $\mathbb H\otimes\mathbb H\simeq M_4(\mathbb{R})$.</p>
+<p><strong>例</strong>. 有限域的 Brauer 群平凡, 因为有限除环都是域.</p>
+<h3>环</h3>
+<h4>与模范畴的关系</h4>
+<p>设 $R$ 为交换环, 考虑 $2$-范畴 $\mathsf{Alg}_R$, 其对象为 $R$-代数 (即 $R$-模范畴中的幺半群), 态射为双模, 态射的复合为张量积, $2$-态射为双模的同态.</p>
+<p>考虑 $\mathsf{Alg}_R$ 的<span class="link local"><a href="/对象的生象.html" title="对象的生象 [对象的生象]">核</a></span> $\mathrm{Core}(\mathsf{Alg}_R)$, 其对象为 $R$-代数, 态射为 Morita 等价, $2$-态射为双模的同构.</p>
+<blockquote>
+<p>This may be understood as the $2$-groupoid of (generalized) line $2$-bundles over $\operatorname{Spec}R$, inside that of all $2$-vector bundles.</p>
+</blockquote>
+<ul>
+<li>$\pi_0(\mathbf{Br}(R))$ 为 $R$ 的 Brauer 群;</li>
+<li>$\pi_1(\mathbf{Br}(R))$ 为 $R$ 的 <span class="link local"><a href="/Picard群.html" title="Picard 群 [Picard群]">Picard 群</a></span>;</li>
+<li>$\pi_2(\mathbf{Br}(R))$ 为 $R$ 的乘法可逆元群.</li>
+</ul>
+<h3>平展上同调的定义</h3>
+<p>在一些小的假设下, 概形 $X$ 的 Brauer 群 $\mathrm{Br}(X)$ 同构于<span class="link local"><a href="/平展上同调.html" title="平展上同调 [平展上同调]">平展上同调</a></span> $H^2_{\text{\'et}}(X,\mathbb G_m)$ 的挠部分. 见<span class="link local"><a href="/EC-H1-H2.html" title="平展上同调讨论班 : 非 Abel 上同调, 主齐性空间与 Brauer 群 [EC-H1-H2]">平展上同调讨论班讲义</a></span>.</p>
+<h3>“范畴化” 的定义</h3>
+<p>Brauer 群某种意义上是 <span class="link local"><a href="/Picard群.html" title="Picard 群 [Picard群]">Picard 群</a></span>的<span class="link local"><a href="/范畴化.html" title="范畴化 [范畴化]">范畴化</a></span>.</p>
+<p>对于概形 $X$ 可以谈论 “$X$ 上的拟凝聚<span class="link local"><a href="/叠.html" title="叠 [叠]">叠</a></span>”, 又叫 “$X$-线性<span class="link local"><a href="/稳定无穷范畴.html" title="稳定范畴 [稳定无穷范畴]">稳定 ∞-范畴</a></span>”; 其构成的范畴记为 $\mathsf{Cat}_X$.
+一个与 Brauer 群相关的群是所谓 “导出 Brauer 群”, 定义为 $\mathsf{Cat}_X$ 的 Picard 群
+$$
+\mathrm{Br}^{\mathrm{der}}(X) := \operatorname{Pic}(\mathsf{Cat}_X).
+$$</p>
+<h2>性质</h2>
+<p>代数闭域的 Brauer 群是平凡群.</p>
+</details></section><section class="block" data-taxon=""><details ><summary id="Deligne–Lusztig理论"><header><h1><span class="taxon"></span>“Deligne–Lusztig 理论” <a class="slug" href="/Deligne–Lusztig理论.html">[Deligne–Lusztig理论]</a><a class="edit" href="vscode://file/E:/Simplopedia_source/trees/Deligne%E2%80%93Lusztig%E7%90%86%E8%AE%BA.md">[edit]</a></h1><div class="metadata"><ul><li class="meta-item">百科</li><li class="meta-item"><span class="link local"><a href="/SimplicialCat.html" title="单纯猫 [SimplicialCat]">SimplicialCat</a></span></li></ul></div></header></summary>
+<p>Deligne–Lusztig 理论研究有限域上<span class="link local"><a href="/约化群.html" title="约化群 [约化群]">约化群</a></span>的表示. 其主要方法是考虑有限域的代数闭包上的光滑代数簇的 $\ell$-进<span class="link local"><a href="/平展上同调.html" title="平展上同调 [平展上同调]">平展上同调</a></span>, 由此得到所谓的虚表示 (virtual representations). 该理论体现了代数几何与表示论之间的联系.</p>
+<p>$\mathrm{GL}_2(\mathbb F_p)$ 有如下三类表示:</p>
+<ul>
+<li>主系列 (principal series), 由分裂环面 (split torus) 经过 Borel 子群诱导;</li>
+<li>Steinberg 表示, 来自 $\mathrm{GL}_2(\mathbb F_p)$ 在 $\mathbb P^1(\mathbb F_p)$ 上的作用;</li>
+<li>尖点表示, 又称离散系列 (discrete series) 表示, 对应于非分裂环面 (non-split torus) 的特征.</li>
+</ul>
+<p>其中最神秘的是尖点表示. Drinfeld 意识到这类表示来自 $(xy^p-x^py)^{p-1}=1$ 的一阶 $\ell$-进上同调. Deligne–Lusztig 理论将这一现象推广到一般的有限域上的约化群.</p>
+</details></section><section class="block" data-taxon=""><details ><summary id="EC-H1-H2"><header><h1><span class="taxon"></span>平展上同调讨论班 : 非 Abel 上同调, 主齐性空间与 Brauer 群 <a class="slug" href="/EC-H1-H2.html">[EC-H1-H2]</a><a class="edit" href="vscode://file/E:/Simplopedia_source/trees/EC-H1-H2.md">[edit]</a></h1><div class="metadata"><ul><li class="meta-item">讲义</li><li class="meta-item"><span class="link local"><a href="/SimplicialCat.html" title="单纯猫 [SimplicialCat]">SimplicialCat</a></span></li></ul></div></header></summary>
+<p>这是 2025 年秋季平展上同调讨论班的一篇讲稿. 参考 <span class="link local"><a href="/MilneEC.html" title="Etale Cohomology [MilneEC]">Milne</a></span>.</p>
+<ul>
+<li>第一部分 (主齐性空间与 $H^1$) 是第 III.4 节,</li>
+<li>第二部分 (Brauer 群与 $H^2$) 是第 IV 章.</li>
+</ul>
+<h2>TODO</h2>
+<p>第一次讲之后留下的漏洞:</p>
+<ul>
+<li>[x] 没能写出 <span class="link local"><a href="/非交换Čech上同调.html" title="非交换 Čech 上同调 [非交换Čech上同调]">Čech 上圈</a></span>的<span class="link local"><a href="/单纯同伦.html" title="单纯同伦 [单纯同伦]">单纯同伦</a></span>对应的具体条件. (<span class="link local"><a href="/单纯同伦.html" title="单纯同伦 [单纯同伦]">单纯同伦</a></span>页面写出了单纯同伦的前几个分量以及具体条件, <span class="link local"><a href="/非交换Čech上同调.html" title="非交换 Čech 上同调 [非交换Čech上同调]">非交换 Čech 上同调</a></span>页面写出了具体到 Čech 上圈的情形.)</li>
+<li>[ ] 没有说清具体的 $1$-景上<span class="link local"><a href="/非交换Čech上同调.html" title="非交换 Čech 上同调 [非交换Čech上同调]">非交换 Čech 上同调</a></span>与真正的上同调的关系.</li>
+<li>[ ] 没证明 Zariski 局部自由 $\mathcal O_X$-模到平坦局部自由 $\mathcal O_X$-模的拉回函子反映同构 (<span class="link local"><a href="/MilneLEC.html" title="Lectures on Etale Cohomology [MilneLEC]">Milne LEC</a></span> 定理 11.4 证明中略去的部分).</li>
+<li>[ ] 有限群 $G$ 的<span class="link local"><a href="/主丛.html" title="主齐性空间, 主丛 [主丛]">主丛</a></span>与<span class="link local"><a href="/Galois覆叠.html" title="Galois 覆叠 [Galois覆叠]">Galois 覆叠</a></span>, <span class="link local"><a href="/平展基本群.html" title="平展基本群 [平展基本群]">平展基本群</a></span>的关系.</li>
+</ul>
+<h2>主齐性空间与一阶上同调</h2>
+<p>本节的目标是</p>
+<ul>
+<li>说明一般的 $1$ 阶<span class="link local"><a href="/非Abel上同调.html" title="非 Abel 上同调 [非Abel上同调]">非 Abel 上同调</a></span>与<span class="link local"><a href="/主丛.html" title="主齐性空间, 主丛 [主丛]">主齐性空间</a></span> (principal homogeneous space) 的关系;</li>
+<li>说明系数为 $\mathrm{GL}_n$ 的 $1$ 阶<span class="link local"><a href="/平展上同调.html" title="平展上同调 [平展上同调]">平展上同调</a></span>与<span class="link local"><a href="/向量丛.html" title="向量丛 [向量丛]">向量丛</a></span>的关系;</li>
+<li>介绍 <span class="link local"><a href="/Kummer理论.html" title="Kummer 理论 [Kummer理论]">Kummer 理论</a></span>.</li>
+</ul>
+<h3>非 Abel 上同调: 一般理论</h3>
+<p>某种意义上, 非 Abel 上同调是比传统的 “Abel” 上同调更简单的概念. 它的简单在于定义的简单, 而不简单在于没有什么计算的手段.</p>
+<p><span class="link local"><a href="/上同调.html" title="上同调 [上同调]">上同调</a></span>页面讨论了上同调的一般理论. 数学上所有名为 “某某上同调” 的概念, 无论 Abel 或者非 Abel, 都是如下概念的特殊情况.</p>
+<p><strong>定义</strong> (上同调). 设 $\mathcal C$ 为 <span class="link local"><a href="/无穷范畴.html" title="无穷范畴 [无穷范畴]">$\infty$-范畴</a></span>, $X,A$ 是 $\mathcal C$ 的对象; 定义 $X$ 的 $A$-系数 $0$ 阶<strong>上同调</strong>为映射空间的截断
+$$
+H^0(X,A) := \pi_0 \operatorname{Hom}_{\mathcal C}(X,A).
+$$
+对于正整数 $n$, 对象 $X,A$, 若 $A$ 具有 $n$ 阶<span class="link local"><a href="/逆环路空间.html" title="逆环路空间 [逆环路空间]">逆环路空间</a></span> $\mathbf{B}^n A$, 则定义 $X$ 的 $A$-系数 $n$ 阶上同调为
+$$
+H^n(X,A) := H^0(X,\mathbf{B}^n A) = \pi_0\operatorname{Hom}_{\mathcal C}(X,\mathbf{B}^n A).
+$$</p>
+<p>由上述讨论, 我们可定义群 $G$ 系数的 $1$ 阶上同调, 因为 $G$ 具有一阶<span class="link local"><a href="/逆环路空间.html" title="逆环路空间 [逆环路空间]">逆环路空间</a></span> $\mathbf{B}G$, 上同调 $H^1(X,G)$ 就定义为
+$$
+H^1(X,G) := \pi_0\operatorname{Hom}(X,\mathbf{B}G).
+$$</p>
+<p>一般地, 要计算空间 $X$ 到空间 $M$ 的映射空间, 若能将 $M$ 表示为某类对象的<span class="link local"><a href="/分类空间.html" title="分类空间 [分类空间]">分类空间</a></span>, 则要计算的东西可以转化为 $X$ 上的这类对象的<strong>丛</strong>. 群 $G$ 的<span class="link local"><a href="/逆环路空间.html" title="逆环路空间 [逆环路空间]">逆环路空间</a></span> $\mathbf{B}G$ 正是 $G$-<span class="link local"><a href="/主丛.html" title="主齐性空间, 主丛 [主丛]">主齐性空间</a></span>的<strong>群胚</strong> (因为 “任何 $G$-主齐性空间都同构于 $G$ 本身, 而这个对象的自同构群就是 $G$”), 所以毫不奇怪地, 计算 $G$-系数 $1$ 阶非 Abel 上同调就是计算 $G$-<span class="link local"><a href="/主丛.html" title="主齐性空间, 主丛 [主丛]">主丛</a></span>.</p>
+<h3>平坦景上的主齐性空间</h3>
+<p><span class="link local"><a href="/主丛.html" title="主齐性空间, 主丛 [主丛]">主丛</a></span>页面介绍的主丛的一般理论. 现在我们将它具体到概形的平坦景上.</p>
+<p>考虑概形 $X$ 上的平坦局部有限型群 $G$. 以下所有概形均为 $X$-概形.</p>
+<p>在概形的平坦景上讨论, 重要的一点是局部有限表现概形的范畴<span class="link local"><a href="/米田嵌入.html" title="米田嵌入 [米田嵌入]">米田嵌入</a></span>到平坦景上的层范畴, 这称为 Grothendieck 拓扑的<span class="link local"><a href="/次典范拓扑.html" title="次典范拓扑 [次典范拓扑]">次典范性</a></span>. 对概形的许多讨论都可以推广到平坦景上的层.</p>
+<h4>局部平凡性</h4>
+<p>首先, 我们看主丛的局部平凡性如何表现在平坦景上. (回忆抽象的主丛的局部平凡性不过是因为主丛平凡化自身.)</p>
+<p><strong>命题</strong>. 设群 $G$ 作用于概形 $S$. 如下条件等价:</p>
+<ol>
+<li>$S$ 忠实平坦, 局部有限型, 且 $S\times_X G\to S\times_X S$ 为同构, 其中两个分量分别为作用映射和投影映射.</li>
+<li>存在平坦覆盖 $\{U_i \to X\}$, 使得 $S_{U_i}$ 带有的 $G_{U_i}$-作用等同于 $G_{U_i}$ 在自身上的作用.</li>
+</ol>
+<p><strong>证明</strong>.</p>
+<ul>
+<li>1 $\Rightarrow$ 2. 取覆盖为 $S\to X$ 即可.</li>
+<li>2 $\Rightarrow$ 1. 令 $U=\bigsqcup_i U_i$, 则 $U$ 忠实平坦, 局部有限型, 且 $S_U$ 作为 $G_U$-作用同构于 $G_U$. 这意味着
+$$
+  (S\times_X G)_U \to (S\times_X S)_U
+$$
+为同构. 沿 $U\to X$ 使用下降理论, 可知
+$$
+  S\times_X G\to S\times_X S
+$$
+亦为同构.</li>
+</ul>
+<h4>可表性</h4>
+<p>平坦景上的层不一定可表为概形. 但是对于平坦景上的 $G$-主齐性空间 $S$, 由于我们<strong>已知</strong>其被一个有限型忠实平坦映射拉回之后同构于 $G$, 故有较大的希望应用概形的 fpqc 下降 (<span class="link local"><a href="/MilneEC.html" title="Etale Cohomology [MilneEC]">Milne</a></span> 定理 I.2.23) 证明 $S$ 可表. 这件事在如下情形中成立 (<span class="link local"><a href="/MilneEC.html" title="Etale Cohomology [MilneEC]">Milne</a></span> 定理 III.4.3):</p>
+<ol>
+<li>$G$ 在 $X$ 上仿射;</li>
+<li>$G$ 在 $X$ 上光滑, 分离, 且 $X$ 的维数 $\leq 1$;</li>
+<li>…</li>
+</ol>
+<h4>上圈</h4>
+<p>一般而言, <span class="link local"><a href="/上同调.html" title="上同调 [上同调]">上同调</a></span>类的<span class="link local"><a href="/数学对象的表现.html" title="数学对象的表现 [数学对象的表现]">表现</a></span>称为上圈. 对于一阶非 Abel 上同调, 有一种重要的表现称为 <span class="link local"><a href="/非交换Čech上同调.html" title="非交换 Čech 上同调 [非交换Čech上同调]">Čech 上圈</a></span>.</p>
+<p><span class="link local"><a href="/非交换Čech上同调.html" title="非交换 Čech 上同调 [非交换Čech上同调]">非交换 Čech 上同调</a></span>页面介绍了 Čech 上圈的抽象陈述, Čech 上同调与真正的上同调的关系, 并讨论了 $0$-截断情形.</p>
+<h3>Zariski, 平展与平坦的比较</h3>
+<p>见 <span class="link local"><a href="/Zar-fl-et.html" title="Zariski 景, 平展景与平坦景的比较 [Zar-fl-et]">Zariski, 平展与平坦的比较</a></span>.</p>
+<h3>应用: Kummer 理论与 Artin–Schreier 理论</h3>
+<ul>
+<li><span class="link local"><a href="/Kummer理论.html" title="Kummer 理论 [Kummer理论]">Kummer 理论</a></span></li>
+<li><span class="link local"><a href="/Artin–Schreier理论.html" title="Artin–Schreier 理论 [Artin–Schreier理论]">Artin–Schreier 理论</a></span></li>
+</ul>
+<h2>Brauer 群与二阶上同调</h2>
+<p>本节介绍概形 $X$ 的 Brauer 群与 $H^2(X,\mathbb G_m)$ 的关系; $X$ 上的 <span class="link local"><a href="/Azumaya代数.html" title="Azumaya 代数 [Azumaya代数]">Azumaya 代数</a></span>的相似等价类 (<span class="link local"><a href="/Morita等价.html" title="Morita 等价 [Morita等价]">Morita 等价</a></span>类) 给出 $H^2(X,\mathbb G_m)$ 的元素.</p>
+<p>假设读者了解域 $k$ 的 Brauer 群, 即 $k$ 上的<span class="link local"><a href="/中心单代数.html" title="中心单代数 [中心单代数]">中心单代数</a></span>的相似类关于张量积构成的群.</p>
+<h3>局部环的 Brauer 群</h3>
+<p>设 $R$ 为<span class="link local"><a href="/局部环.html" title="“局部环” [局部环]">局部环</a></span>.</p>
+<p>相比于一个 <span class="link local"><a href="/Azumaya代数.html" title="Azumaya 代数 [Azumaya代数]">Azumaya 代数</a></span>具体是什么, 我们其实更加关心 Azumaya 代数的<strong>自同构群</strong>是什么. 因为我们最后关心的是这种对象的<strong>丛的同构类</strong>集合; 而任何一个丛都关联于一个群的<span class="link local"><a href="/主丛.html" title="主齐性空间, 主丛 [主丛]">主丛</a></span>, 这个群正是纤维的<strong>自同构群</strong>. 所以如下的命题是尤其重要的. 但目前我不知道如何更好地理解这个命题.</p>
+<p><strong>命题</strong> (<span class="link local"><a href="/Skolem–Noether定理.html" title="Skolem–Noether 定理 [Skolem–Noether定理]">Skolem–Noether 定理</a></span>, <span class="link local"><a href="/MilneEC.html" title="Etale Cohomology [MilneEC]">Milne</a></span> 命题 IV.1.4). 设 $A$ 是 $R$ 上的 <span class="link local"><a href="/Azumaya代数.html" title="Azumaya 代数 [Azumaya代数]">Azumaya 代数</a></span>. 则 $A$ 作为 $R$-代数的自同构均为内自同构, 即形如 $a\mapsto uau^{-1}$, 其中 $u\in A$ 为可逆元.</p>
+<p><strong>命题</strong> (<span class="link local"><a href="/MilneEC.html" title="Etale Cohomology [MilneEC]">Milne</a></span> 推论 IV.1.5). $M_n(R)$ 作为 $R$-代数的自同构群是 $\mathrm{PGL}_n(R) = \mathrm{GL}_n(R) / R^*$.</p>
+<h3>Azumaya 代数与概形的 Brauer 群</h3>
+<p><span class="link local"><a href="/Azumaya代数.html" title="Azumaya 代数 [Azumaya代数]">Azumaya 代数</a></span> 页面介绍了 Azumaya 代数的基本性质:</p>
+<ul>
+<li>概形上的 Azumaya 代数是<span class="link local"><a href="/平展景.html" title="平展景 [平展景]">平展</a></span>局部矩阵代数.</li>
+<li>概形上的 Azumaya 代数的自同构在 <strong>Zariski 局部</strong>为内自同构 (<span class="link local"><a href="/Skolem–Noether定理.html" title="Skolem–Noether 定理 [Skolem–Noether定理]">Skolem–Noether定理</a></span>).</li>
+<li>概形上的 Azumaya 代数的<strong>同构类</strong>由 $H^1(X_{\mathrm{\'et}},\mathrm{PGL}_n)$ 分类.</li>
+<li>群同态 $\mathrm{GL}_n \to \mathrm{PGL}_n$ 给出的<span class="link local"><a href="/非Abel上同调.html" title="非 Abel 上同调 [非Abel上同调]">上同调</a></span>的映射 $H^1(X_{\mathrm{\'et}},\mathrm{GL}_n) \to H^1(X_{\mathrm{\'et}},\mathrm{PGL}_n)$ (向量丛 $\to$ Azumaya 代数) 将向量丛 $E$ 对应到 $\operatorname{End}(E)$.</li>
+</ul>
+<p><span class="link local"><a href="/Morita等价.html" title="Morita 等价 [Morita等价]">Morita 等价</a></span>页面介绍了 Morita 等价的等价刻画, 由此可以证明</p>
+<ul>
+<li><span class="link local"><a href="/Azumaya代数.html" title="Azumaya 代数 [Azumaya代数]">Azumaya 代数</a></span>的<strong>相似</strong>等同于 <span class="link local"><a href="/Morita等价.html" title="Morita 等价 [Morita等价]">Morita 等价</a></span>, 也即模范畴的等价.</li>
+</ul>
+<p>故</p>
+<ul>
+<li>Azumaya 代数的<strong>相似类</strong>含于 $H^2(X,\mathbb G_m)$, 即<span class="link local"><a href="/可逆线性范畴层.html" title="可逆线性范畴层 [可逆线性范畴层]">可逆线性范畴层</a></span>的等价类.</li>
+</ul>
+<h4>正合列</h4>
+<p><strong>命题</strong>. 对概形 $X$, 有带基点集合的正合列
+$$
+\cdots\to H^1(X_{\mathrm{\'et}},\mathrm{GL}_n) \to H^1(X_{\mathrm{\'et}},\mathrm{PGL}_n) \overset{d}{\to} H^2(X_{\mathrm{\'et}},\mathbb G_m),
+$$
+其中 $d$ 将 Azumaya 代数 $A$ 的<strong>同构类</strong>对应到 $A$ 的<strong>相似类</strong>.
+映射 $d$ 有两种具体写出的方法:</p>
+<ul>
+<li>通过 <span class="link local"><a href="/Čech上同调.html" title="Čech 上同调 [Čech上同调]">Čech 上同调</a></span>, 设 $H^1(X_{\mathrm{\'et}},\mathrm{PGL}_n)$ 的一个元素由覆盖 $U$ 上的上圈 $\alpha\colon U\times_X U\to \mathrm{PGL}_n$ 表现, 通过细化覆盖 (即取覆盖 $U'\to U$), 不妨设 $\alpha$ 可提升至 $\alpha\colon U\times_X U \to \mathrm{GL}_n$, 那么 $d$ 将这个上圈映射到 $\mathbb G_m$-系数的 $2$ 阶 Čech 上圈
+$$
+a = \alpha\mathrm{pr}_{23}\cdot (\alpha\mathrm{pr}_{13})^{-1} \cdot \alpha\mathrm{pr}_{12} \colon U\times_X U \times_X U \to \mathbb G_m\subset\mathrm{GL}_n.
+$$</li>
+<li>通过 <span class="link local"><a href="/Azumaya代数.html" title="Azumaya 代数 [Azumaya代数]">Azumaya 代数</a></span>表现的<span class="link local"><a href="/束.html" title="束 [束]">束</a></span> (gerbe) $F_A$.
+对 $U\in X_{\mathrm{\'et}}$, $F_A(U)$ 是<span class="link local"><a href="/结合代数.html" title="结合代数 [结合代数]">代数</a></span>同构 $A_U \simeq \operatorname{End}(E)$ ($E$ 为 $U$ 上的向量丛) 构成的 $1$-群胚. 由于 Azumaya 代数<span class="link local"><a href="/平展景.html" title="平展景 [平展景]">平展</a></span>局部同构于矩阵代数, $F_A$ 局部非空, 构成一个由群 $\mathbb G_m$ 控制的<span class="link local"><a href="/束.html" title="束 [束]">束</a></span>:
+$$
+\begin{aligned}
+  \operatorname{Aut}_{F_A(U)}(x)&amp;\simeq \operatorname{Aut}_{\operatorname{Aut}(\operatorname{End}(E))}(\mathrm{id})\\
+  &amp;\simeq Z(\operatorname{End}(E))\simeq \mathbb G_m(U),
+\end{aligned}
+$$
+(其中 $Z$ 表示代数的<span class="link local"><a href="/中心.html" title="中心 [中心]">中心</a></span>) 从而 (由<span class="link local"><a href="/束.html" title="束 [束]">束</a></span>与<span class="link local"><a href="/上同调.html" title="上同调 [上同调]">上同调</a></span>的关系) 定义了 $H^2(X_{\mathrm{\'et}},\mathbb G_m)$ 的元素; 并且它平凡当且仅当 $F_A$ 有<span class="link local"><a href="/整体截面.html" title="整体截面 [整体截面]">整体</a></span>元素, 即 $A$ 在整体上同构于一个向量丛的自同态代数.</li>
+</ul>
+<h4>挠</h4>
+<p>下图中每行每列均为群的<span class="link local"><a href="/群短正合列.html" title="群的短正合列 [群短正合列]">短正合列</a></span>:
+$$
+\begin{array}
+{ccccc}
+\mu_n &amp; \to &amp; \mathbb G_m &amp; \to &amp; \mathbb G_m\\
+\downarrow &amp; &amp; \downarrow &amp; &amp; |\!| \\
+\mathrm{SL}_n &amp; \to &amp; \mathrm{GL}_n &amp; \to &amp; \mathbb G_m\\
+\downarrow &amp; &amp; \downarrow &amp; &amp; \\
+\mathrm{PGL}_n &amp; = &amp; \mathrm{PGL}_n
+\end{array}
+$$</p>
+<p>比较第一列与第二列的上同调长正合列, 可得
+$$
+\begin{array}
+{ccc}
+H^1(X,\mathrm{PGL}_n) &amp; \overset{\mathrm{id}}{\to} &amp; H^1(X,\mathrm{PGL}_n)\\
+\downarrow &amp; &amp; \downarrow \\
+H^2(X,\mu_n) &amp; \to &amp; H^2(X,\mathbb G_m).
+\end{array}
+$$
+而 $H^2(X,\mu_n)$ 是 $n$-挠群, 故同态 $H^1(X,\mathrm{PGL}_n) \to H^2(X,\mathbb G_m)$ 的像是 $n$-挠群.</p>
+</details></section><section class="block" data-taxon=""><details ><summary id="Kummer理论"><header><h1><span class="taxon"></span>Kummer 理论 <a class="slug" href="/Kummer理论.html">[Kummer理论]</a><a class="edit" href="vscode://file/E:/Simplopedia_source/trees/Kummer%E7%90%86%E8%AE%BA.md">[edit]</a></h1><div class="metadata"><ul><li class="meta-item">百科</li><li class="meta-item"><span class="link local"><a href="/SimplicialCat.html" title="单纯猫 [SimplicialCat]">SimplicialCat</a></span></li></ul></div></header></summary>
+<h3>单位根概形</h3>
+<p>设 $n$ 为正整数. 考虑<span class="link local"><a href="/乘法群概形.html" title="乘法群概形 [乘法群概形]">乘法群概形</a></span> $\mathbb G_m = \operatorname{Spec}\mathbb{Z}[x^{\pm 1}]$. 记
+$$
+n\colon \mathbb G_m \to \mathbb G_m
+$$
+为 $n$ 次方映射,
+定义 “$n$ 次单位根” <span class="link local"><a href="/群概形.html" title="群概形 [群概形]">群概形</a></span>为其核:
+$$
+\mu_n := \operatorname{ker}(n\colon \mathbb G_m \to \mathbb G_m).
+$$
+作为<span class="link local"><a href="/函子式代数几何.html" title="函子式代数几何 [函子式代数几何]">函子</a></span> $\mathsf{Ring} \to \mathsf{Set}$, $\mu_n(A)$ 是 $A$ 中 $n$ 次方等于 $1$ 的元素的集合. 作为<span class="link local"><a href="/仿射概形.html" title="仿射概形 [仿射概形]">仿射概形</a></span>, $\mu_n = \operatorname{Spec}\mathbb{Z}[x]/(x^n-1)$.</p>
+<h3>基底的选取</h3>
+<p>记 $\zeta_n$ 为 $n$ 次<span class="link local"><a href="/本原单位根.html" title="本原单位根 [本原单位根]">本原单位根</a></span>. Kummer 理论关注的是定义在 $A:=\mathbb{Z}[1/n][\zeta_n]$ 上的概形 $X$, 这种概形 $X$ 满足 $\mathcal O(X)$ 具有本原 $n$ 次单位根, 且 $n$ 在其中可逆.</p>
+<p><span class="link local"><a href="/基变换.html" title="基变换 [基变换]">基变换</a></span>到 $A$ 上会产生如下两个重要现象:</p>
+<ul>
+<li>
+<p>由于本原单位根 $\zeta_n$ 的存在, 单位根群 $\mu_n$ 成为 $n$ 阶<strong>循环群</strong> $\mathbb{Z}/n$. 具体地, $A[x]/(x^n-1) \simeq \prod_{i=0}^{n-1} A[x]/(x-\zeta_n^i) \simeq A^n$.</p>
+</li>
+<li>
+<p>由于 $n$ 可逆, 概形态射 $n\colon \mathbb G_m \to\mathbb G_m$ 成为<span class="link local"><a href="/平展概形态射.html" title="“平展概形态射” [平展概形态射]">平展覆盖</a></span> ($y^n-x$ 关于 $y$ 的导数可逆), 从而是<span class="link local"><a href="/平展景.html" title="平展景 [平展景]">平展景</a></span>上的<span class="link local"><a href="/意象中的满射.html" title="意象中的满射 [意象中的满射]">满射</a></span>.</p>
+</li>
+</ul>
+<h3>长正合列</h3>
+<p>对于 $\mathbb{Z}[1/n][\zeta_n]$-<span class="link local"><a href="/概形.html" title="概形 [概形]">概形</a></span> $X$, 其<span class="link local"><a href="/平展景.html" title="平展景 [平展景]">平展景</a></span>上的<span class="link local"><a href="/群短正合列.html" title="群的短正合列 [群短正合列]">短正合列</a></span>
+$$
+0 \to \mu_n \to \mathbb G_m \overset{n}{\to} \mathbb G_m\to 0
+$$
+给出<span class="link local"><a href="/平展上同调.html" title="平展上同调 [平展上同调]">平展上同调</a></span>的长正合列
+$$
+\begin{aligned}
+0 &amp;\to \mu_n(X) \to \mathcal O(X)^* \overset{n}{\to} \mathcal O (X)^*\\
+&amp;\to H^1(X_{\mathrm{\'et}},\mu_n) \to \operatorname{Pic}(X) \overset{n}{\to} \operatorname{Pic}(X),
+\end{aligned}
+$$
+其中 $\operatorname{Pic}(X) = H^1(X,\mathbb G_m)$ 为 <span class="link local"><a href="/Picard群.html" title="Picard 群 [Picard群]">Picard 群</a></span>.
+这个结论也可以表述为正合列
+$$
+0 \to \mathcal O(X)^* / (\mathcal O(X)^*)^n
+\to H^1(X_{\mathrm{\'et}},\mu_n) \to \operatorname{Pic}(X)_n \to 0.
+$$</p>
+<p>设 $X$ 为代数闭域 $k$ 上的完备光滑曲线, 则 <span class="link local"><a href="/Picard群.html" title="Picard 群 [Picard群]">Picard 群</a></span>分解为 $\operatorname{Pic}^0(X)\oplus \mathbb{Z}$, 而 $\operatorname{Pic}^0(X) \simeq \operatorname{Jac}(X)(k)\simeq (\mathbb{Z}/n)^{2g}$, $\operatorname{Jac}(X)$ 为 <span class="link local"><a href="/Jacobi簇.html" title="Jacobi 簇 [Jacobi簇]">Jacobi 簇</a></span>.</p>
+<p><strong>结论</strong>. 设 $X$ 为代数闭域 $k$ 上亏格为 $g$ 的完备连通光滑曲线, 正整数 $n$ 在 $k$ 中可逆, 则
+$$
+H^1(X_{\mathrm{\'et}},\mu_n)\simeq H^1(X_{\mathrm{\'et}},\mathbb{Z}/n)\simeq (\mathbb{Z}/n)^{2g}.
+$$</p>
+</details></section><section class="block" data-taxon=""><details ><summary id="Picard群"><header><h1><span class="taxon"></span>Picard 群 <a class="slug" href="/Picard群.html">[Picard群]</a><a class="edit" href="vscode://file/E:/Simplopedia_source/trees/Picard%E7%BE%A4.md">[edit]</a></h1><div class="metadata"><ul><li class="meta-item">百科</li><li class="meta-item"><span class="link local"><a href="/SimplicialCat.html" title="单纯猫 [SimplicialCat]">SimplicialCat</a></span></li></ul></div></header></summary>
+<h2>观念</h2>
+<p>空间的 Picard 群是其上<span class="link local"><a href="/线丛.html" title="线丛 [线丛]">线丛</a></span>的同构类关于张量积构成的群.</p>
+<h2>定义</h2>
+<h3>复流形</h3>
+<p>紧复流形 $M$ 的 Picard 群 $\text{Pic}(M)$ 是<span class="link local"><a href="/全纯线丛.html" title="“全纯线丛” [全纯线丛]">全纯线丛</a></span>的同构类关于张量积构成的群. $\text{Pic}(M)$ 的单位元是平凡丛, 也即全纯函数层 $\mathcal O_M$.</p>
+<p>定义 $\text{Pic}^0(M)$ 为 $\text{Pic}(M)$ 中由第一<span class="link local"><a href="/陈类.html" title="“陈类” [陈类]">陈类</a></span>等于零的线丛构成的子群.</p>
+<h3>概形</h3>
+<p><span class="link local"><a href="/概形.html" title="概形 [概形]">概形</a></span> (或<span class="link local"><a href="/环化空间.html" title="环化空间 [环化空间]">环化空间</a></span>) $X$ 的 Picard 群 $\operatorname{Pic}(X)$ 是 $X$ 上秩为 $1$ 的局部自由 $\mathcal O_X$-模的同构类在张量积下构成的群. 它也同构于<span class="link local"><a href="/平展上同调.html" title="平展上同调 [平展上同调]">平展上同调</a></span> $H^1(X_{\mathrm{\'et}},\mathbb G_m)$.</p>
+<h3>对称幺半范畴</h3>
+<p><span class="link local"><a href="/对称幺半范畴.html" title="对称幺半范畴 [对称幺半范畴]">对称幺半范畴</a></span>的 Picard 群是其中可逆对象的同构类构成的 Abel 群.</p>
+<h2>性质</h2>
+<p>$\text{Pic}(M) \simeq H^1(M,\mathcal O_M^*)$.</p>
+<p>$\text{Pic}^0(M) \simeq H^1(M,\mathcal O_M) / H^1(M,\mathbb{Z})$. (参见<span class="link local"><a href="/指数序列.html" title="“指数序列” [指数序列]">指数序列</a></span>)</p>
+<p><span class="link local"><a href="/Dedekind整环.html" title="“Dedekind 整环” [Dedekind整环]">Dedekind 整环</a></span>的谱的 Picard 群是这个环的<span class="link local"><a href="/理想类群.html" title="“理想类群” [理想类群]">理想类群</a></span>.</p>
+</details></section><section class="block" data-taxon=""><details ><summary id="p-进Hodge理论"><header><h1><span class="taxon"></span>“p-进 Hodge 理论” <a class="slug" href="/p-进Hodge理论.html">[p-进Hodge理论]</a><a class="edit" href="vscode://file/E:/Simplopedia_source/trees/p-%E8%BF%9BHodge%E7%90%86%E8%AE%BA.md">[edit]</a></h1><div class="metadata"><ul><li class="meta-item">百科</li><li class="meta-item"><span class="link local"><a href="/SimplicialCat.html" title="单纯猫 [SimplicialCat]">SimplicialCat</a></span></li></ul></div></header></summary>
+<p>记号. $K$ 为 $p$-进域, 有完美<span class="link local"><a href="/剩余域.html" title="“剩余域” [剩余域]">剩余域</a></span> $k$</p>
+<p>比较 $p$-进上同调理论</p>
+<ul>
+<li>$p$-进<span class="link local"><a href="/平展上同调.html" title="平展上同调 [平展上同调]">平展上同调</a></span> $H^n_{\text{\'et}}(X_{\bar K},\mathbb{Q}_p)$</li>
+<li>代数 de Rham 上同调</li>
+<li>(对数) 晶体上同调</li>
+</ul>
+<p>Faltings: 张量积上一个周期环 $B_{\text{HT}},B_{\text{dR}},B_{\text{crys}},B_{\text{st}}$ 后可以比较这些上同调理论</p>
+<p><strong>例</strong> (de Rham 比较).
+$$
+H^n_{\text{\'et}}(X_{\bar K},\mathbb{Q}_p)\otimes_{\mathbb{Q}_p}B_{\text{dR}} \simeq H^n_{\text{dR}}(X/K)\otimes_K B_{\text{dR}}
+$$
+(与<span class="link local"><a href="/绝对Galois群.html" title="绝对 Galois 群 [绝对Galois群]">绝对 Galois 群</a></span> $G_K$ 的作用相容)</p>
+<p>如今 $p$-进 Hodge 理论推广为研究一切 $p$-进 Galois 表示, 不仅是上述来自几何的表示 $H^n_{\text{\'et}}$.</p>
+<p><strong>定义</strong>. $\mathsf{Rep}_{\mathbb{Q}_p}(G_K)$ 为 $G_K$ 在有限维 $\mathbb{Q}_p$ 向量空间上的连续表示的范畴.</p>
+<p>子范畴: Hodge-Tate 表示, de Rham 表示, semistable, 晶体. 它们关于张量积, 对偶, 子商封闭.</p>
+<p>$H^n_{\text{\'et}}$ 都是 de Rham 表示.</p>
+<p>在每种情形 $\text{?}\in\{\text{HT, dR, st, crys}\}$, 有函子 $D_{\text{?}}\colon \mathsf {Rep}^{\text{?}}(G_K) \to \text{\{semi linear algebra objects\}}$, $V\mapsto (V\otimes_{\mathbb{Q}_p} B_{\text{?}})^{G_K}$ 将 $G_K$ 表示转化为 semi linear algebra. 这个函子正合, 忠实, 保持张量积和对偶.</p>
+<p>$B$ 为周期环, $B^{G_K}$ 为域. $D_B$ 将 $G_K$-表示转化为 $B^{G_K}$-向量空间.</p>
+<p>$B$-admissible representations:
+$$
+D_B(V)\otimes_{B^{G_K}}B \overset{\simeq}{\longrightarrow} V\otimes_{\mathbb{Q}_p}B
+$$</p>
+<p>Hodge-Tate 表示
+…</p>
+</details></section><section class="block" data-taxon=""><details ><summary id="平展基本群"><header><h1><span class="taxon"></span>平展基本群 <a class="slug" href="/平展基本群.html">[平展基本群]</a><a class="edit" href="vscode://file/E:/Simplopedia_source/trees/%E5%B9%B3%E5%B1%95%E5%9F%BA%E6%9C%AC%E7%BE%A4.md">[edit]</a></h1><div class="metadata"><ul><li class="meta-item">百科</li><li class="meta-item"><span class="link local"><a href="/SimplicialCat.html" title="单纯猫 [SimplicialCat]">SimplicialCat</a></span></li></ul></div></header></summary>
+<h2>观念</h2>
+<p><span class="link local"><a href="/概形.html" title="概形 [概形]">概形</a></span>的平展基本群是其<span class="link local"><a href="/平展意象.html" title="平展意象 [平展意象]">平展意象</a></span>的<span class="link local"><a href="/∞-意象的形.html" title="意象的形 [∞-意象的形]">形</a></span>的<span class="link local"><a href="/基本群.html" title="基本群 [基本群]">基本群</a></span>.</p>
+<h2>定义</h2>
+<h3>传统</h3>
+<p>参考 <span class="link local"><a href="/MilneLEC.html" title="Lectures on Etale Cohomology [MilneLEC]">Milne 平展上同调讲义</a></span>.
+对于概形 $X$, 记 $\mathsf{FEt}_{/X}$ 为指向 $X$ 的有限平展映射的范畴. 对于<span class="link local"><a href="/几何点.html" title="几何点 [几何点]">几何点</a></span> $\bar x \to X$,
+定义<span class="link local"><a href="/纤维函子.html" title="纤维函子 [纤维函子]">纤维函子</a></span> $F \colon \mathsf{FEt}_{/X}\to\mathsf{Set}$,
+$$
+F(Y\to X) := \operatorname{Hom}_X(\bar x,Y).
+$$
+函子 $F$ 是 <span class="link local"><a href="/pro-可表函子.html" title="pro-可表函子 [pro-可表函子]">pro-可表</a></span>的. 记 $\widetilde {X}$ 为 $F$ 的表示 <span class="link local"><a href="/pro-对象.html" title="pro-对象 [pro-对象]">pro-对象</a></span>, 定义
+$$
+\pi_1(X,\bar x) := \operatorname{Aut}_{\mathsf{ProFEt}_{/X}}(\widetilde {X}) = \operatorname{lim}\operatorname{Aut}_{\mathsf{FEt}_{/X}}(X_i)
+$$
+后一个等式来自 <span class="link local"><a href="/pro-对象.html" title="pro-对象 [pro-对象]">pro-对象</a></span>的态射的计算. (<span class="link local"><a href="/todo.html" title="亟需施工处 [todo]">todo</a></span>)</p>
+<h2>性质</h2>
+<h3>与主丛的关系</h3>
+<p>设 $X$ 为连通概形, $G$ 为有限群, 则 $X$ 的 $G$-系数 $1$ 阶<span class="link local"><a href="/非Abel上同调.html" title="非 Abel 上同调 [非Abel上同调]">非 Abel</a></span> <span class="link local"><a href="/平展上同调.html" title="平展上同调 [平展上同调]">平展上同调</a></span>等同于 $X$ 的平展基本群到 $G$ 的同态:
+$$
+H^1(X_{\mathrm{\'et}},G) \simeq \operatorname{Hom}_{\mathrm{cts}}(\pi_1(X,\bar x),G).
+$$</p>
+<h2>例</h2>
+<p>设基环 $k$ 为特征 $0$ 代数闭域, $\mathbb G_m$ 的有限平展覆叠为 $(-)^n\colon \mathbb G_m \to\mathbb G_m$.</p>
+</details></section><section class="block" data-taxon=""><details ><summary id="扭结–素数类比"><header><h1><span class="taxon"></span>扭结–素数类比 <a class="slug" href="/扭结–素数类比.html">[扭结–素数类比]</a><a class="edit" href="vscode://file/E:/Simplopedia_source/trees/%E6%89%AD%E7%BB%93%E2%80%93%E7%B4%A0%E6%95%B0%E7%B1%BB%E6%AF%94.md">[edit]</a></h1><div class="metadata"><ul><li class="meta-item">百科</li><li class="meta-item"><span class="link local"><a href="/SimplicialCat.html" title="单纯猫 [SimplicialCat]">SimplicialCat</a></span></li></ul></div></header></summary>
+<table><thead><tr><th></th><th></th></tr></thead><tbody>
+<tr><td>球面 $S^3$</td><td>$\operatorname{Spec}\mathbb{Z}$</td></tr>
+<tr><td>扭结 $C$</td><td>素数 $p$</td></tr>
+<tr><td>$\pi_1(S^3)=1$</td><td>$\pi_1(\operatorname{Spec}\mathbb{Z})=1$<br>(见 <span class="link local"><a href="/GrothendieckGalois理论.html" title="Grothendieck Galois 理论 [GrothendieckGalois理论]">Grothendieck Galois 理论</a></span>)</td></tr>
+<tr><td>$H^3(S^3,\mathbb{Z})=\mathbb{Z}$</td><td>$H^3(\operatorname{Spec}\mathbb{Z},\mathbb G_m)=\mathbb{Q}/\mathbb{Z}$<br>(<span class="link local"><a href="/平展上同调.html" title="平展上同调 [平展上同调]">平展上同调</a></span>)</td></tr>
+<tr><td>嵌入 $C\hookrightarrow S^3$</td><td>$\operatorname{Spec}\mathbb F_p \to \operatorname{Spec}\mathbb{Z}$</td></tr>
+<tr><td>补空间 $S^3-C$</td><td>$\operatorname{Spec}\mathbb{Z}[1/p]$</td></tr>
+<tr><td>$\pi_1(S^3-C)^{\mathrm{ab}}=\mathbb{Z}$</td><td>$\pi_1(\operatorname{Spec}\mathbb{Z}[1/p])^{\mathrm{ab}} = \mathbb{Z}_p^\times$</td></tr>
+<tr><td>$\pi_1(C_1)\to\pi_1(S^3-C_2)^{\mathrm{ab}}$</td><td>$\pi_1(\operatorname{Spec}\mathbb F_p) \to \pi_1(\operatorname{Spec}\mathbb{Z}[1/q])^{\mathrm{ab}}$</td></tr>
+<tr><td>两个扭结 $C_1,C_2$ 的卷绕数</td><td>$p\in\mathbb{Z}_q^\times$</td></tr>
+</tbody></table>
+</details></section></details></section></footer></article></div></body></html>
