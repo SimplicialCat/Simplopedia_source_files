@@ -32,12 +32,6 @@ $$
 
 ## 例
 
-| 左           | 右            |
-| ----------- | ------------ |
-| 张量积 $\otimes$   | Hom          |
-| 余极限       | 极限          |
-| 几何实现 (realization) | 全体 (totalization) |
-
 ### 极限
 
 对于指标范畴 $\mathcal I$, 沿 $\mathcal I\to 1$ 的左右 Kan 扩张 $\mathsf {Fun}(\mathcal I,\mathcal C)\to\mathcal C$ 分别为余极限和极限:
@@ -49,9 +43,16 @@ $$
 $$
 
 
-### 几何实现
+### 几何实现 (米田扩张)
 
-$|{-}|\colon \Delta\to\mathsf {Top}$ 沿[米田嵌入](米田嵌入.md) $\mathbf{y}\colon \Delta\to\mathsf {sSet}$ 的左 Kan 扩张 $\mathsf {sSet}\to\mathsf {Top}$ 为单纯集的[几何实现](几何实现.md):
+[预层范畴](预层意象.md)是自由[余完备化](余完备化.md), 换言之, 任意到余完备范畴 $\mathcal D$ 的函子 $F\colon \mathcal C\to\mathcal D$ 都可扩张到预层范畴 $\widehat {\mathcal C}$, 这正是沿[米田嵌入](米田嵌入.md)的左 Kan 扩张.
+该左 Kan 扩张有时记为张量积
+$$
+F \otimes - \colon \widehat {\mathcal C} \to \mathsf{Set}.
+$$
+这也可理解为[代函子](代函子.md) $1 \to \mathcal C$ 与 $\mathcal C\to 1$ 的复合.
+
+例如, $|{-}|\colon \Delta\to\mathsf {Top}$ 沿[米田嵌入](米田嵌入.md) $\mathbf{y}\colon \Delta\to\mathsf {sSet}$ 的左 Kan 扩张 $\mathsf {sSet}\to\mathsf {Top}$ 为单纯集的[几何实现](几何实现.md):
 $$
 |X| := \operatorname{colim}_{\Delta^n \to X} |\Delta^n|,
 $$

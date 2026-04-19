@@ -14,6 +14,7 @@ author: [SimplicialCat](SimplicialCat.md)
 
 计划中的讲稿 / 笔记:
 
+- [](nearby.md)
 - [](notes-Gestalten.md)
 - [](on-P1.md)
 - [](GeoLang2.md)

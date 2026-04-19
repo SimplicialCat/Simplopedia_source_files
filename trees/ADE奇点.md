@@ -1,5 +1,5 @@
 ---
-title: "ADE 奇点"
+title: ADE 奇点
 tag: 百科
 author: [SimplicialCat](SimplicialCat.md)
 ---

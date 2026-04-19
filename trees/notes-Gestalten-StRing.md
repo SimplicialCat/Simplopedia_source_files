@@ -1,5 +1,5 @@
 ---
-title: Gestalten - Stafanich 环
+title: Gestalten - Stefanich 环
 tag: 笔记
 author: [SimplicialCat](SimplicialCat.md)
 ---
@@ -39,7 +39,9 @@ $$
 这可视为 $B$ 在 $A$ 上的一种[相对](相对.md)观点, 正如在代数几何中我们常常固定一个基环 $A$ 考虑 $A$-代数一样. 而 "绝对" 的基环是 $A = (*,\mathsf{Ani},\mathsf{Pr},\cdots)$, 此时,
 $(B/A)_{n-1} = B_{n-1} \in \mathsf{CAlg}((n-1)\mathsf{Pr})$.
 
-在 Stefanich 环的世界中, 任何一个层级的 "$A$-代数" 都可视为 Stefanich 环的同态 $A\to B$. 更准确地说有如下命题.
+函子 $f_{n-1,*}$ 可想象为几何对象之间 $(n-1)$-范畴层的推前, 即[整体截面](整体截面.md)操作的相对版本. 当几何对象被其上 $(n-1)$-范畴层的整体截面完全确定时, 称其 $(n-1)$-[仿射](高阶仿射性.md). 在[相对](相对.md)情形中, 也有仿射态射的概念.
+
+在 Stefanich 环的世界中, 任何一个层级的 "$A$-代数" 都可视为 Stefanich 环的 (仿射) 同态 $A\to B$. 更准确地说有如下命题.
 
 **命题**. 对 $n\geq 1$, 有全忠实函子
 $$
@@ -55,44 +57,50 @@ $$
 $$
 其中 $B\in\mathsf{StRing}_{A/}$ 对应于 $((B/A)_0,(B/A)_1,\cdots)$.
 
-*证明* (大致思路). 注意到对于 $n\geq 1$ 有
+*证明概要*. 依定义,
 $$
-\begin{aligned}\mathsf{CAlg}(\mathsf{nPr})_{A_n/}&\simeq
-\mathsf{CAlg}(\mathsf{Mod}_{1\mathsf{Pr}}((n-1)\mathsf{Pr}))_{A_n /}\\
-&\simeq
-\mathsf{CAlg}(1\mathsf{Pr})_{(n-1)\mathsf{Pr}/}{}_{A_n /}\\
-&\simeq\mathsf{CAlg}(1\mathsf{Pr})_{A_n /}
-\\
-&\simeq\mathsf{CAlg}(\mathsf{Mod}_{1\mathsf{Pr}}(A_n)),
-\end{aligned}
-$$
-(模范畴中的[交换代数](交换代数.md)相当于原范畴中的交换代数带有代数同态)
-从而
-$$
-\begin{aligned}
-\mathsf{StRing}_{A/} &\simeq
+\mathsf{StRing}_{A/} \simeq
 \operatorname{lim}^{\mathsf{Cat}}(
-\mathsf{CAlg}(\mathsf{Ani})_{A_0/}
+\mathsf{CAlg}(1\mathsf{Pr})_{A_1/}
 \leftarrow
-\mathsf{CAlg}(\mathsf{1Pr})_{A_1/}
-\leftarrow
-\cdots
-)\\
-&\simeq
-\operatorname{lim}^{\mathsf{Cat}}(
-\mathsf{CAlg}(\mathsf{Mod}_{1\mathsf{Pr}}(A_1))
-\leftarrow
-\mathsf{CAlg}(\mathsf{Mod}_{1\mathsf{Pr}}(A_2))
+\mathsf{CAlg}(2\mathsf{Pr})_{A_2/}
 \leftarrow
 \cdots
 ).
-\end{aligned}
 $$
-其中转移映射为
+我们仔细观察其中的转移映射
 $$
-\mathsf{CAlg}(\mathsf{Mod}_{1\mathsf{Pr}}(A_n))
-\leftarrow\mathsf{CAlg}(A_{n+1})\leftarrow
-\mathsf{CAlg}(\mathsf{Mod}_{1\mathsf{Pr}}(A_{n+1})).
+\operatorname{End}_{-}(1)\colon 
+\mathsf{CAlg}(n\mathsf{Pr})_{/ A_n}
+\leftarrow
+\mathsf{CAlg}((n+1)\mathsf{Pr})_{/ A_{n+1}}.
+$$
+设 $B_{n+1}\in \mathsf{CAlg}((n+1)\mathsf{Pr})_{/ A_{n+1}}$. 拆开定义, 我们发现 $B_{n+1}$ 的信息相当于对称幺半可表现 $1$-范畴的如下图表.
+
+[](notes-Gestalten-StRing-2.typ#:block)
+
+而这样一个图表的信息仅相当于其下方的一个态射 $g$.
+
+此时 $\operatorname{End}_{B_{n+1}}(1_B)$ 是单位 $1_B\in B_{n+1}$ 在两个函子的右伴随的复合下的像, $\operatorname{End}_{B_{n+1}}(1_B) = f^R g^R (1_B)$. 复合中间经过的对象是 $g^R (1_B) \in \mathsf{CAlg}(A_{n+1})$, 如下图.
+
+[](notes-Gestalten-StRing-1.typ#:block)
+
+由此我们看出, 转移映射中间可穿过 $\mathsf{CAlg}(A_{n+1})$, 于是前述极限可改写为
+
+$$
+\mathsf{StRing}_{A/} \simeq
+\operatorname{lim}^{\mathsf{Cat}}(
+\mathsf{CAlg}(A_1)
+\leftarrow
+\mathsf{CAlg}(A_2)
+\leftarrow
+\cdots
+),
 $$
 
-https://q.uiver.app/#q=WzAsMTAsWzAsMCwiXFxtYXRoc2Z7Q0FsZ30oblxcbWF0aHNme1ByfSlfe0FfbiAvfSJdLFswLDEsIlxcbWF0aHNme0NBbGd9KFxcbWF0aHNme01vZH1fezFcXG1hdGhzZntQcn19KChuLTEpXFxtYXRoc2Z7UHJ9KSlfe0FfbiAvfSJdLFswLDIsIlxcbWF0aHNme0NBbGd9KDFcXG1hdGhzZntQcn0pX3sobi0xKVxcbWF0aHNme1ByfS99e31fe0FfbiAvfSJdLFswLDMsIlxcbWF0aHNme0NBbGd9KDFcXG1hdGhzZntQcn0pX3tBX24gL30iXSxbMCw0LCJcXG1hdGhzZntDQWxnfShcXG1hdGhzZntNb2R9X3sxXFxtYXRoc2Z7UHJ9fShBX24pKSJdLFsxLDAsIlxcbWF0aHNme0NBbGd9KChuKzEpXFxtYXRoc2Z7UHJ9KV97QV97bisxfSAvfSJdLFsxLDEsIlxcbWF0aHNme0NBbGd9KFxcbWF0aHNme01vZH1fezFcXG1hdGhzZntQcn19KG5cXG1hdGhzZntQcn0pKV97QV97bisxfSAvfSJdLFsxLDIsIlxcbWF0aHNme0NBbGd9KDFcXG1hdGhzZntQcn0pX3tuXFxtYXRoc2Z7UHJ9L317fV97QV97bisxfSAvfSJdLFsxLDMsIlxcbWF0aHNme0NBbGd9KDFcXG1hdGhzZntQcn0pX3tBX3tuKzF9IC99Il0sWzEsNCwiXFxtYXRoc2Z7Q0FsZ30oXFxtYXRoc2Z7TW9kfV97MVxcbWF0aHNme1ByfX0oQV97bisxfSkpIl0sWzAsMV0sWzEsMl0sWzIsM10sWzMsNF0sWzUsNl0sWzUsMCwiXFxvcGVyYXRvcm5hbWV7RW5kfV97LX0oMSkiLDJdLFs2LDddLFs2LDFdLFs3LDIsIlxcb3BlcmF0b3JuYW1le0VuZH1fey19KDEpIiwyXSxbOCwzXSxbNyw4XSxbOSw0XSxbOCw5XV0=
+且 Stefanich 环的同态 $A\to B$ 对应序列
+$$
+((B/A)_0, (B/A)_1,\cdots).
+$$
+
+对于 $R\in\mathsf{CAlg}(A_n)$, 有 $\mathsf{Mod}_{A_n}(R)\in \mathsf{CAlg}(\mathsf{Mod}_{1\mathsf{Pr}}(A_n))$,

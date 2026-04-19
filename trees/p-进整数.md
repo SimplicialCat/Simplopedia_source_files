@@ -10,3 +10,7 @@ author: [SimplicialCat](SimplicialCat.md)
 $$
 \mathbb{Z}_p = \operatorname{lim}_n \mathbb{Z}/(p^n).
 $$
+
+## 性质
+
+$\mathbb{Z}_p$ 是[离散赋值环](离散赋值环.md).

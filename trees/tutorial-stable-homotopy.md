@@ -10,7 +10,7 @@ author: [SimplicialCat](SimplicialCat.md)
 
 ---
 
-### 负数维球面
+## 负数维球面
 
 同伦论中的最基本对象是球面 $S^0, S^1, S^2, \cdots$; 其具有如下递推关系:
 $$
@@ -45,6 +45,8 @@ $$
 $$
 
 简单地说, **谱**就是这样一种对象: 如果我们希望任何空间都是某空间的[纬悬](纬悬.md) (更准确地说是 $\Sigma$ 是**范畴等价**), 那么谱就会自然地出现, 正如我们由自然数定义整数一样.
+
+---
 
 整数有另一种看法. 虽然自然数上没有 "减一" 运算, 但有一种接近于 "减一" 的运算, 称为**前驱** (precursor), 记作 $\operatorname{prec}$. 它的定义是
 $$
@@ -96,7 +98,7 @@ $$
 \mathsf{Sp} = \operatorname{lim} (\mathsf{Ani}\overset{\Omega}{\leftarrow}\mathsf{Ani}\overset{\Omega}{\leftarrow}\mathsf{Ani}\overset{\Omega}{\leftarrow}\cdots).
 $$
 
-### 纬悬的用处
+## 纬悬
 
 那么为什么我们希望任何空间都是某空间的[纬悬](纬悬.md)?
 
@@ -139,4 +141,7 @@ $$
 [\Sigma X,Y]\simeq [X,\Omega Y]=\pi_0\operatorname{Aut}_{X/,/Y}(*).
 $$
 
-(未完待续)
+总之, 如果任何空间都是某空间的[纬悬](纬悬.md), 那么任何两个空间之间的映射空间 (或映射同伦类的集合) 构成群.
+
+当然, 纬悬的效果不仅如此. 如果任何空间都是某空间的[纬悬](纬悬.md), 那么自然也是某空间的两次纬悬; 而 $\Sigma^2 X = X \wedge S^1\wedge S^1$ 上的两种相容的余群结构合在一起, 构成了一种 $\mathbb E_2$-余群结构, 使得映射同伦类的集合 $[\Sigma^2 X, Y]$ 构成 **Abel 群**.
+
