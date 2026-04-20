@@ -54,5 +54,12 @@
             "#set page(width: auto, height: auto, margin: (x: 0em, y: 0.1em), fill: rgb(0, 0, 0, 0)); ",
             "#set text(size: 15.5pt, top-edge: \"bounds\", bottom-edge: \"bounds\");"
         ]
-	}
+	},
+	"插入svg": {
+        "prefix": "new-svg",
+        "body": [
+            "<img src=\"/assets/$1.svg\" alt=\"$2\" width=\"300\" style=\"display:block; margin:auto;\">"
+        ],
+        "description": "插入一个居中的 SVG 图片，路径为 /assets/，支持占位符"
+    }
 }
