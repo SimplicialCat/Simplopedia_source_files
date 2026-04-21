@@ -41,6 +41,7 @@ $(D_\varepsilon,D_\varepsilon \cap V,p)$ 同构于 $(\operatorname{Cone}(S^3),\o
 下图是 $t=0.15$ 时的 Milnor 纤维, 它是带边界的光滑曲面.
 
 <div style="display: flex; justify-content: center; gap: 12px; flex-wrap: wrap;">
-  <img src="/assets/milnor-fiber-1.svg" alt="Milnor 纤维 (俯视图)" style="max-width: 200px; height: auto; object-fit: contain;">
-  <img src="/assets/milnor-fiber-2.svg" alt="Milnor 纤维 (侧视图)" style="max-width: 300px; height: auto; object-fit: contain;">
+  <img src="/assets/milnor-fiber-1.svg" alt="Milnor 纤维 (俯视图)" style="max-width: 240px; height: auto; object-fit: contain;">
+  <img src="/assets/milnor-fiber-2.svg" alt="Milnor 纤维 (侧视图)" style="max-width: 200px; height: auto; object-fit: contain;">
 </div>
+

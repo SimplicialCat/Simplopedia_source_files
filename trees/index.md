@@ -35,6 +35,8 @@ You may also want to visit [my personal main page](https://simplicialcat.github.
 
 ## 最近
 
+[](Milnor纤维化.md)
+
 [](元素范畴.md)
 
 [](局部意象.md)
