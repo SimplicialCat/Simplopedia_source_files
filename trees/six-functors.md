@@ -107,6 +107,7 @@ $$
   $$
     f_! A \otimes B \simeq f_!(A\otimes f^*B).
   $$
+  换言之, $f_!\colon D(X)\to D(Y)$ 是 $D(Y)$-线性函子.
 
 用[关系范畴](关系2-范畴.md)可以给出一种严格的叙述.
 
@@ -126,8 +127,28 @@ $$
 D \colon \mathsf{Corr}(\mathcal C,E) \to \mathsf{Cat}.
 $$
 
+这个简洁的定义囊括了上述所有要素.
+
 - 对 $X\in\mathcal C$, 该函子给出范畴 $D(X)$.
 - 对 $\mathcal C$ 中任意态射 $f\colon X\to Y$, 对应 $(Y \overset{f}{\leftarrow} X = X)$ 给出拉回函子 $f^*$.
-- 由于 $X$ 是交换余代数 (余乘法为[对角线](对角线.md)) 而 $D$ 给出松对称幺半函子 $\mathcal C^{\mathrm{op}}\to\mathsf{Cat}$, 故 $D(X)$ 为 $\mathsf{Cat}$ 中的交换代数, 即[对称幺半范畴](对称幺半范畴.md).
-- 对 $E$ 中的态射 $f\colon X\to Y$, 对应 $(X = X \overset{f}{\to} Y)$ 给出函子 $f_!\colon D(X)\to D(Y)$.
+- 由于 $X$ 是交换余代数 (即 $\mathcal C^{\mathrm{op}}$ 中的交换代数, 余乘法为[对角线](对角线.md)) 而 $D$ 给出松对称幺半函子 $\mathcal C^{\mathrm{op}}\to\mathsf{Cat}$, 故 $D(X)$ 为 $\mathsf{Cat}$ 中的交换代数, 即[对称幺半范畴](对称幺半范畴.md).
+- 对 $E$ 中的态射 $f\colon X\to Y$, 对应 $(X = X \overset{f}{\to} Y)$ 给出函子 $f_!\colon D(X)\to D(Y)$, 并且由于态射 $f$ 给出了 $\mathcal C^{\mathrm{op}}$ 中 $X$ 的 $Y$-模结构且 $f\colon X\to Y$ 是 $Y$-模同态, 故 $f_!\colon D(X)\to D(Y)$ 是 $D(Y)$-模同态.
 - 一般地, 对应 $(X\overset{f}{\leftarrow} W \overset{g}{\to} Y)$ 给出 "[拉-推](拉-推.md)" 函子 $g_! f^*\colon D(X)\to D(Y)$.
+
+## 对称幺半范畴
+
+[对称幺半范畴](对称幺半范畴.md)是 $\mathsf{Cat}$ 中的[交换代数](交换代数.md), 由定义即保持乘积的函子
+
+**定理**. 对于[对称幺半范畴](对称幺半范畴.md) $\mathcal C$, [积幺半范畴](积幺半范畴.md) $\mathcal D$, 松对称幺半函子 $\mathcal C\to\mathcal D$ 等同于函子 $F\colon \mathcal C^\otimes \to \mathcal D$, 满足 $F((X_i)_{i\in I})\simeq\prod_i F(X_i)$.
+
+令
+$$
+\mathsf{Corr}(\mathcal C,E)^\otimes = \mathsf{Corr}(\mathcal C^\times, E^\times).
+$$
+
+## 六函子体系的构造
+
+固定几何语境 $(\mathcal C,E)$, 我们想知道具体如何构造六函子体系
+$$
+\mathsf{Corr}(\mathcal C,E) \to \mathsf{Cat}.
+$$

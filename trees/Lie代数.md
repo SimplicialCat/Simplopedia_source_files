@@ -4,6 +4,9 @@ tag: 百科
 author: [SimplicialCat](SimplicialCat.md)
 ---
 
+## 观念
+
+
 
 ## 定义
 
