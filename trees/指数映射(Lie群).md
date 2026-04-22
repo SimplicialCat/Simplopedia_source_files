@@ -1,16 +1,17 @@
 ---
-title: "指数映射 (Lie 群)"
+title: 指数映射 (Lie 群)
 tag: 百科
 author: [SimplicialCat](SimplicialCat.md)
 ---
 
+## 定义
 
 Lie 群上的指数映射是一个光滑映射 $\exp\colon \mathfrak g\to G$, 定义如下. 对 $a\in\mathfrak g$ 令 $\gamma\colon (-\varepsilon,\varepsilon) \to G$ 为满足方程 $\gamma(0)=e$, $\gamma'(t)=L_{\gamma(t)}a$ ($L_{g}$ 为左平移) 的曲线, 定义
 $$
 \exp(a) = \gamma(1).
 $$
 
-## 主丛上的指数映射
+### 主丛上的指数映射
 
 设 $G$ 是紧 Lie 群, $M$ 是 Riemann 流形, $\pi\colon P\to M$ 是 $G$-[主丛](主丛.md). 设 $\omega$ 为 $P$ 上的[联络](联络.md).
 
