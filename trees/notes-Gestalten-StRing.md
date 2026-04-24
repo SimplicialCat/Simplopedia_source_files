@@ -25,6 +25,8 @@ $$
 $\mathsf{StRing}$ 的始对象是 $(*,\mathsf{Ani},1\mathsf{Pr},\cdots)$; 即任何 Stefanich 环 $A$ 都带有一列函子 $(n-1)\mathsf{Pr} \to A_n$.
 这可以如下理解: $A_n$ 是 $n\mathsf{Pr}$ 中的交换代数, 而 $n\mathsf{Pr}$ 是 $1\mathsf{Pr}$ 中 $(n-1)\mathsf{Pr}$-模的范畴. 模范畴中的[交换代数](交换代数.md)相当于原范畴中的交换代数带有代数同态; 故 $A_n$ 带有代数同态 $(n-1)\mathsf{Pr} \to A_n$.
 
+## 态射与相对情形
+
 Stefanich 环的态射 $f\colon A\to B$ 是一族相容的交换代数同态 $A_n \to B_n$. 我们采用一个看似 "错位" 的记号 $f^*_{n-1}\colon A_n\to B_n$ 来表示这个同态.[^1]
 
 [^1]: 这是因为 $A_n$ 可想象为几何对象 $X$ 上的 $(n-1)$-范畴层, 而 $f^*_{n-1}$ 可想象为 $(n-1)$-范畴层的拉回. 换言之, $f^*$ 的下标表示的是其操作的**对象**的范畴层级.
@@ -98,7 +100,7 @@ $$
 ),
 $$
 
-且 Stefanich 环的同态 $A\to B$ 对应序列
+左边的对象即 Stefanich 环的同态 $A\to B$, 对应右边的序列
 $$
 ((B/A)_0, (B/A)_1,\cdots).
 $$

@@ -54,6 +54,14 @@ $$
 
 **定义**. [](term-gestalt.md)为 Stefanich 环的对偶: $\mathsf{Gest} = \mathsf{StRing}^{\mathrm{op}}$.
 
+### 相对情形
+
+给定 Stefanich 环 $A$, 记对应的[](term-gestalt.md)为 $X=\operatorname{Gest}(A)$, 可以证明[相对](相对.md)于 $X$ 的[](term-gestalt.md)的范畴为
+$$
+\mathsf{Gest}_{/X}=(\mathsf{StRing}_{A/})^{\mathrm{op}}\simeq\operatorname{lim}_{\operatorname{End}_{-}(1)}\mathsf{CAlg}(A_n).
+$$
+
+
 ## 性质
 
 **定理** ([Scholze–Stefanich](ScholzeStefanichGestalten.md)). (在实用的意义上,) $\mathsf{Gest}$ 是一个 [$\infty$-意象](∞-意象.md).
@@ -66,6 +74,15 @@ $$
 $$
 
 对于仿射概形范畴上适当的 Grothendieck 拓扑, 该构造即延拓至适当的叠.
+
+### 空集
+
+空集对应的[](term-gestalt.md)为 $\operatorname{Gest}(*,*,*,\cdots)$.
+
+### 单点
+
+单点对应的[](term-gestalt.md)为 $\operatorname{Gest}(*,\mathsf{Ani},1\mathsf{Pr},\cdots)$. 与任何几何对象的语境中一致, 单点是 $\mathsf{Gest}$ 的终对象.
+
 
 ### 映射空间
 
