@@ -105,4 +105,5 @@ $$
 ((B/A)_0, (B/A)_1,\cdots).
 $$
 
-对于 $R\in\mathsf{CAlg}(A_n)$, 有 $\mathsf{Mod}_{A_n}(R)\in \mathsf{CAlg}(\mathsf{Mod}_{1\mathsf{Pr}}(A_n))$,
+下面说明 $\mathsf{CAlg}(A_n) \to \mathsf{CAlg}(A_{n+1})$ 为全忠实函子.
+对于 $B\in\mathsf{CAlg}(A_n)$, 有 $\mathsf{Mod}_{A_n}(B)\in \mathsf{CAlg}(\mathsf{Mod}_{1\mathsf{Pr}}(A_n))$,

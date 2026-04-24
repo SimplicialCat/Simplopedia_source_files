@@ -18,7 +18,7 @@ $$
 $$
 且其有右[伴随](伴随.md) $\mathcal D\mapsto \operatorname{End}_{\mathcal D}(1)$.
 
----
+我们先解释一下 $\operatorname{End}(1)$.
 
 回忆, 对于 $\mathcal D\in\mathsf{Mod}_{\mathsf{Pr}}(\mathcal C)$, 有函子 $\operatorname{Hom}_{\mathcal D}(-,-)\colon \mathcal D^{\mathrm{op}}\times\mathcal D \to\mathcal C$, 满足
 $$
@@ -32,6 +32,13 @@ $$
 $$
 其中 $F^R$ 为 $F$ 的右伴随; 因而 $\operatorname{End}_{\mathcal D}(1)$ 继承 $1$ 的[交换代数](交换代数.md)结构.
 这给出了上述定理中的函子 $\mathcal D\mapsto \operatorname{End}_{\mathcal D}(1)$.
+
+现在展开来讲上述定理中的伴随: 对任意 $A\in\mathsf{CAlg}(\mathcal C)$ 与 $B\in \mathsf{CAlg}(\mathsf{Mod}_{1\mathsf{Pr}}(\mathcal C)) = \mathsf{CAlg}(1\mathsf{Pr})_{\mathcal C/}$, 如下两资料等价:
+
+- $\mathsf{CAlg}(1\mathsf{Pr})$ 中的态射 $\mathsf{Mod}_{\mathcal C}(A) \to B$;
+- $\mathsf{CAlg}(\mathcal C)$ 中的态射 $A \to \operatorname{End}_B(1)$.
+
+> 我感觉这对伴随类似于同伦论中 $\mathbf{B}$ 与 $\Omega$ 的互逆. 取模范畴有点像是取逆环路空间, 取 $\operatorname{End}(1)$ 有点像是取环路空间.
 
 ---
 
