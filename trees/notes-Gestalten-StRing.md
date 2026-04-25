@@ -25,7 +25,7 @@ $$
 $\mathsf{StRing}$ 的始对象是 $(*,\mathsf{Ani},1\mathsf{Pr},\cdots)$; 即任何 Stefanich 环 $A$ 都带有一列函子 $(n-1)\mathsf{Pr} \to A_n$.
 这可以如下理解: $A_n$ 是 $n\mathsf{Pr}$ 中的交换代数, 而 $n\mathsf{Pr}$ 是 $1\mathsf{Pr}$ 中 $(n-1)\mathsf{Pr}$-模的范畴. 模范畴中的[交换代数](交换代数.md)相当于原范畴中的交换代数带有代数同态; 故 $A_n$ 带有代数同态 $(n-1)\mathsf{Pr} \to A_n$.
 
-## 态射与相对情形
+## 相对情形
 
 Stefanich 环的态射 $f\colon A\to B$ 是一族相容的交换代数同态 $A_n \to B_n$. 我们采用一个看似 "错位" 的记号 $f^*_{n-1}\colon A_n\to B_n$ 来表示这个同态.[^1]
 
@@ -107,3 +107,33 @@ $$
 
 下面说明 $\mathsf{CAlg}(A_n) \to \mathsf{CAlg}(A_{n+1})$ 为全忠实函子.
 对于 $B\in\mathsf{CAlg}(A_n)$, 有 $\mathsf{Mod}_{A_n}(B)\in \mathsf{CAlg}(\mathsf{Mod}_{1\mathsf{Pr}}(A_n))$,
+
+TODO
+
+
+## 仿射性
+
+**定义**. 设 $A\in\mathsf{StRing}$, $n\geq 0$. 定义 $n$-**仿射**的 $A$-代数就是落在 $\mathsf{CAlg}(A_{n+1}) \to \mathsf{StRing}_{A/}$ 的本质像中的 $A$-代数.
+
+换言之, 能被 $n$-范畴层完全决定的几何对象就是 $n$-仿射几何对象. $0$-仿射大致就是通常说的仿射, "被函数环完全决定".
+
+具体地, 对于 $n$-仿射 $A$-代数 $B$, 从 $(B/A)_{n}\in\mathsf{CAlg}(A_{n+1})$ 开始, 不断取 $\mathsf{Mod}(-)$, 即可得到更高阶的元素 $(B/A)_{n+1}, (B/A)_{n+2},\cdots$: 对任意 $m\geq n$,
+$$
+\mathsf{Mod}_{A_{m+1}}((B/A)_m) \simeq (B/A)_{m+1}.
+$$
+
+**命题**. 如下操作均保持 $n$-仿射性:
+
+- Stefanich 环的余极限 ([](term-gestalt.md)的极限),
+- 基变换,
+- 复合.
+
+## "紧" 性
+
+对于 Stefanich 环的同态 $f\colon A\to B$, 在 $A_{n+1}$ 中有态射
+$$
+f^*_{m-1} \colon 1 \to (B/A)_m.
+$$
+
+**定义**. 若对任意 $m\geq n+1$, $f^*_{m-1}$ 在 $A_{m+1}$ 中有右伴随 $f_{m-1,*}\colon (B/A)_m \to 1$, 则称 $f$ 为 $n$-**[](term-prim.md)** (prim) 态射.
+

@@ -66,13 +66,3 @@ $$
 $$
 定义 $\mathsf{Mod}_{\mathsf{Pr}}(2\mathsf{Pr})$ 为 $3\mathsf{Pr}$, 这个过程可以重复下去, 定义 "可表现 $n$-范畴的范畴" $n\mathsf{Pr} \in \mathsf{Pr}$. 可表现 $n$-范畴是 "充实于 $(n-1)\mathsf{Pr}$ 的可表现范畴".
 
----
-
-我们看数学实践中常用的一个代数语境, 即 $\mathbb E_\infty$-环谱, 是如何置入上述范畴代数当中的.
-记 $\mathcal C$ 为 $\mathbb E_\infty$-环谱 (又称 $\mathbb E_\infty$-$\mathbb S$-代数) 的范畴的对偶. 记 $\mathcal C$ 的对象为 $\operatorname{Spec}A$, 想象为 "[仿射概形](仿射概形.md)".
-
-对于 $\mathbb E_\infty$-环谱 $A$, 归纳定义
-
-- $0\mathsf{Pr}_A := \mathsf{Mod}(A)$,
-- $(n+1)\mathsf{Pr}_A := \mathsf{Mod}_{\mathsf{Pr}} (n\mathsf{Pr}_A)$;
-
