@@ -35,6 +35,8 @@ You may also want to visit [my personal main page](https://simplicialcat.github.
 
 ## 最近
 
+[](吸引子.md)
+
 [](Milnor纤维化.md)
 
 [](元素范畴.md)
@@ -52,8 +54,6 @@ You may also want to visit [my personal main page](https://simplicialcat.github.
 [算畴上的代数上的模](OpAlgMod.md)
 
 [多项式函子](多项式函子.md), [LCCC](LCCC.md), [单子](单子.md), [Kleisli 范畴](Kleisli范畴.md), [对称序列](对称序列.md)
-
-## 精选
 
 [高阶 Morita 范畴](高阶Morita范畴.md)
 

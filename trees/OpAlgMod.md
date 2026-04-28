@@ -6,9 +6,23 @@ author: [SimplicialCat](SimplicialCat.md)
 
 ## 观念
 
-对于单色[算畴](算畴.md) $\mathcal O$ 上的[代数](算畴上的代数.md) $A$, 可以谈论 $A$-模. 这种模是如下的一个新的算畴 $\tilde{\mathcal O}$ 上的代数:
+对于单色[算畴](算畴.md) $\mathcal O$ 上的[代数](算畴上的代数.md) $A$, 可以谈论 $A$-模. 这种模是如下的一个新的算畴 $\widetilde{\mathcal O}$ 上的代数:
 
-记 $a$ 为算畴 $\mathcal O$ 唯一的颜色, 添加第二种颜色 $m$, 并且对每种运算 $a^n\to a$, 用 $m$ 代替左边的一个 $a$ 和右边的 $a$, 得到一种新的运算 $a\cdots a m a\cdots a \to m$, 即得到算畴 $\tilde{\mathcal O}$.
+记 $a$ 为算畴 $\mathcal O$ 唯一的颜色, 添加第二种颜色 $m$, 并且对每种运算 $a^n\to a$, 用 $m$ 代替左边的一个 $a$ 和右边的 $a$, 得到一种新的运算 $a\cdots a m a\cdots a \to m$, 即得到算畴 $\widetilde{\mathcal O}$.
+
+## 定义
+
+### 通过算子范畴
+
+[算畴](算畴.md) $\mathcal O$ 的一种定义是 $\mathsf{Fin}_*$ 上的纤维化 $p\colon \mathcal O^\otimes\to\mathsf{Fin}_*$, 称为算子范畴. 我们定义一个新的算畴 $\widetilde{\mathcal O}$ 的算子范畴 $\widetilde {\mathcal O}^\times$ 为如下拉回:
+$$
+\begin{array}{ccc}
+\widetilde {\mathcal O}^\otimes & \rightarrow & \widetilde {\mathsf{Fin}}_* \\
+\downarrow &  & \downarrow \\
+\mathcal O^\otimes & \rightarrow & \mathsf{Fin}_*
+\end{array}
+$$
+其中 $\widetilde {\mathsf{Fin}}_*$ 是
 
 ## 例
 

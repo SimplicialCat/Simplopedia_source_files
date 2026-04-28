@@ -12,4 +12,6 @@ author : [SimplicialCat](SimplicialCat.md)
 
 [-](语法–语义对偶.md#:embed)
 
+[-](探测.md#:embed)
+
 [-](形变.md#:embed)
