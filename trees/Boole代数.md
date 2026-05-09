@@ -4,6 +4,9 @@ tag: 百科
 author: [SimplicialCat](SimplicialCat.md)
 ---
 
+## 观念
+
+Boole 代数是经典逻辑的[语义](语法–语义对偶.md). 如 Boole 代数中的积 (交) 是逻辑与 $X\wedge Y$, 指数 $Y^X$ 是逻辑蕴含 $X\Rightarrow Y$, 赋值映射是推理法则 $(X\Rightarrow Y)\wedge X \leq Y$ 等等.
 
 ## 定义
 

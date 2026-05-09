@@ -4,6 +4,8 @@ tag: meta
 author: [SimplicialCat](SimplicialCat.md)
 ---
 
+<img src="/assets/simplopedia.svg" alt="Simplopedia" style="float: right; width: min(200px,30vw); margin-right: 20px; margin-top:-50px; filter: drop-shadow(5px 5px 4px rgba(0,0,0,0.5));">
+
 这里是[单纯百科](单纯百科.md)的主目录.
 
 欢迎访问[我的个人主页](https://simplicialcat.github.io/index.html?lang=zh).
@@ -34,6 +36,10 @@ You may also want to visit [my personal main page](https://simplicialcat.github.
 [术语翻译表](terminologies.md)
 
 ## 最近
+
+[](Barr–Beck–Lurie定理.md)
+
+[](远足代数.md)
 
 [](吸引子.md)
 

@@ -1,1 +1,1 @@
-{"metadata":{"slug":[{"Plain":"测试二"},0],"ext":[{"Plain":"md"},1],"tag":[{"Plain":"meta"},3],"title":[{"Plain":"测试页面-2"},2]},"content":{"Lazy":[{"Plain":"\n<p>"},{"Embed":{"url":"test-3.md","title":null,"option":{"numbering":false,"details_open":true,"catalog":true}}},{"Plain":"</p>\n"}]}}
+{"metadata":{"ext":[{"Plain":"md"},1],"tag":[{"Plain":"meta"},3],"slug":[{"Plain":"测试二"},0],"title":[{"Plain":"测试页面-2"},2]},"content":{"Lazy":[{"Plain":"\n<p>"},{"Embed":{"url":"test-3.md","title":null,"option":{"numbering":false,"details_open":true,"catalog":true}}},{"Plain":"</p>\n"}]}}

@@ -19,6 +19,10 @@ $$
 $$
 是[可表函子](可表函子.md)在 $\mathsf{Fun}(\mathcal C^{\mathrm{op}},\mathsf{Set})$ 中的[滤余极限](滤余极限.md)构成的全子范畴.
 
+## 例
+
+[ind-概形](ind-概形)是一类常见的 ind-对象.
+
 ## 相关概念
 
 [ind-层](ind-层.md)

@@ -13,7 +13,7 @@ author: [SimplicialCat](SimplicialCat.md)
 
 考虑 $N=\mathbb{Z}$ 的特殊情形, 记 $\mathbb G_m = \operatorname{Spec}\mathbb{Z}[x^{\pm 1}] = \operatorname{Spec}\mathbb{Z}[\mathbb{Z}]$ 为[乘法群概形](乘法群概形.md). 那么环 $A$ 上的 $\mathbb{Z}$-[分次](分次代数.md)等同于 $\mathbb G_m$ 在[仿射概形](仿射概形.md) $\operatorname{Spec}A$ 上的[作用](群作用.md). 在[相对](相对.md)情形中, [概形](概形.md) $X$ 上的[拟凝聚](拟凝聚层.md)代数 $A$ 上的 $\mathbb{Z}$-[分次](分次代数.md)等同于[相对谱](相对谱.md) $\operatorname{Spec}_X A$ 上的 $\mathbb G_m$-[作用](群作用.md).
 
-分次环 $A$ 上的分次模 $M$ 相当于 $\operatorname{Spec}A$ 上的 $\mathbb G_m$-等变拟凝聚层, 也即商叠 $\operatorname{Spec}A / \mathbb G_m$ 上的[拟凝聚层](拟凝聚层.md). 具体地, 考虑两个作用 $\mathrm{act},\mathrm{triv} \colon \mathbb G_m\times\operatorname{Spec}A\to\operatorname{Spec}A$, 对应两个环同态 $A\to A[x^{\pm 1}]$, 那么 $\operatorname{Spec}A$ 上的 $\mathbb G_m$-等变拟凝聚层是 $A$-模 $M$ 带有同构
+分次环 $A$ 上的[分次模](分次模.md) $M$ 相当于 $\operatorname{Spec}A$ 上的 $\mathbb G_m$-等变拟凝聚层, 也即商叠 $\operatorname{Spec}A / \mathbb G_m$ 上的[拟凝聚层](拟凝聚层.md). 具体地, 考虑两个作用 $\mathrm{act},\mathrm{triv} \colon \mathbb G_m\times\operatorname{Spec}A\to\operatorname{Spec}A$, 对应两个环同态 $A\to A[x^{\pm 1}]$, 那么 $\operatorname{Spec}A$ 上的 $\mathbb G_m$-等变拟凝聚层是 $A$-模 $M$ 带有同构
 $$
 M\otimes_{A,\mathrm{act}}A[x^{\pm 1}] \simeq M\otimes_{A,\mathrm{triv}}A[x^{\pm 1}],
 $$
