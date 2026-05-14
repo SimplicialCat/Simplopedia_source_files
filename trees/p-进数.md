@@ -8,7 +8,7 @@ author: [SimplicialCat](SimplicialCat.md)
 
 ### 作为分式域
 
-$p$-进数域 $\mathbb{Q}_p$ 是 [$p$-进整数环](p-进整数.md) $\mathbb{Z}_p$ 的分式域.
+$p$-进数域 $\mathbb{Q}_p$ 是 [$p$-进整数环](p-进整数.md) $\mathbb{Z}_p$ 的[分式域](分式域.md).
 
 ### 作为完备化
 

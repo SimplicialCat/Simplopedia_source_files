@@ -1,5 +1,5 @@
 ---
-title: "Shtuka"
+title: Shtuka (Chtouca)
 tag: 百科
 author: [SimplicialCat](SimplicialCat.md)
 ---
@@ -12,6 +12,8 @@ Shtuka = Hecke 调整 + [Frobenius 态射](Frobenius态射.md)
 Shtuka 的[模空间](模空间.md)或模叠是[志村簇](志村簇.md)的[函数域类比](函数域类比.md), 是[函数域](函数域.md) [Langlands 纲领](Langlands对应.md)中的重要角色.
 
 > L. Lafforgue used the moduli stack of rank $n$ Shtukas and their compactifications to prove the Ramanujan–Petersson conjecture and the Langlands conjecture for $\mathrm {GL}_n$ over a global function field for any $n\in\mathbb N$.
+
+Vincent Lafforgue 利用 Shtuka 的模空间定义了[远足代数](远足代数.md)
 
 ## 定义
 
