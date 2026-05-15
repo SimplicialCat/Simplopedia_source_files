@@ -6,6 +6,8 @@ author: [SimplicialCat](SimplicialCat.md)
 
 ## 观念
 
+Fourier 变换是 Abel 群上的函数关于平移算子生成的交换 [$C^*$-代数](C-星代数.md)的[谱分解](谱分解.md).
+
 ## 定义
 
 ### 局部紧 Abel 群
