@@ -6,6 +6,16 @@ author: [SimplicialCat](SimplicialCat.md)
 
 本文是为准备 2026 年春季学期徐斌老师 "朗兰兹纲领选讲" 课程报告而记的笔记. 主要参考 [BKV](BKV-SCC.md).
 
+## 引言
+
+局部 Langlands 猜想说的是 $G(F)$ 的光滑不可约表示的同构类集合分解为所谓 L-包的并.
+
+记 $G(F)$ 的 Bernstein 中心 (即表示范畴 $R(G)$ 的中心) 为 $Z_G$.
+
+稳定中心猜想是关于 $Z_G$ 的一个子代数 $Z_G^{\mathrm{st}}$ 的猜想. 根据该猜想, $\operatorname{Irr}(G)$ 可根据 $Z_G^{\mathrm{st}}$ 的特征来分解, 提供局部 Langlands 猜想的线索.
+
+本文的技术手段是构造 Bernstein 中心的范畴化类比, 其 Frobenius 不变对象通过 [Grothendieck 函数–层字典](Grothendieck函数–层字典.md)给出 $Z_G$ 的元素.
+
 ## 1. 可容许 ind-叠上的可构造层
 
 ### 1.1 可容许态射
@@ -200,5 +210,8 @@ $$
 (注意, 我们需要先得到 pro-范畴再取极限, 因为 "不变分布不可能紧支集")
 它是不变分布空间 $\operatorname{Dist}^{G(F)}G(F)$ 的范畴化.
 
+### 3.4 应用到经典情形
+
+通过 [Grothendieck 函数–层字典](Grothendieck函数–层字典.md)
 
 ## Bernstein 投影算子的稳定性

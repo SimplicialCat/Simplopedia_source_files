@@ -15,6 +15,8 @@ author: [SimplicialCat](SimplicialCat.md)
 
 计划中的讲稿 / 笔记:
 
+- [](Chtoucas.md)
+- [](Excursion.md)
 - [](notes-stable-center.md)
 - [](six-functors.md)
 - [](notes-Gestalten.md)

@@ -1,5 +1,5 @@
 ---
-title: "Grothendieck 函数–层字典"
+title: Grothendieck 函数–层字典
 tag: 百科
 author: [SimplicialCat](SimplicialCat.md)
 ---

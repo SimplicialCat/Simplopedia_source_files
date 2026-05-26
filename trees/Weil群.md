@@ -4,11 +4,15 @@ tag: 百科
 author: [SimplicialCat](SimplicialCat.md)
 ---
 
-Weil 群是[局部域](局部域.md)或[整体域](整体域.md)的[绝对 Galois 群](绝对Galois群.md)的一个变体.
+## 观念
 
-> 如下陈述引自 Dustin Clausen 关于推广 Weil 群的演讲.
+参考 [Clausen](ClausenWeilAnima.md).
 
-回忆数域 $F$ 的绝对 Galois 群可以写成
+Weil 群是[局部域](局部域.md)或[整体域](整体域.md)的[绝对 Galois 群](绝对Galois群.md)的一个变体, 是对其[平展同伦型](平展同伦论.md)的一个修正, 可理解为基本群.
+
+> Clausen 认为 Weil 群仍然不足以描述数域的同伦型, 因为 "数域不应该是 $K(\pi,1)$", 除 "基本群" 以外还有高阶同伦信息.
+
+回忆[数域](数域.md) $F$ 的[绝对 Galois 群](绝对Galois群.md)可以写成
 $$
 G_F = \lim_{\text{有限 Galois 扩张 }E/F}\operatorname{Gal}(E^{\mathrm{ab}}/F),
 $$

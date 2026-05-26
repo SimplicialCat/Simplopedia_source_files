@@ -8,7 +8,7 @@ author: [SimplicialCat](SimplicialCat.md)
 
 推广不会仅做一次就停止. 对于可表现对称幺半范畴 $\mathcal A$, 其在 $\mathsf{Pr}$ 中的[模范畴](高阶模.md)为可表现对称幺半 $2$-范畴, 这种对象又可视为可表现对称幺半范畴的推广. 以此类推至于无穷, 就得到 **Stefanich 环**的概念.
 
-**定义**. Stafanich 环的范畴 $\mathsf{StRing}$ 是如下 $\aleph_1$-[可表现范畴](可表现范畴.md):
+**定义**. Stefanich 环的范畴 $\mathsf{StRing}$ 是如下 $\aleph_1$-[可表现范畴](可表现范畴.md):
 $$
 \begin{aligned}
 \mathsf{StRing} &= \operatorname{colim}^{1\mathsf{Pr}}(\mathsf{CAlg}(\mathsf{Ani})\hookrightarrow\mathsf{CAlg}(1\mathsf{Pr})\hookrightarrow\cdots)\\
@@ -39,7 +39,7 @@ $$
 $$
 
 这可视为 $B$ 在 $A$ 上的一种[相对](相对.md)观点, 正如在代数几何中我们常常固定一个基环 $A$ 考虑 $A$-代数一样. 而 "绝对" 的基环是 $A = (*,\mathsf{Ani},\mathsf{Pr},\cdots)$, 此时,
-$(B/A)_{n-1} = B_{n-1} \in \mathsf{CAlg}((n-1)\mathsf{Pr})$.
+$(B/A)_{n-1} = B_{n-1} \in \mathsf{CAlg}((n-1)\mathsf{Pr})$. 以后我们将默认 Stefanich 环处于相对情形.
 
 函子 $f_{n-1,*}$ 可想象为几何对象之间 $(n-1)$-范畴层的推前, 即[整体截面](整体截面.md)操作的相对版本. 当几何对象被其上 $(n-1)$-范畴层的整体截面完全确定时, 称其 $(n-1)$-[仿射](高阶仿射性.md). 在[相对](相对.md)情形中, 也有仿射态射的概念.
 
@@ -137,3 +137,14 @@ $$
 
 **定义**. 若对任意 $m\geq n+1$, $f^*_{m-1}$ 在 $A_{m+1}$ 中有右伴随 $f_{m-1,*}\colon (B/A)_m \to 1$, 则称 $f$ 为 $n$-**[](term-prim.md)** (prim) 态射.
 
+**命题**.
+
+- 若 $B\in\mathsf{StRing}_{A/}$ 为 $n$-仿射 $A$-代数且可数表现, 则 $A\to B$ 为 $n$-[](term-prim.md)态射.
+
+*证明*.
+
+- 设 $m\geq n$. 拉回函子 $f^*_{m-1}\colon A_m \to \mathsf{Mod}_{A_m}((B/A)_{m-1})$ 在 $\mathsf{Mod}_{\mathsf{Pr}}(A_m)$ 中有右伴随 $f_{m-1,*}$; 由仿射性, 函子 $\mathsf{Mod}(A_m) \to A_{m+1}$ 将 $\mathsf{Mod}((B/A)_{m-1})$ 映射到 $(B/A)_m$. 因此 $f_{m-1}^*\colon 1\to (B/A)_m$ 在 $A_{m+1}$ 中有右伴随.
+
+## 平展性
+
+对于 Stefanich 环的同态 $f\colon A\to B$,

@@ -4,6 +4,16 @@ tag: 笔记
 author: [SimplicialCat](SimplicialCat.md)
 ---
 
+## Gestalten 的意象
+
+Gestalten 的范畴在实用意义上是个[意象](意象.md), 满足了我们对一个几何对象的范畴的所有期待.
+
+### 拉回保持余极限
+
+拉回保持余极限是意象的一个重要性质, 也是 [Giraud 公理](Giraud公理.md)的第一条. 我们看看 Gestalten 为何满足这一性质, 这其实令人惊叹.
+
+Gestalten 的余极限是 Stefanich 环的极限, 那么这个性质就是说 Stefanich 环的极限在基变换下保持.
+
 ## 例
 
 ### 仿射直线

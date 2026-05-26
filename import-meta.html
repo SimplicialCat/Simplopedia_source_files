@@ -1,1 +1,19 @@
 <link rel="icon" href="/assets/favicon.ico" type="image/x-icon">
+
+
+<div id="tcomment"></div>
+<script src="https://cdn.jsdelivr.net/npm/twikoo@1.7.9/dist/twikoo.min.js"></script>
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    const footer = document.querySelector('footer');
+    const commentEl = document.getElementById('tcomment');
+    if (footer && commentEl) {
+      footer.parentNode.insertBefore(commentEl, footer.nextSibling);
+    }
+    twikoo.init({
+      envId: 'https://simplopedia.netlify.app/.netlify/functions/twikoo',
+      el: '#tcomment',
+      path: location.pathname,
+    });
+  });
+</script>

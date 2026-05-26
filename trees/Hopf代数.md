@@ -16,8 +16,6 @@ Hopf 代数上的模范畴是群表示范畴的推广.
 
 ## 定义
 
-### 传统定义
-
 [对称幺半 $1$-范畴](对称幺半范畴.md)中的 Hopf 代数是[双代数](双代数.md) $(A,m,\eta,\epsilon,\Delta)$ 带有对径映射 $S\colon A\to A$, 满足
 $$
 m (\mathrm{id} \otimes S) \Delta = m (S \otimes \mathrm{id}) \Delta = \eta\epsilon,

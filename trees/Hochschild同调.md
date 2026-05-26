@@ -21,6 +21,15 @@ $$
 $$
 这个定义的缺陷是它没能反映 Hochschild 同调的 $S^1$-对称性.
 
+另一个定义. 将结合代数 $A$ 视为 $\mathcal C$ 的[Morita 范畴](Morita范畴.md)中的对象, 其[对偶](可对偶对象.md)为 $A^{\mathrm{op}}$, 从而给出一个取值于 Morita 范畴的 $1$ 维[拓扑场论](拓扑场论.md)
+$$
+Z_A\colon \mathsf{Bord}_1^{\mathrm{fr}}\to\mathsf{Morita}(\mathcal C),
+$$
+Hochschild 同调是其在 $S^1$ 上的值:
+$$
+\operatorname{HH}(A) := Z_A(S^1).
+$$
+
 ### 交换代数
 
 当 $A$ 为[交换代数](交换代数.md)时,

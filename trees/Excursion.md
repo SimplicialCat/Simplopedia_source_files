@@ -4,11 +4,15 @@ tag: 笔记
 author: [SimplicialCat](SimplicialCat.md)
 ---
 
+
+
 [Gaitsgory–Lin–Reeves](GaitsgoryLinReevesExcALg.md) 的阅读笔记.
 
 ## AGKRRV
 
 本文依赖于 [AGKRRV](AGKRRV1.md).
+
+相关笔记: [AGKRRV](notes-AGKRRV.md)
 
 ## 引言
 

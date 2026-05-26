@@ -14,6 +14,10 @@ You may also want to visit [my personal main page](https://simplicialcat.github.
 
 可以试试[搜索单纯百科的页面](search.md).
 
+欢迎所有读者在页面下方发布[评论](comments.md), 或[通过邮箱联系我](mailto:wangjiny24@mails.tsinghua.edu.cn) `wangjiny24@mails.tsinghua.edu.cn` , 交流, 催更. (对于好友, 通过微信或 QQ 联系我当然是更加欢迎的.)
+
+
+
 ## 分类
 
 单纯百科的页面分为以下几类.
@@ -29,13 +33,19 @@ You may also want to visit [my personal main page](https://simplicialcat.github.
 
 点击 [SimplicialCat](SimplicialCat.md) 可以看到本站的所有页面.
 
-欢迎所有读者[通过邮箱联系我](mailto:wangjiny24@mails.tsinghua.edu.cn) `wangjiny24@mails.tsinghua.edu.cn` , 交流, 催更. (对于好友, 通过微信或 QQ 联系我当然是更加欢迎的.)
-
 [亟需施工处](todo.md)列表 ("TODO list")
 
 [术语翻译表](terminologies.md)
 
 ## 最近
+
+
+
+[](配边范畴.md)
+
+[](谱分解.md)
+
+[](单纯形范畴.md)
 
 [](Barr–Beck–Lurie定理.md)
 
@@ -78,3 +88,4 @@ You may also want to visit [my personal main page](https://simplicialcat.github.
 [非交换 Čech 上同调](非交换Čech上同调.md)
 
 [分解同调](分解同调.md)
+
