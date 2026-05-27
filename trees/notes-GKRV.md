@@ -24,13 +24,12 @@ $$
 
 ### 1.2 将 $\mathcal A^{\otimes Y}$ 表现为余极限
 
-**命题**. 范畴 $\mathcal A^{\otimes Y}$ (遗忘到 $\mathfrak C$ 中) 等同于如下的余极限:
+**命题**. 范畴 $\mathcal A^{\otimes Y}$ (遗忘到 $\mathfrak C$ 中) 等同于如下的[余端](余端.md):
 $$
-\mathcal A^{\otimes Y} = \operatorname{colim}^{\mathfrak C}_{(I\to J)\in\mathsf{TwArr}(\mathsf{Fin})} \operatorname{colim}_{\operatorname{Hom}(J,Y)}^{\mathfrak C}\mathcal A^{\otimes I}.\, (\star)
-$$
-其中 $\mathsf{TwArr}(-)$ 表示[扭箭头范畴](扭箭头范畴.md). 
+\mathcal A^{\otimes Y} = \int_{I\in\mathsf{Fin}} Y^I\otimes\mathcal A^{\otimes I}.\, (\star)
+$$ 
 
-证明的思路是: 命题对 $Y\in\mathsf{Fin}$ 较为平凡, 然后将两边沿 $\mathsf{Fin}\to\mathsf{Ani}$ 作左 [Kan 扩张](Kan扩张.md).
+证明的思路是: 命题对 $Y\in\mathsf{Fin}$ 较为平凡, 然后将两边视为关于 $Y$ 的函子, 沿 $\mathsf{Fin}\to\mathsf{Ani}$ 作左 [Kan 扩张](Kan扩张.md).
 
 **引理 1**. 函子 $\mathsf{Ani}\to\mathfrak C$, $Y\mapsto \mathcal A^{\otimes Y}$ 是其沿 $\mathsf{Fin}\to\mathsf{Ani}$ 的限制的左 Kan 扩张.
 
@@ -42,7 +41,7 @@ $$
 
 **引理 2**. 等式 $(\star)$ 的右端给出的函子 $\mathsf{Ani}\to\mathfrak C$ 是其沿 $\mathsf{Fin}\to\mathsf{Ani}$ 的限制的左 Kan 扩张.
 
-*证明*. 对任意有限集 $I,J$, 函子 $Y\mapsto \operatorname{Hom}(J,-)$, $Z\mapsto \operatorname{colim}^{\mathfrak C}_{Z}\mathcal A^{\otimes I}$ 均保持[筛余极限](筛余极限.md), 从而复合函子 $Y\mapsto \operatorname{colim}^{\mathfrak C}_{\operatorname{Hom}(J,Y)}\mathcal A^{\otimes I}$ 保持筛余极限.
+*证明*. 对任意有限集 $I,J$, 函子 $Y\mapsto Y^J$, $Z\mapsto Z\otimes \mathcal A^{\otimes I}$ 均保持[筛余极限](筛余极限.md), 从而复合函子 $Y\mapsto Y^J\otimes \mathcal A^{\otimes I}$ 保持筛余极限.
 
 上面讨论了一些余极限. 下面讨论一些极限, 陈述某些极限和余极限相等.
 
@@ -73,7 +72,9 @@ $$
 
 ### 1.5 局部系统的叠
 
-局部系统的叠 $\mathsf{LS}_G(Y)$ 上的 $\mathsf{QCoh}$ 是对称幺半范畴 $\mathsf{Rep}(G)$ 沿空间积分的重要例子, 也是本文的主要研究对象. 由生象的映射
+局部系统的叠 $\mathsf{LS}_G(Y)$ 上的 $\mathsf{QCoh}$ 是对称幺半范畴 $\mathsf{Rep}(G)$ 沿空间积分的重要例子, 也是本文的主要研究对象 (本文将研究其上的 $\mathsf{QCoh}$, 以及 $1\in\mathsf{QCoh}$ 的自同态, 也即函数环).
+
+由生象的映射
 $$
 \begin{aligned}
 Y&\simeq\operatorname{Hom}_{\mathsf{Ani}}(*,Y)\\
@@ -91,7 +92,19 @@ $$
 
 ### 1.7 由 $\mathcal A^{\otimes Y}$ 出发的函子
 
-由于 $\mathcal A^{\otimes Y}$ 可表现为余极限,
+由于 $\mathcal A^{\otimes Y}$ 可表现为[余端](余端.md), 相应地 $\operatorname{Hom}(\mathcal A^{\otimes Y},\mathcal C)$ 可表现为[端](端.md)
+$$
+\begin{aligned}
+\operatorname{Hom}(\mathcal A^{\otimes Y},\mathcal C)&\simeq \int_{I\in\mathsf{Fin}}\operatorname{Hom}(Y^J\otimes\mathcal A^{\otimes I},\mathcal C)\\
+&\simeq \int_{I\in\mathsf{Fin}}\operatorname{Hom}(\mathcal A^{\otimes I},\mathcal C\otimes\mathsf{LS}(Y^I))\\
+&\simeq\mathsf{Nat}_{\mathsf{Fun}(\mathsf{Fin},\mathfrak C)}(\mathcal A^{\otimes (-)},\mathcal C\otimes\mathsf{LS}(Y^{(-)})).
+\end{aligned}
+$$
+
+从而 $\mathcal A^{\otimes Y}$ 在 DG 范畴 $\mathcal M$ 上的作用 $\mathcal A^{\otimes Y} \to \operatorname{End}(\mathcal M)$ 等同于一族函子
+$$
+\mathcal A^{\otimes I} \to \operatorname{End}(\mathcal M)\otimes\mathsf{LS}(Y^I).
+$$
 
 ## 2. 远足
 
@@ -145,8 +158,29 @@ $$
 $$
 \mathrm{BC}_J\colon \mathrm{mult}_J\circ\mathrm{mult}_J^R \to \iota_s^R\circ\iota_t.
 $$
+注意该变换保持松幺半函子结构.
 
-**引理**. 若 $\mathcal A$ 为刚性, 则 $\mathrm{BC}_J$ 为等价.
+**引理 2.7.4**. 若 $\mathcal A$ 为刚性, 则 $\mathrm{BC}_J$ 为等价.
+
+又因为 $\iota_s,\iota_t$ 均将 $1_{\mathcal A}$ 对应到 $1_{\mathcal A^{\otimes\Sigma (J)}}$
+
+**推论 2.7.6**.
+$$
+\operatorname{Hom}(1_{\mathcal A},\mathrm{mult}_J\circ\mathrm{mult}_J^R (1_{\mathcal A})) \simeq \operatorname{End}(1_{\mathcal A^{\Sigma (J)}}).
+$$
+
+从而 $\operatorname{Hom}(1_{\mathcal A},\mathrm{mult}_J\circ\mathrm{mult}_J^R (1_{\mathcal A}))$ 带有交换代数结构. 这个代数结构还可以具体写出: 对于 $\xi_1,\xi_2\colon 1_{\mathcal A}\to\mathrm{mult}_J\circ\mathrm{mult}_J^R (1_{\mathcal A})$, 其乘积 $\xi_1 * \xi_2$ 是如下复合:
+$$
+\begin{aligned}
+1_{\mathcal A} & = 1_{\mathcal A} \otimes 1_{\mathcal A}\\
+& \to \mathrm{mult}_J(\mathrm{mult}_J^R (1_{\mathcal A})) \otimes \mathrm{mult}_J(\mathrm{mult}_J^R (1_{\mathcal A}))\\
+& \simeq \mathrm{mult}_J(\mathrm{mult}_J^R (1_{\mathcal A}) \otimes \mathrm{mult}_J^R (1_{\mathcal A})) \\
+& \to \mathrm{mult}_J(\mathrm{mult}_J^R (1_{\mathcal A} \otimes 1_{\mathcal A})) \\
+& \simeq \mathrm{mult}_J(\mathrm{mult}_J^R (1_{\mathcal A})).
+\end{aligned}
+$$
+
+记 $\xi$ 对应的 $1_{\mathcal A^{\Sigma (J)}}$ 的自同态为 $E_\xi$.
 
 ### 2.8 以远足构造模上的作用
 
