@@ -15,13 +15,14 @@ Hochschild 同调又叫 "[迹](迹.md)", "[余中心](余中心.md)".
 
 ### 结合代数
 
-设 $\mathcal C$ 为[闭](闭范畴.md)[对称幺半范畴](对称幺半范畴.md), $A$ 为 $\mathcal C$ 中的[结合代数](结合代数.md). 定义其 **Hochschild 同调**为
+设 $\mathcal C$ 为[对称幺半范畴](对称幺半范畴.md), $A$ 为 $\mathcal C$ 中的[结合代数](结合代数.md). 定义其 **Hochschild 同调**为
 $$
 \operatorname{HH}_*(A) := A \otimes_{A\otimes A^{\mathrm{op}}} A.
 $$
+也即 $\operatorname{HH}_*(A)$ 是 $A$ 作为 $(A,A)$-双模的[迹](迹.md).
 这个定义的缺陷是它没能反映 Hochschild 同调的 $S^1$-对称性.
 
-另一个定义. 将结合代数 $A$ 视为 $\mathcal C$ 的[Morita 范畴](Morita范畴.md)中的对象, 其[对偶](可对偶对象.md)为 $A^{\mathrm{op}}$, 从而给出一个取值于 Morita 范畴的 $1$ 维[拓扑场论](拓扑场论.md)
+另一个定义. 将结合代数 $A$ 视为 $\mathcal C$ 的 [Morita 范畴](Morita范畴.md)中的对象, 其[对偶](可对偶对象.md)为 $A^{\mathrm{op}}$, 从而给出一个取值于 Morita 范畴的 $1$ 维[拓扑场论](拓扑场论.md)
 $$
 Z_A\colon \mathsf{Bord}_1^{\mathrm{fr}}\to\mathsf{Morita}(\mathcal C),
 $$
@@ -29,6 +30,14 @@ Hochschild 同调是其在 $S^1$ 上的值:
 $$
 \operatorname{HH}(A) := Z_A(S^1).
 $$
+
+### 结合代数与双模
+
+设 $\mathcal C$ 为[对称幺半范畴](对称幺半范畴.md), $A$ 为 $\mathcal C$ 中的[结合代数](结合代数.md), $M$ 为 $(A,A)$-双模. 定义其 **Hochschild 同调**为
+$$
+\operatorname{HH}_*(A,M) := A \otimes_{A\otimes A^{\mathrm{op}}} M.
+$$
+也即 $\operatorname{HH}_*(A,M)$ 是 $M$ 作为 $(A,A)$-双模的[迹](迹.md).
 
 ### 交换代数
 

@@ -39,6 +39,8 @@ You may also want to visit [my personal main page](https://simplicialcat.github.
 
 ## 最近
 
+[](中心.md)
+
 [](余端.md)
 
 [](配边范畴.md)

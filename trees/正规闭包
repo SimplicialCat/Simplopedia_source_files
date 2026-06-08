@@ -1,0 +1,9 @@
+---
+title: 正规闭包
+tag: 百科
+author: [SimplicialCat](SimplicialCat.md)
+---
+
+## 观念
+
+[生象群](群.md)的同态 $H\to G$ 的正规闭包是与它最接近的[正规同态](正规子群.md) $K\to G$.

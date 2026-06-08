@@ -12,7 +12,7 @@ Verdier 对偶使用了 Grothendieck [六函子](六函子.md).
 
 ### 流形的 Poincaré 对偶
 
-设 $M$ 是 $n$ 维紧可定向流形, 则有典范同构
+设 $M$ 是 $n$ 维紧[可定向](定向.md)流形, 则有典范同构
 $$
 H^k(M;\mathbb{Z})\to H_{n-k}(M;\mathbb{Z}).
 $$

@@ -1,11 +1,11 @@
 ---
-title: "Morava K-理论"
+title: Morava K-理论
 tag: 百科
 author: [SimplicialCat](SimplicialCat.md)
 ---
 
 
-对于素数 $p$, Morava K-理论是一列复定向上同调理论 $K(n)$,
+对于素数 $p$, Morava K-理论是一列[复定向上同调理论](广义上同调中的定向.md) $K(n)$,
 $$
 \pi_\bullet(K(n))\simeq\mathbb F_p[v_n,v_n^{-1}],
 $$

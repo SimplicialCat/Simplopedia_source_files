@@ -8,6 +8,8 @@ author: [SimplicialCat](SimplicialCat.md)
 
 [Gaitsgory–Lin–Reeves](GaitsgoryLinReevesExcALg.md) 的阅读笔记.
 
+相关概念: [](远足代数.md)
+
 ## AGKRRV
 
 本文依赖于 [AGKRRV](AGKRRV1.md).

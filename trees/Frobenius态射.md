@@ -4,6 +4,9 @@ tag: 百科
 author: [SimplicialCat](SimplicialCat.md)
 ---
 
+## 观念
+
+从[平展同伦论](平展同伦论.md)的角度看, Frobenius 态射给出 $\operatorname{Spec}\mathbb F_q$ 上概形的平展同伦型的[和乐](和乐.md).
 
 ## 定义
 

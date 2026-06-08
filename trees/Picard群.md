@@ -6,7 +6,11 @@ author: [SimplicialCat](SimplicialCat.md)
 
 ## 观念
 
-空间的 Picard 群是其上[线丛](线丛.md)的同构类关于张量积构成的群.
+空间的 **Picard 叠**是其上[线丛](线丛.md) (即 [$\mathbb{G}_m$](乘法群概形.md)-[主丛](主丛.md)) 的[模空间](模空间.md),
+$$
+\mathrm{Pic}(X) = \operatorname{Maps}(X,\mathbf{B}\mathbb{G}_m);
+$$
+**Picard 群**是 Picard 叠的 $0$-[截断](截断性(同伦类型论).md), 即线丛的同构类关于张量积构成的群.
 
 ## 定义
 

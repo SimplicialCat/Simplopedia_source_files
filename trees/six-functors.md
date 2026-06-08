@@ -50,7 +50,7 @@ $$
 
 定向流形的上同调满足 [Poincaré 对偶](Poincaré--Verdier对偶.md):
 
-**定理** (Poincaré 对偶). 对于紧定向 $d$ 维流形 $X$,
+**定理** (Poincaré 对偶). 对于紧[定向](定向.md) $d$ 维流形 $X$,
 $$
 R\Gamma(X,\mathbb{Z})[d] \simeq R\Gamma(X,\mathbb{Z})^\vee.
 $$

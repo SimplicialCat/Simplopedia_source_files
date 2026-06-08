@@ -21,3 +21,7 @@ H^*(\mathbf{B}O(n),\mathbb{Z}/2) \to H^*(\mathbf{B}O(1)^n,\mathbb{Z}/2) =
 \mathbb{Z}/2 [a_1,\cdots,a_n]
 $$
 是对称多项式环的嵌入.
+
+### 阻碍
+
+第一 Stiefel–Whitney 类是[定向](定向.md)的[阻碍](阻碍.md).

@@ -15,7 +15,7 @@ $$
 
 ## 性质
 
-$\mathsf{Sp}$ 上有[压缩积](压缩积.md) $\wedge$ 与映射谱 $[-,-]$ 给出的[闭](闭范畴.md)[对称幺半](对称幺半∞-范畴.md)结构. 有[对称幺半函子](对称幺半∞-范畴.md)
+$\mathsf{Sp}$ 上有[压缩积](压缩积.md) $\wedge$ 与[映射谱](映射谱.md) $[-,-]$ 给出的[闭](闭范畴.md)[对称幺半](对称幺半∞-范畴.md)结构. 有[对称幺半函子](对称幺半∞-范畴.md)
 $$
 (\mathsf{Set},\times) \to (\mathsf{Ani},\times) \overset{(-)_+}{\to} (\mathsf{Ani}_{*/},\wedge) \overset{\Sigma_{\infty}}{\to} (\mathsf{Sp},\wedge).
 $$

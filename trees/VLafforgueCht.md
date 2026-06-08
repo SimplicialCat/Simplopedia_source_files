@@ -5,7 +5,6 @@ author: Vincent Lafforgue
 ---
 
 ```
-
 @misc{lafforgue2018chtoucaspourlesgroupes,
       title={Chtoucas pour les groupes r\'eductifs et param\'etrisation de Langlands globale}, 
       author={Vincent Lafforgue},

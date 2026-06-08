@@ -14,22 +14,47 @@ $$
 $$
 其中的态射为保持余极限的函子.
 
-设 $\mathcal A$ 为[对称幺半](对称幺半范畴.md) [DG 范畴](微分分次范畴.md), $Y$ 为空间 (即[生象](生象.md)). 考虑范畴 $\mathcal A^{\otimes Y} = \operatorname{colim}^{\mathsf{SymMonCat}}_Y\mathcal A$. 我们可以在三种不同语境下描述这个范畴:
+> 脑中图像:
+>
+> - $\mathcal A = \mathsf{QCoh}(X)$ (实际 $X=\mathbf{B}G$)
+> - $1_{\mathcal A} = \mathcal O_X$
+> - $\mathcal A^{\otimes Y} = \mathsf{QCoh}(\operatorname{Maps}(Y,X))$
+> - $1_{\mathcal A^{\otimes Y}} = \mathcal O_{\operatorname{Maps}(Y,X)}$
+> - $\mathcal A^{\otimes\Sigma(J)}=\mathsf{QCoh}(\operatorname{Maps}(\Sigma(J),X))=\mathsf{QCoh}(X\times_{X^J}X)$
+> - $\Sigma (J) \to Y$ 给出映射 $\operatorname{Maps}(Y,X) \to \operatorname{Maps}(\Sigma (J),X)$
+
+设 $\mathcal A$ 为[对称幺半](对称幺半范畴.md) [DG 范畴](微分分次范畴.md), $Y$ 为空间 (即[生象](生象.md)). 考虑对称幺半 DG 范畴
+$$
+\mathcal A^{\otimes Y} := \operatorname{colim}^{\mathsf{SymMonCat}}_Y\mathcal A.
+$$
+我们可以在三种不同语境下描述这个范畴:
 
 - 对称幺半 DG 范畴,
 - 幺半 DG 范畴,
 - DG 范畴.
 
-总之, 设 $\mathfrak C$ 是上述某种范畴的全体. 注意, 三种语境中一般的余极限不相容 (余极限的底层范畴不同); 但[筛余极限](筛余极限.md)是相容的. 这个事实马上就要用到.
+总之, 设 $\mathfrak C$ 是上述某种范畴的全体, 即 $\mathfrak C = \mathsf{Alg}_{\mathbb E_n}(\mathsf{DGCat})$, $n\in\{0,1,\infty\}$. 注意, 三种语境中一般的余极限与遗忘函子不相容; 但[筛余极限](筛余极限.md)是相容的. 这个事实马上就要用到.
+
+> 注. $\mathcal A$ 也可以视为 $\mathsf{CAlg}(\mathfrak C)$ 的对象, 也即对称幺半函子 $\mathsf{Fin} \to \mathfrak C$, $I\mapsto \mathcal A^{\otimes I}$. (我觉得这个视角才是本质的.)
 
 ### 1.2 将 $\mathcal A^{\otimes Y}$ 表现为余极限
 
-**命题**. 范畴 $\mathcal A^{\otimes Y}$ (遗忘到 $\mathfrak C$ 中) 等同于如下的[余端](余端.md):
+**命题**. 对称幺半 DG 范畴 $\mathcal A^{\otimes Y}$ 遗忘到 $\mathfrak C$ 中, 等同于如下的[余端](余端.md):
 $$
-\mathcal A^{\otimes Y} = \int_{I\in\mathsf{Fin}} Y^I\otimes\mathcal A^{\otimes I}.\, (\star)
-$$ 
+\mathcal A^{\otimes Y} = \int_{I\in\mathsf{Fin}}^{\mathfrak C} Y^I\otimes\mathcal A^{\otimes I}.\, (\star)
+$$
+其中
+- $\mathcal A^{\otimes I}$ 是 $\mathcal A$ 作为对称幺半 DG 范畴的 $I$ 次张量积,
+- $Y^I\otimes (-)$ 是指取常值图的余极限 $\operatorname{colim}_{Y^I}^{\mathfrak C}(-)$.
 
 证明的思路是: 命题对 $Y\in\mathsf{Fin}$ 较为平凡, 然后将两边视为关于 $Y$ 的函子, 沿 $\mathsf{Fin}\to\mathsf{Ani}$ 作左 [Kan 扩张](Kan扩张.md).
+
+> 注. 我目前对这个命题的理解是:
+> - $\mathsf{Fin}$ 在 $\mathsf{Ani}$ 中关于[筛余极限](筛余极限.md)稠密;
+> - 对称幺半范畴 $\mathfrak C$ 中的交换代数等同于对称幺半函子 $\mathsf{Fin} \to \mathfrak C$;
+> - 命题中等式右端正是将其按筛余极限延拓为 $\mathsf{Ani} \to \mathfrak C$ 的方法, 同时也是沿 $\mathsf{Fin}\to\mathsf{Ani}$ 左 Kan 扩张的计算式.
+>
+> 注意, 函子 $\mathsf{Ani} \to \mathfrak C$, $Y\mapsto\mathcal A^{\otimes Y}$ 不保持余极限. 换言之, 它不是 $1\to\mathfrak C$ 沿 $1\to\mathsf{Ani}$ 的左 Kan 扩张.
 
 **引理 1**. 函子 $\mathsf{Ani}\to\mathfrak C$, $Y\mapsto \mathcal A^{\otimes Y}$ 是其沿 $\mathsf{Fin}\to\mathsf{Ani}$ 的限制的左 Kan 扩张.
 
@@ -53,7 +78,10 @@ $$
 
 定义生象 $Y$ 上[局部系统](局部系统.md)的范畴为
 $$
-\mathsf{LS}(Y) = \operatorname{lim}_Y \mathsf{Vect},
+\begin{aligned}
+\mathsf{LS}(Y) &= \operatorname{lim}_Y^{\mathsf{DGCat}} \mathsf{Vect}\\
+&=\operatorname{lim}_Y^{\mathsf{CAlg}(\mathsf{DGCat})} \mathsf{Vect},
+\end{aligned}
 $$
 它是对称幺半 DG 范畴. 若 $\mathscr Y$ 为较好的拓扑空间 (仿紧, 同伦等价于 CW 复形, 同伦维数有限), $Y$ 为 $\mathscr Y$ 对应的生象, 则 $\mathsf{LS}(Y)$ 等价于 $\mathsf{Shv}_{\text{lisse}}(Y)$, 即线性空间层的导出范畴 $\mathsf{Shv}(\mathscr{Y})$ 中上同调为局部常值层的对象构成的全子范畴.
 
@@ -92,16 +120,18 @@ $$
 
 ### 1.7 由 $\mathcal A^{\otimes Y}$ 出发的函子
 
-由于 $\mathcal A^{\otimes Y}$ 可表现为[余端](余端.md), 相应地 $\operatorname{Hom}(\mathcal A^{\otimes Y},\mathcal C)$ 可表现为[端](端.md)
+仍设 $\mathfrak C$ 为 $\mathsf{CAlg}(\mathsf{DGCat}),\mathsf{Alg}(\mathsf{DGCat}),\mathsf{DGCat}$ 之一, $\mathcal C$ 为 $\mathfrak C$ 的对象.
+
+由于 $\mathcal A^{\otimes Y}$ 可表现为 $\mathfrak C$ 中的[余端](余端.md), 相应地 $\operatorname{Hom}_{\mathfrak C}(\mathcal A^{\otimes Y},\mathcal C)$ 可表现为[端](端.md)
 $$
 \begin{aligned}
-\operatorname{Hom}(\mathcal A^{\otimes Y},\mathcal C)&\simeq \int_{I\in\mathsf{Fin}}\operatorname{Hom}(Y^J\otimes\mathcal A^{\otimes I},\mathcal C)\\
+\operatorname{Hom}_{\mathfrak C}(\mathcal A^{\otimes Y},\mathcal C)&\simeq \int_{I\in\mathsf{Fin}}\operatorname{Hom}_{\mathfrak C}(Y^I\otimes\mathcal A^{\otimes I},\mathcal C)\\
 &\simeq \int_{I\in\mathsf{Fin}}\operatorname{Hom}(\mathcal A^{\otimes I},\mathcal C\otimes\mathsf{LS}(Y^I))\\
 &\simeq\mathsf{Nat}_{\mathsf{Fun}(\mathsf{Fin},\mathfrak C)}(\mathcal A^{\otimes (-)},\mathcal C\otimes\mathsf{LS}(Y^{(-)})).
 \end{aligned}
 $$
 
-从而 $\mathcal A^{\otimes Y}$ 在 DG 范畴 $\mathcal M$ 上的作用 $\mathcal A^{\otimes Y} \to \operatorname{End}(\mathcal M)$ 等同于一族函子
+**例**. $\mathfrak C = \mathsf{Alg}(\mathsf{DGCat})$, $\mathcal A^{\otimes Y}$ 在 DG 范畴 $\mathcal M$ 上的作用, 即幺半函子 $\mathcal A^{\otimes Y} \to \operatorname{End}(\mathcal M)$, 等同于一族幺半函子
 $$
 \mathcal A^{\otimes I} \to \operatorname{End}(\mathcal M)\otimes\mathsf{LS}(Y^I).
 $$
@@ -145,7 +175,7 @@ $$
 
 由推论 2.4.4,
 $$
-\operatorname{End}(1_{\mathcal A^{\otimes Y}}) = \operatorname{colim}_{}\operatorname{End}(1_{\mathcal A^{\otimes\Sigma (I_+)}})
+\operatorname{End}(1_{\mathcal A^{\otimes Y}}) = \operatorname{colim}_{I\to\Omega Y}\operatorname{End}(1_{\mathcal A^{\otimes\Sigma (I_+)}}).
 $$
 
 设 $J$ 为有限集. 记 $\mathrm{mult}_J\colon \mathcal A^{\otimes J} \to \mathcal A$ 为乘积函子.
@@ -184,4 +214,47 @@ $$
 
 ### 2.8 以远足构造模上的作用
 
-设有 DG 范畴的函子 $S^Y\colon \mathcal A^{\otimes Y} \to \mathcal C$.
+对于带基点生象 $Y$ 的 $I$ 条环路
+$$
+\gamma^I\colon I\to\Omega Y,
+$$
+有映射
+$$
+\gamma^{I_+} \colon \operatorname{End}(1_{\mathcal A^{\Sigma (I_+)}}) \to \operatorname{End}(1_{\mathcal A^{\otimes Y}}).
+$$
+我们关注 $E_\xi$ 在这个映射下的像, 称为**远足算子**; 它们是远足代数的生成元.
+
+
+设有 DG 范畴的函子 $S^Y\colon \mathcal A^{\otimes Y} \to \mathcal C$. 它等同于一族函子
+$$
+S_I \colon \mathcal A^{\otimes I} \to\mathcal C\otimes\mathsf{LS}(Y^I).
+$$
+
+对于点 $y\in Y$, 记 $\mathrm{ev}_y$ 为 $y$ 处的取值函子 $\mathsf{LS}(Y)\to\mathsf{Vect}$. 对于两个点 $y_1,y_2$ 之间的道路 $\gamma$, 有自然变换 $\mathrm{mon}_\gamma\colon \mathrm{ev}_{y_1} \to \mathrm{ev}_{y_2}$, 称为 "[平行移动](平行移动.md)".
+
+设 $y_1,y_2\in Y$ 是两个点, $\gamma^J$ 是 $J$ 条 $y_1$ 到 $y_2$ 的道路, $\xi\in\operatorname{Hom}(1_{\mathcal A},\mathrm{mult}_J\circ\mathrm{mult}_J^R (1_{\mathcal A}))$.
+
+**断言**. 远足算子为如下映射的复合.
+- 由于 $1_{\mathcal A}$ 沿 $\mathcal A \to \mathcal A^{\otimes Y}$ 的像是 $1_{\mathcal A^{\otimes Y}}$, 可将 $S_Y(1_{\mathcal A^{\otimes Y}})$ 等价于 $\mathrm{ev}_{y_1}(S_{1}(1_{\mathcal A}))$;
+- 通过函数 $\xi$ 由 $\mathrm{ev}_{y_1}(S_{1}(1_{\mathcal A}))$ 映射到 $\mathrm{ev}_{y_1}(S_{1}(\mathrm{mult}_J\mathrm{mult}_J^R 1_{\mathcal A}))$;
+- 由于 $S_I$ 的相容性, 上述对象等价于 $\mathrm{ev}_{y_1^J}(S_{J}(\mathrm{mult}_J^R 1_{\mathcal A}))$;
+- 用 "平行移动" 算子 $\mathrm{mon}_{\gamma^J}$ 映射到 $\mathrm{ev}_{y_2^J}(S_{J}(\mathrm{mult}_J^R 1_{\mathcal A}))$;
+- 由于 $S_I$ 的相容性, 上述对象等价于 $\mathrm{ev}_{y_2}(S_{1}(\mathrm{mult}_J\mathrm{mult}_J^R 1_{\mathcal A}))$;
+- 通过伴随的余单位映射到 $\mathrm{ev}_{y_2}(S_{1}(1_{\mathcal A}))$;
+- 上述对象等价于 $S_Y(1_{\mathcal A^{\otimes Y}})$.
+
+脑中图像:
+
+- $\mathcal A = \mathsf{QCoh}(X)$, $\mathcal A^{\otimes Y}=\mathsf{QCoh}(X^Y)$ (其中 $X^Y$ 表示 $\operatorname{Maps}(Y,X)$), 特别地 $\mathcal A^{\otimes\Sigma (J)}=\mathsf{QCoh}(X^{\Sigma (J)})=\mathsf{QCoh}(X\times_{X^J}X)$;
+- $\mathcal C =\mathsf{QCoh}(S)$, $S_Y\colon \mathcal A^{\otimes Y}\to\mathcal C$ 对应映射 $f\colon S\to X^Y$ (其中 $S$ 是任何测试空间, 或为万有情形即 $X^Y$ 本身);
+- $1_{\mathcal A} = \mathcal O_X$, $1_{\mathcal A^{\otimes Y}} = \mathcal O_{X^Y}$, $S_Y(1_{\mathcal A^{\otimes Y}})=\mathcal O_S$;
+- $\xi\in \operatorname{End}(1_{\mathcal A^{\otimes\Sigma (J)}})=\Gamma(\mathcal O_{X^{\Sigma (J)}})$;
+- $S_{I}\colon \mathcal A^{\otimes I}\to\mathcal C\otimes\mathsf{LS}(Y^I)$ 对应映射 $s_I\colon S\times Y^I \to X^I$, 特别地, $S_1$ 对应 $s_1\colon S\times Y\to X$;
+- $\mathrm{ev}_{y_1^I}$ 对应映射 $y_1^I\colon S\to S\times Y^I$;
+
+## 3. 迹
+
+**定理 3.8.5**. 设 $\mathcal C$ 为刚性对称幺半 DG 范畴, $F$ 为对称幺半的自函子. 那么 $F$ 的迹等于 [Hochschild 同调](Hochschild同调.md)的单位的自同态:
+$$
+\operatorname{Tr}(F) \simeq \operatorname{End}(1_{\operatorname{HH}_* (\mathcal C,F)}).
+$$
