@@ -190,7 +190,7 @@ $$
 $$
 注意该变换保持松幺半函子结构.
 
-**引理 2.7.4**. 若 $\mathcal A$ 为刚性, 则 $\mathrm{BC}_J$ 为等价.
+**引理 2.7.4**. 若 $\mathcal A$ 为[刚性](刚性幺半范畴.md), 则 $\mathrm{BC}_J$ 为等价.
 
 又因为 $\iota_s,\iota_t$ 均将 $1_{\mathcal A}$ 对应到 $1_{\mathcal A^{\otimes\Sigma (J)}}$
 

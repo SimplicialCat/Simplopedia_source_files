@@ -151,7 +151,7 @@ $$
 
 我们的目标是
 
-**定理**. 上述卷积使得 $\mathsf{Sph}$ 构成刚性张量范畴, 且存在忠实正合的纤维函子 $\mathsf{Sph} \to \mathsf{Vect}$, 在[淡中对偶](淡中对偶.md)下, 将 $\mathsf{Sph}$ 等同于 $\mathsf{Rep}(^LG)$.
+**定理**. 上述卷积使得 $\mathsf{Sph}$ 构成[刚性](刚性幺半范畴.md)张量范畴, 且存在忠实正合的纤维函子 $\mathsf{Sph} \to \mathsf{Vect}$, 在[淡中对偶](淡中对偶.md)下, 将 $\mathsf{Sph}$ 等同于 $\mathsf{Rep}(^LG)$.
 
 $G(\widehat {\mathcal K})_n$ 的群结构
 $$
