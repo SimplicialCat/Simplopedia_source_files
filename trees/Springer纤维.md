@@ -18,3 +18,7 @@ Springer 纤维与 Schubert 簇有关; 两者都是[旗流形](旗流形.md) $\m
 Springer 纤维的上同调带有自然的[对称群](对称群.md)作用, 这是几何表示论的重要构造.
 
 $X$ 的 Jordan 分解给出了 $n$ 的一个划分 $\lambda$, 而 Springer 证明了 $\mathcal B^X$ 的最高维上同调是 $\lambda$ 对应的 $S_n$ 的不可约表示. 见[对称群的表示](对称群的表示.md).
+
+## 相关概念
+
+[](仿射Springer纤维.md)

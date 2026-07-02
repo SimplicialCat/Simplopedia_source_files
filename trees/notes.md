@@ -15,6 +15,7 @@ author: [SimplicialCat](SimplicialCat.md)
 
 计划中的讲稿 / 笔记:
 
+- [](ch-fil.md)
 - [](GrpAni.md)
 - [](Chtoucas.md)
 - [](Excursion.md)

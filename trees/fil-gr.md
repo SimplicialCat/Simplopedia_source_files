@@ -21,9 +21,9 @@ $$
 
 ### 滤
 
-[仿射直线对乘法群的商](A1-Gm.md) $\mathbb A^1 / \mathbb G_m$
+特别地, 令 $A = \mathbb{Z}[t]$, 我们得到 $\mathbb{Z}$-分次的 $\mathbb{Z}[t]$-模相当于 $\mathbb A^1$ 上的 $\mathbb G_m$-等变拟凝聚层, 也即商叠 [$\mathbb A^1 / \mathbb G_m$](A1-Gm.md) 上的拟凝聚层.
 
-...
+另一方面, $\mathbb{Z}$-分次的 $\mathbb{Z}[t]$-模也相当于 $\mathbb{Z}$-模范畴中的[滤对象](滤过.md), 其中 $t$ 的作用即为滤对象中的各阶结构映射.
 
 ## 相关概念
 

@@ -132,7 +132,7 @@ $$
 
 - $B\subset G$ 是固定的 Borel 子群,
 - $I$ 是 $B$ 对应的 [Iwahori 子群](Iwahori子群.md), 即 $B$ 在投影 $L^+G\to G$ 下的原像.
-- $\mathrm{Fl} := LG / I$ 为仿射旗簇, $\widetilde W$ 为[仿射 Weyl 群](仿射Weyl群.md).
+- $\mathrm{Fl} := LG / I$ 为[仿射旗簇](仿射旗簇.md), $\widetilde W$ 为[仿射 Weyl 群](仿射Weyl群.md).
 - $\mathsf{Par}$ 为 $LG$ 的[抛物-Iwahori 子群](parahoric.md) (也即包含 $I$ 的 fp-闭子群) 的偏序集.
 - 对于 $P\in\mathsf{Par}$, 记 $P^+$ 为 pro-幂幺根, ...
 
@@ -141,6 +141,8 @@ $$
 记 $K = k(\!(t)\!)$, $\mathcal O = k[\![t]\!]$. 固定 $n\in\mathbb{Z}_{\geq 0}$.
 
 ### 2.2 Hecke 代数
+
+固定一个 [Borel 子群](Borel子群.md) $B\subset G$, 记 $\mathbf I$ 为相应的 [Iwahori 子群](Iwahori子群.md).
 
 $M(LG)$ 关于卷积
 $$
@@ -173,12 +175,22 @@ $$
 
 记 $R(G)$ 为 $G(F)$ 的光滑表示的范畴, $\operatorname{Irr}(G)$ 为其中不可约对象的等价类集合.
 
+#### 3.1.2 Bernstein 中心
+
 记 $Z_G = Z(R(G))$ 为 Bernstein 中心, 即 $\mathrm{id}_{R(G)}$ 的自同态代数.
 $$
 Z_G := \operatorname{End}(\mathrm{id}_{R(G)})
 $$
 
 $Z_G$ 的每个元素 $z$ 给出 [Hecke 代数](Hecke代数.md) $\mathcal H(G(F))$ 的一个自同态 $z_{\mathcal H}$.
+
+#### 3.1.3 稳定 Bernstein 中心
+
+$Z_G$ 的每个元素 $z$ 给出不变[分布](分布.md) $\mu_z \in \operatorname{Dist}^{G(F)}(G(F))$
+
+#### 3.1.4 稳定中心猜想
+
+稳定中心猜想是说 $Z_G^{\text{st}}\subset Z_G$ 构成子代数.
 
 ### 3.2 Bernstein 中心的范畴化
 
@@ -210,8 +222,26 @@ $$
 (注意, 我们需要先得到 pro-范畴再取极限, 因为 "不变分布不可能紧支集")
 它是不变分布空间 $\operatorname{Dist}^{G(F)}G(F)$ 的范畴化.
 
+### 3.3 
+
+记 $\Upsilon$ 为 $\mathrm{Fl}$ 的 $\mathbf I$-不变非空闭子概形构成的偏序集.
+
 ### 3.4 应用到经典情形
 
-通过 [Grothendieck 函数–层字典](Grothendieck函数–层字典.md)
+通过 [Grothendieck 函数–层字典](Grothendieck函数–层字典.md)可由 $X$ 上的 $\mathrm{Fr}$-不变层 $\mathcal F\in D^{\mathrm{Fr}}(X)$ 得到 $X$ 上的函数 $[\mathcal F]$.
+
+对于 $X=LG$ 的情形, 有 $[\mathcal F]\in C_c^{\infty}(G(F))$.
+
+定义
+$$
+\frak{Z}^{\mathrm{Fr}}(LG) := \operatorname{End}_{K_0M^{\mathrm{Fr}}(LG^2)}(K_0M^{\mathrm{Fr}}(LG)).
+$$
+
 
 ## Bernstein 投影算子的稳定性
+
+## 5. 应用到经典 Bernstein 投影 $z^0$
+
+在 3.4 节的情形,
+
+## 6. 定理 5.1.8 的证明

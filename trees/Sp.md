@@ -17,5 +17,10 @@ $$
 
 $\mathsf{Sp}$ 上有[压缩积](压缩积.md) $\wedge$ 与[映射谱](映射谱.md) $[-,-]$ 给出的[闭](闭范畴.md)[对称幺半](对称幺半∞-范畴.md)结构. 有[对称幺半函子](对称幺半∞-范畴.md)
 $$
-(\mathsf{Set},\times) \to (\mathsf{Ani},\times) \overset{(-)_+}{\to} (\mathsf{Ani}_{*/},\wedge) \overset{\Sigma_{\infty}}{\to} (\mathsf{Sp},\wedge).
+(\mathsf{Set},\times) \to (\mathsf{Ani},\times) \overset{(-)_+}{\to} (\mathsf{Ani}_{*/},\wedge) \overset{\Sigma^{\infty}}{\to} (\mathsf{Sp},\wedge).
 $$
+其中单位的像为[球谱](球谱.md) $\mathbb S = \Sigma^\infty_+(*)$.
+
+### 泛性质
+
+$\mathsf{Sp}$ 是一个对象生成的[自由](自由-遗忘伴随.md)[稳定](稳定无穷范畴.md)[可表现范畴](可表现范畴.md).
