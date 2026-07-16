@@ -10,7 +10,7 @@ Heyting 代数是[直觉主义](直觉主义逻辑.md)命题演算的模型.
 
 ## 定义
 
-Heyting 代数是一个[偏序集](偏序集.md), 存在所有有限的[积](积(范畴论).md)和[余积](和(范畴论).md), 且构成[积闭范畴](积闭范畴.md). 换言之, Heyting 代数中有 $0$, $1$, 指数对象 $y^x$ (通常记作 $x\Rightarrow y$), 而指数对象由如下的伴随关系刻画:
+Heyting 代数是一个[偏序集](偏序集.md), 存在所有有限的[积](积(范畴论).md)和[余积](和(范畴论).md), 且构成[积闭范畴](积闭范畴.md). 换言之, Heyting 代数中有 $0$, $1$, [指数对象](指数对象.md) $y^x$ (通常记作 $x\Rightarrow y$), 而指数对象由如下的伴随关系刻画:
 $$
 z\leq (x\Rightarrow y) \quad \text{iff} \quad z\wedge x \leq y.
 $$
@@ -41,6 +41,10 @@ $$
 (U \Rightarrow V) = \bigcup_{W\cap U\subset V} W.
 $$
 每个 [Boole 代数](Boole代数.md)都是 Heyting 代数, 反之则不然.
+
+### 位象
+
+每个[位象](位象.md) $X$ 都给出一个 Heyting 代数 $\mathcal O(X)$. 由此容易给出不满足 Boole 性质的例子. 例如拓扑空间 $X$ 对应的 Heyting 代数中, 开集 $U$ 的[否定](否定.md) $U\Rightarrow \bot$ 实际上是 $X\setminus U$ 的内部, 除非 $U$ 既开又闭, 否则不会有 $\neg\neg U = U$.
 
 ## 参考资料
 
