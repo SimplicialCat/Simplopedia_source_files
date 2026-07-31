@@ -4,9 +4,21 @@ tag: 笔记
 author: [SimplicialCat](SimplicialCat.md)
 ---
 
+
+
 ## Gestalten 的意象
 
-Gestalten 的范畴在实用意义上是个[意象](意象.md), 满足了我们对一个几何对象的范畴的所有期待.
+Gestalten 的范畴在实用意义上是个[意象](意象.md), 实际上是 "可数意象" (countably topos), 满足了我们对一个几何对象的范畴的所有期待.
+
+**命题-定义**. 设小范畴 $\mathcal C$ 具有可数余极限和有限极限. 若如下等价条件成立, 则称 $\mathcal C$ 为**可数意象**:
+
+
+- 存在具有有限极限的小范畴 $S$, 以及[正合局部化](正合局部化.md) $\mathsf{Psh}(S)^{\aleph_1} \to \mathcal C$.
+- $\mathcal C$ 满足可数版本的 [Giraud 公理](Giraud公理.md), 即
+  - $\mathcal C$ 中的可数余极限是万有余极限;
+  - $\mathcal C$ 中的和无交;
+  - 群胚对象有效.
+- 范畴 $\mathsf{Ind}_{\aleph_1}(\mathcal C)$ 是意象.
 
 ### 拉回保持余极限
 

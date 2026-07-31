@@ -13,11 +13,20 @@ author: [SimplicialCat](SimplicialCat.md)
 
 ## 定义
 
+### 通过可表函子的滤余极限
+
 范畴 $\mathcal C$ 的 ind-对象的范畴
 $$
 \mathsf{Ind}(\mathcal C) \hookrightarrow \mathsf{Fun}(\mathcal C^{\mathrm{op}},\mathsf{Set})
 $$
 是[可表函子](可表函子.md)在 $\mathsf{Fun}(\mathcal C^{\mathrm{op}},\mathsf{Set})$ 中的[滤余极限](滤余极限.md)构成的全子范畴.
+
+### 通过平坦函子
+
+范畴 $\mathcal C$ 的 ind-对象的范畴也可定义为[平坦函子](平坦函子.md) $\mathcal C^{\mathrm{op}}\to\mathsf{Ani}$ (或 $\mathcal C^{\mathrm{op}}\to\mathsf{Set}$) 的范畴:
+$$
+\mathsf{Ind}(\mathcal C) \simeq \mathsf{Flat}(\mathcal C^{\mathrm{op}},\mathsf{Ani}).
+$$
 
 ## 例
 

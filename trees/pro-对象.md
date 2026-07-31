@@ -13,16 +13,29 @@ author: [SimplicialCat](SimplicialCat.md)
 
 ## 定义
 
+### 通过可表函子的余滤极限
+
 范畴 $\mathcal C$ 的 pro-对象的范畴
 $$
 \mathsf{Pro}(\mathcal C) \hookrightarrow \mathsf{Fun}(\mathcal C,\mathsf{Set})^{\mathrm{op}}
 $$
 是[可表函子](可表函子.md)在 $\mathsf{Fun}(\mathcal C,\mathsf{Set})^{\mathrm{op}}$ 中的[余滤极限](余滤极限.md)构成的全子范畴.
 
+### 通过平坦函子
+
+范畴 $\mathcal C$ 的 pro-对象的范畴也可定义为[平坦函子](平坦函子.md) $\mathcal C\to\mathsf{Ani}$ (或 $\mathcal C\to\mathsf{Set}$) 的范畴的对偶:
+$$
+\mathsf{Pro}(\mathcal C) \simeq \mathsf{Flat}(\mathcal C,\mathsf{Ani})^{\mathrm{op}}.
+$$
+
 ## 例
 
 - [pro-有限集](pro-有限集.md)
 - [pro-有限群](pro-有限群.md)
+
+### pro-同伦型
+
+[意象的形](∞-意象的形.md) (如[平展同伦型](平展同伦论.md)) 是 pro-同伦型, 即 pro-[生象](生象.md).
 
 ## 性质
 
@@ -71,3 +84,10 @@ $$
 其中标记为 $\simeq^*$ 的一步使用了 $i(d)$ 的余紧性. $\square$
 
 上述命题的一个重要应用是将 [pro-有限集](pro-有限集.md)与 [pro-有限群](pro-有限群.md)视为紧 Hausdorff 空间, 因为有限离散空间是紧 Hausdorff 空间范畴 $\mathsf{CHaus}$ 中的余紧对象.
+
+### 有限极限范畴
+
+设范畴 $\mathcal C$ 具有[有限极限](有限极限.md). 那么 pro-对象 (反变地) 等同于保持有限极限的函子 $\mathcal C \to \mathsf{Ani}$, 即
+$$
+\mathsf{Pro}(\mathcal C) \simeq \mathsf{Fun}^{\mathrm{fin.~lim.}}(\mathcal C,\mathsf{Ani})^{\mathrm{op}}.
+$$

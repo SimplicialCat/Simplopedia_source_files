@@ -15,6 +15,7 @@ author: [SimplicialCat](SimplicialCat.md)
 
 计划中的讲稿 / 笔记:
 
+- [](strat-cat.md)
 - [](higherZar.md)
 - [](geometry-DAGV.md)
 - [](ch-fil.md)

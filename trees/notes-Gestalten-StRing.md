@@ -147,4 +147,10 @@ $$
 
 ## 平展性
 
-对于 Stefanich 环的同态 $f\colon A\to B$,
+**定义**. 设有 Stefanich 环的同态 $f\colon A\to B$, 若如下条件成立, 则称 $f$ 为 $n$-**[](term-suave.md)** (suave) 态射:
+
+- 对任意 $m\geq n+1$, $f^*_{m-1}\colon 1\to (B/A)_m$ 在 $A_{m+1}$ 中有左伴随 $f_{m-1,\sharp}\colon (B/A)_m\to 1$;
+- 对任意 $m\geq n$, 令 $(B/A)^!_m = f_{m,\sharp}(1)\in A_{m+1}$, 其带有的映射 $f_{m-1,!}\colon (B/A)^!_{m} \to 1$ 当 $m\geq n+1$ 时有右伴随 $f^!_{m-1}$.
+
+**注**. 这里的记号 $(B/A)_m^!$ 的直观是所谓 $!$-层, 在 fpqc 叠 $X/\mathbb{S}$ 上, $(X/\mathbb{S})_1^!$ 等于 $D(A)$ 沿 $!$-拉回的极限.
+

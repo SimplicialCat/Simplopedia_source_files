@@ -39,6 +39,16 @@ You may also want to visit [my personal main page](https://simplicialcat.github.
 
 ## 最近
 
+[](分层.md)
+
+[](合聚意象.md)
+
+[](线图.md)
+
+[](代数充实于余代数.md)
+
+[](位象.md)
+
 [](共轭作用.md)
 
 [](fil-gr.md)

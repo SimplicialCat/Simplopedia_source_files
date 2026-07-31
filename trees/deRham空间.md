@@ -20,6 +20,11 @@ X_{\text{dR}}(R) := X(R/I),
 $$
 其中 $I$ 是 $R$ 的幂零根 (nilpotent radical).
 
+对于[导出概形](导出概形.md), 即某种导出环范畴出发的函子, 其 de Rham 空间为
+$$
+X_{\text{dR}}(R) := X(\operatorname{red}(\pi_0(R))).
+$$
+
 ### 对角线形式邻域的商
 
 $X_{\text{dR}}$ 也可表示为 $X$ 的商. 定义 $X_{\text{inf}}\to X\times X$ 为对角线的[形式邻域](形式邻域.md), 则

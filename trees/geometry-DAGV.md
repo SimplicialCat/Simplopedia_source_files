@@ -96,6 +96,18 @@ $$
 
 注意, 范畴 $\mathsf{Str}_{\mathcal G}(\mathcal X)$ 本身只取决于 $\mathcal G$ 及其上的 Grothendieck 拓扑, 但局部同态的概念依赖于可容许结构.
 
+**定理**. 设 $\mathcal G$ 为任意几何, 对于意象 $\mathcal X$, 范畴 $\mathsf{Str}_{\mathcal G}(\mathcal X)$ 上有[分解系统](正交分解系.md) $(L_{\mathcal X},R_{\mathcal X})$, 使得 $R_{\mathcal X}$ 为局部同态的类.
+
+*证明*.
+首先考虑 $\mathcal X = \mathsf{Ani}$ 的特例. 注意到
+$$
+\mathsf{Fun}^{\mathrm{fin.~lim.}}
+(\mathcal G, \mathsf{Ani}) \simeq \mathsf{Pro}(\mathcal G)^{\mathrm{op}},
+$$
+
+
+### 分类意象
+
 设 $\mathcal K$ 为意象. 定义 $\mathcal K$ 上的一个**几何结构**为如下资料: 对任意一个意象 $\mathcal X$, 函子性地指定 $\operatorname{Hom}(\mathcal X,\mathcal K)$ 的一个[分解系统](正交分解系.md) $(L_{\mathcal X},R_{\mathcal X})$.
 函子性是指对意象态射 $\mathcal Y\to \mathcal X$, 函子 $\mathsf{Fun}(\mathcal X,\mathcal K) \to \mathsf{Fun}(\mathcal Y,\mathcal K)$ 将 $L_{\mathcal X}$ 映射到 $L_{\mathcal Y}$, $R_{\mathcal X}$ 映射到 $R_{\mathcal Y}$.
 
