@@ -15,6 +15,9 @@ author: [SimplicialCat](SimplicialCat.md)
 
 计划中的讲稿 / 笔记:
 
+- [](opecat.md)
+- [](HADR.md)
+- [](br-monodromy.md)
 - [](strat-cat.md)
 - [](higherZar.md)
 - [](geometry-DAGV.md)

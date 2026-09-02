@@ -39,6 +39,20 @@ You may also want to visit [my personal main page](https://simplicialcat.github.
 
 ## 最近
 
+[](加权余极限.md)
+
+[](代数胚.md), [](多重范畴.md)
+
+[](平坦函子.md)
+
+[](Segal范畴Γ.md), [](Joyal范畴.md)
+
+[](杠–余杠对偶.md)
+
+[](辫群.md)
+
+[](超滤.md)
+
 [](分层.md)
 
 [](合聚意象.md)

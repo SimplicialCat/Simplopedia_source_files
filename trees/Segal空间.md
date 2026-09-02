@@ -1,20 +1,20 @@
 ---
-title: Segal 空间
+title: Segal 对象
 tag: 百科
 author: [SimplicialCat](SimplicialCat.md)
 ---
 
 ## 观念
 
-Segal 空间 (Segal 生象) 可用于定义 $(\infty,1)$-范畴.
-道理是, 假设我们要在[生象](生象.md)概念的基础上定义范畴, 我们可以采用[脉](脉.md)的观念, 对一个假想的 $(\infty,1)$-范畴 $\mathcal C$, 用各个单形 $[n]$ 探测之, 得到[单纯](单纯对象.md)生象 $N(\mathcal C)$:
+Segal 对象是用于定义[范畴对象](范畴对象.md) (如 $(\infty,1)$-范畴) 的一个中间概念.
+假设我们要在[生象](生象.md)概念的基础上定义范畴, 我们可以采用[脉](脉.md)的观念, 对一个假想的 $(\infty,1)$-范畴 $\mathcal C$, 用各个单形 $[n]$ 探测之, 得到[单纯](单纯对象.md)生象 $N(\mathcal C)$:
 $$
 N(\mathcal C)_n = \operatorname{Hom}_{\mathsf{Cat}_{(\infty,1)}}([n],\mathcal C) = \operatorname{Fun}([n],\mathcal C)^{\simeq},
 $$
 其中 $(-)^\simeq$ 表示取范畴的[对象的生象](对象的生象). 这一过程又称为 **Rezk 脉**.
-函子 $N$ 的像恰为完备 Segal 生象的范畴.
+由设想, 这个单纯对象必须将单形之间的拼接 (余极限) 变为生象的极限, 这便是 Segal 对象的条件.
 
-类似地, 完备 Segal 对象也可用于定义一般的 $\infty$-范畴内部的范畴, 见[范畴对象](范畴对象.md).
+Segal 对象要表达范畴的概念还需要具有 "完备性" (类似于[泛等性](泛等性.md)). 见[范畴对象](范畴对象.md).
 
 ## 定义
 
@@ -48,3 +48,10 @@ $N(0\overset{\simeq}{\to} 1) \to {*}$
 的[局部对象](局部对象.md).
 
 完备 Segal 生象等同于 [$(\infty,1)$-范畴](无穷范畴.md). 另见[范畴对象](范畴对象.md).
+
+## 例
+
+
+### 群胚对象
+
+[群胚对象](群胚对象.md)是重要的 Segal 对象.
