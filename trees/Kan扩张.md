@@ -30,6 +30,15 @@ $$
 \operatorname{RKE}_f (F)(d) = \operatorname{lim}_{d\to f(c)} F(c).
 $$
 
+这两条计算式也可以用[余端](余端.md)与[端](端.md)表述为
+$$
+\operatorname{LKE}_f(F)(d) = \int_{c\in \mathcal C}\operatorname{Hom}(f(c),d)\otimes F(c),
+$$
+$$
+\operatorname{RKE}_f(F)(d) = \int_{c\in \mathcal C}^*[\operatorname{Hom}(d,f(c)),F(c)].
+$$
+其中 $\otimes,[-,-]$ 分别表示[生象](生象.md)在 $\mathcal D$ 的对象上的[张量积](张量积.md)与[幂](幂.md).
+
 ## 例
 
 ### 极限
