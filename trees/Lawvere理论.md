@@ -7,12 +7,16 @@ author: [SimplicialCat](SimplicialCat.md)
 
 ## 定义
 
-### 语法范畴
+### 作为语法范畴
 
 Lawvere 理论的[语法范畴](语法范畴.md)是满足如下条件的范畴 $\mathcal T$:
 
 - $\mathcal T$ 具有有限[积](积(范畴论).md);
 - $\mathcal T$ 有一个对象 $x$, 使得所有对象都同构于某个 $x^n$ ($n$ 为自然数).
+
+### 作为自由代数单子
+
+Lawvere 理论是 $\mathsf{Set}$ 上的[有限性单子](有限性单子.md), 即保持滤余极限的单子.
 
 ## 性质
 

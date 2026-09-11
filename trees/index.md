@@ -39,6 +39,8 @@ You may also want to visit [my personal main page](https://simplicialcat.github.
 
 ## 最近
 
+[](Idem.md), [](游走的收缩.md)
+
 [](加权余极限.md)
 
 [](代数胚.md), [](多重范畴.md)
