@@ -39,3 +39,8 @@ $$
 ### 与单纯形范畴的关系
 
 [单纯形范畴](单纯形范畴.md) $\Delta$ 到 $\Gamma$ 有一函子, 将对象 $[n]\in\Delta$ 对应到 $\underline{n}\in\Gamma$. 详见 [Segal 函子 $\gamma$](Segal函子γ.md).
+
+
+### 代数模式
+
+范畴 $\Gamma$ 可用于定义 [$\mathbb E_\infty$-代数](交换代数.md)的[代数模式](代数模式.md).

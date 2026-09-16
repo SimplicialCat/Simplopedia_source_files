@@ -22,12 +22,13 @@ $$
 - (余单位律) $M \to \Gamma\otimes_A M \to M = \operatorname{id}_M$;
 - (余结合律) $M\to \Gamma\otimes_A \Gamma\otimes_A M$ 的两个映射相等.
 
+余模可以理解为[拟凝聚层](拟凝聚层.md)沿 $\operatorname{Spec}\Gamma\to\operatorname{Spec} A$ 的 [Čech 脉](Čech脉.md)的[下降数据](下降.md).
 
 ## 性质
 
 ### 与叠的关系
 
-一个交换 Hopf 代数胚 $(A,\Gamma)$ 也给出一个叠
+一个交换 Hopf 代数胚 $(A,\Gamma)$ 也给出一个[叠](叠.md) ([代数叠](代数叠.md))
 $$
 \mathcal M_{(A,\Gamma)}\colon \mathsf {Ring} \to \mathsf {Grpd},
 $$
@@ -35,4 +36,4 @@ $$
 R\mapsto \{\operatorname{Hom}_{\mathsf {Ring}}(\Gamma,R)\rightrightarrows \operatorname{Hom}_{\mathsf {Ring}}(A,R)\}.
 $$
 
-交换 Hopf 代数胚 $(A,\Gamma)$ 上的余模即是叠 $\mathcal M_{(A,\Gamma)}$ 上的[拟凝聚层](拟凝聚层.md)
+交换 Hopf 代数胚 $(A,\Gamma)$ 上的余模即是叠 $\mathcal M_{(A,\Gamma)}$ 上的[拟凝聚层](拟凝聚层.md).
