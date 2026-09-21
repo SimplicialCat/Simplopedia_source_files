@@ -14,9 +14,9 @@ Segal 范畴 $\Gamma$ 是[带基点](带基点对象.md)有限集范畴的[反�
 $$
 \Gamma := \mathsf{Fin}_*^{\mathrm{op}}.
 $$
-记其对象为 $\underline{n} = \{*,1,\cdots,n\}\,(n\geq 0)$.
+记 $\mathsf{Fin}_*$ 的对象 $\{*,1,\cdots,n\}$ 在 $\Gamma$ 中的对应物为 $\langle n\rangle$.
 
-由定义, 范畴 $\Gamma$ 的态射可描述如下: 态射 $\underline{n} \to \underline{m}$ 将每个 $1\leq i\leq n$ 对应到 $\{1,\cdots,m\}$ 的一个子集, 这些子集互不相交.
+范畴 $\Gamma$ 的态射可描述如下: 态射 $\langle n\rangle \to \langle m\rangle$ 将每个 $1\leq i\leq n$ 对应到 $\{1,\cdots,m\}$ 的一个子集, 这些子集互不相交.
 
 ### 通过泛性质
 
@@ -26,21 +26,36 @@ $$
 
 ## 性质
 
-Segal 范畴 $\Gamma$ 的[零对象](零对象.md)为 $[0]$, [积](积(范畴论).md)为
+Segal 范畴 $\Gamma$ 的[零对象](零对象.md)为 $\langle 0\rangle$, [积](积(范畴论).md)为
 $$
-\underline{n}\times \underline{m} = \underline{n+m}.
+\langle n\rangle\times \langle m\rangle = \langle n+m\rangle.
 $$
 特别地,
 $$
-\underline{n} = \underline{1}^{\times n}.
+\langle n\rangle = \langle 1\rangle^{\times n}.
 $$
 这说明 $\Gamma$ 是一个 [Lawvere 理论](Lawvere理论.md). 事实上, 它正是[带基点对象](带基点对象.md)的 Lawvere 理论.
 
+### 张量积
+
+范畴 $\Gamma$ 带有一个张量积 $\otimes\colon \Gamma\times\Gamma \to \Gamma$,
+$$
+\langle n\rangle\otimes \langle m\rangle = \langle nm\rangle.
+$$
+
+它对应带基点有限集的[压缩积](压缩积.md) $\land\colon \mathsf{Fin}_*\times\mathsf{Fin}_* \to \mathsf{Fin}_*$.
+
+这个张量积既不是范畴论积, 也不是范畴论和.
+
 ### 与单纯形范畴的关系
 
-[单纯形范畴](单纯形范畴.md) $\Delta$ 到 $\Gamma$ 有一函子, 将对象 $[n]\in\Delta$ 对应到 $\underline{n}\in\Gamma$. 详见 [Segal 函子 $\gamma$](Segal函子γ.md).
+[单纯形范畴](单纯形范畴.md) $\Delta$ 到 $\Gamma$ 有一函子, 将对象 $[n]\in\Delta$ 对应到 $\langle n\rangle\in\Gamma$. 详见 [Segal 函子 $\gamma$](Segal函子γ.md).
 
 
 ### 代数模式
 
-范畴 $\Gamma$ 可用于定义 [$\mathbb E_\infty$-代数](交换代数.md)的[代数模式](代数模式.md).
+范畴 $\Gamma$ 可用于定义 [$\mathbb E_\infty$-代数](交换代数.md)的[代数模式](代数模式.md). 例如 $\mathsf{Ani}$ 中的交换代数等同于函子
+$$
+F\colon \Gamma^{\mathrm{op}} \to\mathsf{Ani},
+$$
+满足 $F(\langle n\rangle) \simeq F(\langle 1 \rangle)^n$. 这种函子又称为 Segal $\Gamma$-生象. 该函子与函子 $\gamma\colon \Delta \to \Gamma$ 的复合给出[交换代数](交换代数.md)到[结合代数](结合代数.md)的[遗忘](自由-遗忘伴随.md), 沿 $\gamma$ 的左 Kan 扩张给出相应的[自由](自由-遗忘伴随.md)函子.

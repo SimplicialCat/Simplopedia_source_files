@@ -11,8 +11,10 @@ Segal 对象是用于定义[范畴对象](范畴对象.md) (如 $(\infty,1)$-范
 $$
 N(\mathcal C)_n = \operatorname{Hom}_{\mathsf{Cat}_{(\infty,1)}}([n],\mathcal C) = \operatorname{Fun}([n],\mathcal C)^{\simeq},
 $$
-其中 $(-)^\simeq$ 表示取范畴的[对象的生象](对象的生象). 这一过程又称为 **Rezk 脉**.
+其中 $(-)^\simeq$ 表示取范畴的[对象的生象](对象的生象.md). 这一过程又称为 **Rezk 脉**.
 由设想, 这个单纯对象必须将单形之间的拼接 (余极限) 变为生象的极限, 这便是 Segal 对象的条件.
+
+范畴的 Segal 条件可推广为 (或者说启发了) [代数模式](代数模式.md)的 Segal 条件.
 
 Segal 对象要表达范畴的概念还需要具有 "完备性" (类似于[泛等性](泛等性.md)). 见[范畴对象](范畴对象.md).
 
