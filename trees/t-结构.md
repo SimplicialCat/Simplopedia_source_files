@@ -8,39 +8,48 @@ author: [SimplicialCat](SimplicialCat.md)
 
 ## 定义
 
-设 $\mathcal C$ 为[三角范畴](三角范畴.md)或[稳定无穷范畴](稳定无穷范畴.md), 其上的一个 t-结构是一对子范畴 $(\mathcal C_{\geq 0},\mathcal C_{\leq 0})$, 记 $\mathcal C_{\geq n}=\mathcal C_{\geq 0}[n]$, $\mathcal C_{\leq n}=\mathcal C_{\leq 0}[n]$, 满足
+设 $\mathcal C$ 为[三角范畴](三角范畴.md)或[稳定无穷范畴](稳定无穷范畴.md), 在**同调指标**中, 其上的一个 $t$-结构是一对子范畴 $(\mathcal C_{\geq 0},\mathcal C_{\leq 0})$, 记 $\mathcal C_{\geq n}=\mathcal C_{\geq 0}[n]$, $\mathcal C_{\leq n}=\mathcal C_{\leq 0}[n]$, 满足
 - 对任意 $X\in\mathcal C_{\geq 0}$, $Y\in\mathcal C_{\leq -1}$, $\operatorname{Hom}(X,Y)=0$.
 - $\mathcal C_{\geq 1}\subset\mathcal C_{\geq 0}$, $\mathcal C_{\leq -1}\subset\mathcal C_{\leq 0}$.
 - 对任意 $X\in\mathcal C$ 存在[纤维列](纤维列.md) $X'\to X\to X''$, $X'\in\mathcal C_{\geq 0}$, $X''\in\mathcal C_{\leq -1}$.
 
 $\mathcal C_{\geq 0}$ 的对象又称连合 (connective) 对象.
 
-注意另一种记号 "上同调记号", $\mathcal C^{\geq n}$, 对应此处的 $\mathcal C_{\leq -n}$.
+注意另一种记号称为 "**上同调指标**", $\mathcal C^{\geq n}$ 对应此处的 $\mathcal C_{\leq -n}$.
+
+- 对任意 $X\in\mathcal C^{\leq 0}$, $Y\in\mathcal C^{\geq 1}$, $\operatorname{Hom}(X,Y)=0$.
+- $\mathcal C^{\leq 0}\subset\mathcal C^{\leq 1}$, $\mathcal C^{\geq 1}\subset\mathcal C^{\geq 0}$.
+- 对任意 $X\in\mathcal C$ 存在[纤维列](纤维列.md) $X'\to X\to X''$, $X'\in\mathcal C^{\leq 0}$, $X''\in\mathcal C^{\geq 1}$.
 
 [稳定无穷范畴](稳定∞-范畴.md)上的 t-结构等同于其[链复形范畴的同伦范畴](链复形范畴的同伦范畴.md)上的 t-结构.
 
-t-结构的**心** (heart) 是 $\mathcal C_{\leq 0}\cap\mathcal C_{\geq 0}$.
+$t$-结构的**心** (heart) 是 $\mathcal C_{\leq 0}\cap\mathcal C_{\geq 0}$.
 
-t-结构之间的正合函子是保持两个子范畴 $\mathcal C_{\geq 0},\mathcal C_{\leq 0}$ 的函子.
+$t$-结构之间的 **$t$-正合函子**是保持两个子范畴 $\mathcal C_{\geq 0},\mathcal C_{\leq 0}$ 的函子.
+
 ## 性质
 
 对于 $m<n$, 容易证明
 $$
 \mathcal C_{\leq m} \cap \mathcal C_{\geq n} \simeq \{0\}.
 $$
-在[稳定无穷范畴](稳定无穷范畴.md)的 t-结构中, 对于 $X\in\mathcal C_{\geq 0}$ 与 $Y\in\mathcal C_{\leq n}$, $\operatorname{Hom}(X,Y)$ 为 $n$-类型. 这是因为
+在[稳定无穷范畴](稳定无穷范畴.md)的 $t$-结构中, 对于 $X\in\mathcal C_{\geq 0}$ 与 $Y\in\mathcal C_{\leq n}$, $\operatorname{Hom}(X,Y)$ 为 [$n$-类型](截断性(同伦类型论).md). 这是因为
 $$
 \Omega \operatorname{Hom}(X,Y)\simeq \operatorname{Hom}(X,\Omega Y).
 $$
-特别地, 对于 $X\in\mathcal C_{\geq 0}$ 与 $Y\in\mathcal C_{\leq 0}$, $\operatorname{Hom}(X,Y)$ 为集合 ($0$-类型).
+特别地, 对于 $X\in\mathcal C_{\geq 0}$ 与 $Y\in\mathcal C_{\leq 0}$, $\operatorname{Hom}(X,Y)$ 为[集合](集合(同伦类型论).md) ($0$-类型).
 
-由此可知 t-结构的心为 $1$-范畴. 事实上, 它是 [Abel 范畴](Abel范畴.md), 其中的短正合列正是 $\mathcal C$ 中的纤维列.
+由此可知 $t$-结构的心为 $(1,1)$-范畴. 事实上, 它是 [Abel 范畴](Abel范畴.md), 其中的短正合列是 $\mathcal C$ 中的纤维列.
 
-注意 t-结构的心不能反过来决定 t-结构. 稳定无穷范畴一般也不等价于其上 t-结构的心的[导出范畴](导出范畴.md). 不是所有的 t-结构都来自导出范畴. 例如[谱](谱.md)的范畴不同于 $\mathsf {Ab}$ 的导出范畴 (否则稳定同伦论就没有意义了).
+注意 $t$-结构的心不能反过来决定 $t$-结构. 稳定无穷范畴一般也不等价于其上 $t$-结构的心的[导出范畴](导出范畴.md). 不是所有的 t-结构都来自导出范畴. 例如[谱](谱.md)的范畴不同于 $\mathsf {Ab}$ 的导出范畴 (否则稳定同伦论就没有意义了).
 
 ### 截断
 
-嵌入 $\mathcal C_{\leq n}\to \mathcal C$ 有左伴随 $\tau_{\leq n}$, 嵌入 $\mathcal C_{\geq n}\to\mathcal C$ 有右伴随 $\tau_{\geq n}$.
+同调指标: 嵌入 $\mathcal C_{\leq n}\to \mathcal C$ 有左伴随 $\tau_{\leq n}$, 嵌入 $\mathcal C_{\geq n}\to\mathcal C$ 有右伴随 $\tau_{\geq n}$.
+
+上同调指标: 嵌入 $\mathcal C^{\geq n}\to \mathcal C$ 有左伴随 $\tau^{\geq n}$, 嵌入 $\mathcal C^{\leq n}\to\mathcal C$ 有右伴随 $\tau^{\leq n}$.
+
+
 
 $X\in\mathcal C_{\geq 0}$ 当且仅当 $\operatorname{Hom}(X,Y)\simeq\operatorname{Hom}(\tau_{\leq -1}X,Y)\{0\}$ 对任意 $Y\in\mathcal C_{\leq -1}$ 成立.
 
@@ -72,21 +81,31 @@ $\mathcal C_{\geq 0}$ 关于余极限封闭, $\mathcal C_{\leq 0}$ 关于极限�
 
 ### 分离性
 
-称 t-结构右分离 (因为给我讲这个概念的人使用上同调记号) 是指 $\mathcal C_{\leq-\infty}=\bigcap_n\mathcal C_{\leq n}\simeq\{0\}$, 左分离是指 $\mathcal C_{\geq \infty}=\bigcap_n\mathcal C_{\geq n}\simeq\{0\}$.
+称 t-结构**右分离**是指
+
+上同调指标: $\mathcal C^{\geq\infty} =\bigcap_n\mathcal C^{\geq n} = \{0\}$,
+
+同调指标: $\mathcal C_{\leq-\infty}=\bigcap_n\mathcal C_{\leq n}=\{0\}$,
+
+**左分离**是指
+
+上同调指标: $\mathcal C^{\leq -\infty} = \bigcap_n\mathcal C^{\leq n} = \{0\}$,
+
+同调指标: $\mathcal C_{\geq \infty}=\bigcap_n\mathcal C_{\geq n}\simeq\{0\}$.
 
 ### 完备性与完备化
 
-t-结构的完备化为
+$t$-结构的完备化为
 $$
 \widehat {\mathcal C} =\operatorname{lim} (\cdots \overset{\tau_{\leq 2}}{\to}\mathcal C_{\leq 2}\overset{\tau_{\leq 1}}{\to}\mathcal C_{\leq 1}\overset{\tau_{\leq 0}}{\to}\mathcal C_{\leq 0}\overset{\tau_{\leq -1}}{\to}\cdots).
 $$
 注意此图的右边是不重要的, 可从任意一处截断只保留其左边. 这个极限的一个对象是一个 [Postnikov 塔](Postnikov塔.md). 由定义有自然的函子 $\mathcal C\to\widehat {\mathcal C}$, 当这个函子为同构时, 称 $\mathcal C$ 左完备.
 
-左完备 t-结构是左分离的, 反之不一定.
+左完备 $t$-结构是左分离的, 反之不一定.
 
-### 粘 t-结构
+### 粘 $t$-结构
 
-[粘 t-结构](粘t-结构.md)
+[粘 $t$-结构](粘t-结构.md)
 
 ## 例
 

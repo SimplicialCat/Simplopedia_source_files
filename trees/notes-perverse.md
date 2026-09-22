@@ -6,7 +6,7 @@ author: [SimplicialCat](SimplicialCat.md)
 
 偏屈层始于奇性的代数簇的几何. 常值层的上同调不能正确描述这种几何对象; 人们最初发明[相交上同调](相交上同调.md)描述它们.
 
-
+## 第 1 讲
 
 ### Poincaré 对偶
 
@@ -209,3 +209,13 @@ $$
 $$
 
 ---
+
+## 第 2 讲
+
+设 $X$ 具有分层 $X = \bigsqcup S_\alpha$, 且 $\mathcal F\in D^b_c(X)$ 逐层局部常值. 我们将定义 $D^b_c(X)$ 上的可构造 [$t$-结构](t-结构.md), 使得
+
+- $\mathcal F\in D(X)^{\leq 0}$ 当且仅当 $r > -\operatorname{dim}S_\alpha$ 时 $H^r(\mathcal F|^{*}_{S_\alpha}) =0$;
+- $\mathcal F\in D(X)^{\geq 0}$ 当且仅当 $r < -\operatorname{dim}S_\alpha$ 时 $H^r(\mathcal F|^{!}_{S_\alpha}) =0$.
+
+(我们采用上同调指标.)
+
