@@ -212,7 +212,7 @@ $$
 
 ## 第 2 讲
 
-设 $X$ 具有分层 $X = \bigsqcup S_\alpha$, 且 $\mathcal F\in D^b_c(X)$ 逐层局部常值. 我们将定义 $D^b_c(X)$ 上的可构造 [$t$-结构](t-结构.md), 使得
+设 $X$ 具有分层 $X = \bigsqcup S_\alpha$, 且 $\mathcal F\in D^b_c(X)$ 逐层局部常值. 我们将定义 $D^b_c(X)$ 上的可构造 [$t$-结构](t-结构.md) ([偏屈 $t$-结构](偏屈t-结构.md)), 使得
 
 - $\mathcal F\in D(X)^{\leq 0}$ 当且仅当 $r > -\operatorname{dim}S_\alpha$ 时 $H^r(\mathcal F|^{*}_{S_\alpha}) =0$;
 - $\mathcal F\in D(X)^{\geq 0}$ 当且仅当 $r < -\operatorname{dim}S_\alpha$ 时 $H^r(\mathcal F|^{!}_{S_\alpha}) =0$.

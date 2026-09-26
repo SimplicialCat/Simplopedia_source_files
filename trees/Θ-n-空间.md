@@ -16,3 +16,4 @@ $\Theta_n$-空间是指 [Joyal 范畴](Joyal范畴.md) $\Theta_n$ 上满足特�
 
 ### $K(\pi,n)$
 
+设 $\pi$ 为 Abel 群. 考虑 [$\Gamma$-空间](Segal范畴Γ.md)

@@ -10,12 +10,16 @@ author: [SimplicialCat](SimplicialCat.md)
 
 Segal 函子 $\gamma\colon \Delta \to \Gamma$ 是[单纯形范畴](单纯形范畴.md) $\Delta$ 到 [Segal 范畴 $\Gamma$](Segal范畴Γ.md) 的一个函子,
 
-- $\gamma([n]) = \underline{n} = \{*,1,\cdots,n\}$,
-- 对于态射 $\varphi\colon [n] \to [m]$, $\gamma(\varphi)\colon \underline{n} \to \underline{m}$ 为态射
+- $\gamma([n]) = \langle n\rangle$,
+- 对于态射 $\varphi\colon [n] \to [m]$, $\gamma(\varphi)\colon \langle n\rangle \to \langle m\rangle$ 为态射
 $$
 i\mapsto (\varphi(i-1),\varphi(i)].
 $$
 其中 $(a,b]$ 表示整数的左开右闭区间 $\{x\in \mathbb{Z}\mid a < x \leq b\}$.
+
+直观上, $\gamma$ 将一个单纯形映射到其中 "基本区间" 的集合. (这件事可以写成一个严格的命题, 见[代数模式](代数模式.md)中的 "积性模式".)
+
+函子 $\gamma$ 还可推广到 [$\Theta_n$](Joyal范畴.md) 上给出 $\gamma_n\colon \Theta_n \to \Gamma$.
 
 ### 通过 $S^1$
 

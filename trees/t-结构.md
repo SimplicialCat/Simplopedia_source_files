@@ -61,7 +61,16 @@ $\tau_{\geq m}\tau_{\geq n}\simeq\tau_{\leq\operatorname{max}(m,n)}$.
 
 由 $\mathcal C$ 到 $\mathcal C_{\leq m}\cap\mathcal C_{\geq n}$ 的两种截断方式是等价的.
 
-对任意 $n$, $\mathcal C_{\leq n}\cap\mathcal C_{\geq n}\simeq \mathcal C^{\heartsuit}$. 一个对象截断到这个范畴中的像又称为它的第 $n$ 阶同调, 对于所有的 $n$ 这些同调形成长正合列.
+对任意 $n$, $\mathcal C_{\leq n}\cap\mathcal C_{\geq n}\simeq \mathcal C^{\heartsuit}$. 一个对象截断到这个范畴中的像又称为它的第 $n$ 阶**同调**
+$$
+H_n = [-n]\tau_{\geq n}\tau_{\leq n} \colon \mathcal C \to \mathcal C^{\heartsuit}.
+$$
+对于所有的 $n$ 这些同调形成长正合列.
+
+在上同调指标中, 对应物称为**上同调**:
+$$
+H^n = [n]\tau_{\leq n}\tau_{\geq n} \colon \mathcal C \to \mathcal C^{\heartsuit}.
+$$
 
 注意所有同调为 $0$ 不能推出这个对象为 $0$, 这个现象在许多场合是有趣的, 如无穷维表示论, 无限型代数几何.
 
@@ -115,7 +124,7 @@ $$
 - $\operatorname{Sp}(\mathcal C)_{\geq 0}$ 是 $\Sigma^{\infty}$ 的像在扩张和余极限之下生成的子范畴.
 - $\operatorname{Sp}(\mathcal C)_{\leq -1}$ 是 $\Omega^{\infty}$ 为 $0$ 的子范畴.
 
-[谱](谱.md)范畴的心与 $\mathsf {Ab}$ 的同构由 [Eilenberg–MacLane 谱](Eilenberg–MacLane谱.md)给出. 此时同调是谱的同伦群.
+[谱](谱.md)范畴的心与 $\mathsf {Ab}$ 的同构由 [Eilenberg–MacLane 谱](Eilenberg–MacLane谱.md)给出. 此时同调是谱的同伦群. 这是一个稳定范畴不等于其心的[导出范畴](导出范畴.md)的重要例子.
 
 
 [偏屈 t-结构](偏屈t-结构.md)

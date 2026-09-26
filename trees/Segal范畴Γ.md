@@ -34,7 +34,7 @@ $$
 $$
 \langle n\rangle = \langle 1\rangle^{\times n}.
 $$
-这说明 $\Gamma$ 是一个 [Lawvere 理论](Lawvere理论.md). 事实上, 它正是[带基点对象](带基点对象.md)的 Lawvere 理论.
+这说明 $\Gamma$ 是一个 [Lawvere 理论](Lawvere理论.md). 事实上, 它正是[带基点对象](带基点对象.md)的 Lawvere 理论, 即任何[积幺半范畴](积幺半范畴.md) $\mathcal C$ 中的带基点对象等同于保持有限积的函子 $\Gamma \to \mathcal C$.
 
 ### 张量积
 
@@ -54,7 +54,7 @@ $$
 
 ### 代数模式
 
-范畴 $\Gamma$ 可用于定义 [$\mathbb E_\infty$-代数](交换代数.md)的[代数模式](代数模式.md). 例如 $\mathsf{Ani}$ 中的交换代数等同于函子
+范畴 $\Gamma$ 可用于定义 [$\mathbb E_\infty$-代数](交换代数.md)的[代数模式](代数模式.md). 例如 $\mathsf{Ani}$ 中的交换代数等同于 [$\Gamma$-空间](Γ-空间.md)
 $$
 F\colon \Gamma^{\mathrm{op}} \to\mathsf{Ani},
 $$
