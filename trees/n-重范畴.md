@@ -30,15 +30,24 @@ $$
 $$
 X(\cdots,[k],\cdots)\simeq X(\cdots,[1],\cdots)^{\times_{X(\cdots,[0],\cdots)}k}.
 $$
+而 $n$ 重范畴则可定义为满足每个分量的[完备性](范畴对象.md)的 Segal 对象.
+
 
 
 ## 性质
 
 ### 与 $n$-范畴的联系
 
-
+$n$-范畴可视为某些方向退化的 $n$ 重范畴.
 
 ## 例
+
+### 外张量积
+
+给定范畴 $\mathcal C_1,\cdots,\mathcal C_n$, 可构造 $n$ 重范畴 $\mathcal C_1 \boxtimes\cdots\boxtimes\mathcal C_n$,
+$$
+([k_1],\cdots,[k_n]) \mapsto \mathcal C_1 ([k_1])\times\cdots\times\mathcal C_n ([k_n]).
+$$
 
 ### 景的二重范畴
 

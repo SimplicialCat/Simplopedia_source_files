@@ -39,7 +39,9 @@ You may also want to visit [my personal main page](https://simplicialcat.github.
 
 ## 最近
 
-[](代数模式.md)
+[](Blakers–Massey定理.md)
+
+[](代数模式.md), [](正交分解系.md)
 
 [](始代数.md), [](P-树.md), [](自由单子.md)
 

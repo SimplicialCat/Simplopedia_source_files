@@ -4,6 +4,8 @@ tag: 参考资料
 author: Mathieu Anel, Georg Biedermann, Eric Finster, André Joyal
 ---
 
+注意同样四位作者还有另外一篇文章, 见 [ABFJ-BM](ABFJ-BM.md).
+
 ## Left-exact localizations of ∞-topoi I: Higher sheaves
 
 ```
