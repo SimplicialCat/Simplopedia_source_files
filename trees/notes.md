@@ -15,6 +15,8 @@ author: [SimplicialCat](SimplicialCat.md)
 
 计划中的讲稿 / 笔记:
 
+- [](AT.md)
+- [](notes-perverse.md)
 - [](opecat.md)
 - [](HADR.md)
 - [](br-monodromy.md)

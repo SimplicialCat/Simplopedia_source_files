@@ -17,3 +17,5 @@ author : [SimplicialCat](SimplicialCat.md)
 [-](形变.md#:embed)
 
 [-](谱分解.md#:embed)
+
+[-](代数.md)

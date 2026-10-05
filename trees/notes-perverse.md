@@ -208,7 +208,7 @@ $$
 \end{aligned}
 $$
 
----
+
 
 ## 第 2 讲
 
@@ -219,3 +219,118 @@ $$
 
 (我们采用上同调指标.)
 
+本讲内容已经记载在 [$t$-结构](t-结构.md), [粘 $t$-结构](粘t-结构.md)等页面.
+
+## 第 3 讲
+
+考虑两层的开闭分解
+$$
+i\colon U\subset X \hookleftarrow Z \colon j,
+$$
+伴随
+$$
+(i^*\dashv i_*\dashv i^!)\colon 
+D_c^b (Z)
+\begin{aligned}
+&\overset{i^*}{\leftarrow}\\
+&\overset{i_*}{\rightarrow}\\
+&\overset{i^!}{\leftarrow}
+\end{aligned}\,
+D_c^b(X)
+\begin{aligned}
+&\overset{j_!}{\leftarrow}\\
+&\overset{j^*}{\rightarrow}\\
+&\overset{j_*}{\leftarrow}
+\end{aligned}\,
+D_c^b(U) \colon (j_!\dashv j^*\dashv j_*)
+$$
+给出如下三角.
+$$
+j_! j^* F \to F\to i_* i^* F
+$$
+$$
+i_* i^! F \to F \to j_* j^* F
+$$
+
+换言之,
+$$
+F = \operatorname{fib}(j_* F_U \to i_* F_Z [1])
+$$
+
+一般地, 要定义 $X$ 上关于指定分层 $S$ 的偏屈 $t$-结构, 只需定义各层 $D^b_S(S_\alpha)$ 上的 $t$-结构 (平移通常 $t$-结构使得 $\underline{\mathbb{Q}}[\operatorname{dim}S_\alpha] \in \heartsuit$).
+
+然后老师详细解释了粘 $t$-结构. 详见[粘 $t$-结构](粘t-结构.md).
+
+设 $S$ 为光滑代数簇, 配备平凡分层 $\mathcal S_{\mathrm{triv}}$ (只有一层).
+
+由定义, $D^b_{\mathcal S_{\mathrm{triv}}} (S) = D^b_{\mathrm{loc}}(S)$. 注意它不等于它的心 (普通局部系统的 Abel 范畴 $\mathsf{LS}(S)$) 的导出范畴. 例如当 $S$ 单连通时, 局部系统平凡, 但 $D^b_{\mathrm{loc}}(S)$ 包含了 $S$ 的所有[上同调](上同调.md)的信息.
+
+定义偏屈 $t$-结构满足
+$$
+D^b_{\mathcal{S}_{\mathrm{triv}}}(S)^{p,\leq 0} = D^b_{\mathcal S_{\mathrm{triv}}}(S)^{\leq 0} [\operatorname{dim}S].
+$$
+
+一般地, 设 $X$ 有分层结构 $\mathcal S \colon X = \bigcup_\alpha S_\alpha$.
+
+**定理**. 通过[粘 $t$-结构](粘t-结构.md)得到的 $D^b_{\mathcal S}(X)$ 上的[偏屈 $t$-结构](偏屈t-结构.md)满足
+$$
+D^b_{\mathcal S}(X)^{p,\leq 0} = \{
+    F\mid H^r(S_\alpha^*F) = 0\,\forall r>{-{\operatorname{dim}S_\alpha}}
+\},
+$$
+$$
+D^b_{\mathcal S}(X)^{p,\geq 0} = \{
+    F\mid H^r(S_\alpha^! F) = 0\,\forall r<{-{\operatorname{dim}S_\alpha}}
+\}.
+$$
+其中 $H^r$ 是对于普通 $t$-结构的上同调.
+条件也可以对偏屈 $t$-结构的上同调表述为
+$$
+H^{p,r}(S_\alpha^* F) = 0 \,\forall r > 0.
+$$
+
+记 $\mathsf{Perv}_{\mathcal S}(X) := D^b_{\mathcal S}(X)^{\heartsuit}$.
+
+若分层 $\mathcal S'$ 是 $\mathcal S$ 的细化, 则
+$$
+D_{\mathcal S}^b(X) \subset D_{\mathcal S'}^b (X),
+$$
+
+**习题**. 证明上述包含中 $(p,\leq 0),(p,\geq 0)$ 部分均相容:
+$$
+D^b_{\mathcal S}(X)^{p,\leq 0} = D^b_{\mathcal S'}(X)^{p,\leq 0} \cap D^b_{\mathcal S}(X).
+$$
+提示: 若 $f\colon T\to S$ 为光滑代数簇的映射, 则 $f^*(\mathsf{LS}_S)\subset\mathsf{LS}_T$, $f^*(\mathsf{Perv}(S))[\operatorname{dim}_T - \operatorname{dim}_S]\subset\mathsf{Perv}(T)$.
+
+**习题**. $\mathbb D (\mathsf{Perv}(X)) = \mathsf{Perv}(X)$.
+
+**例**. 考虑 $X=\mathbb A^1$, $Z=\mathrm{pt}$.
+
+- $\mathrm{IC}_X = \underline{\mathbb{Q}}[1]$.
+- $i_* i^! \underline{\mathbb{Q}}\to \underline{\mathbb{Q}}\to j_* j^*\underline{\mathbb{Q}}$
+- $j_! j^* \underline{\mathbb{Q}} \to \underline{\mathbb{Q}} \to i_* i^* \underline{\mathbb{Q}}$ (通常 $t$-结构的心中的正合列)
+- 平移后旋转得到心中的正合列 $i_*\mathbb{Q}\to j_! \mathrm{IC}_U \to \mathrm{IC}_X$.
+- $j_!\mathrm{IC}_U\to \mathrm{IC}_X\to j_*\mathrm{IC}_U$ 恰好是 $j_!\mathrm{IC}_U\to j_*\mathrm{IC}_U$ 的满-单分解. (一般地, 若 $F^R$ 全忠实则有自然变换 $F^L \to F^R$, 来自 $\mathrm{id} = FF^R$.)
+
+### IC 延拓
+记
+$$
+j_!^{\heartsuit} = \tau^{\geq 0} \circ j_!,
+$$
+$$
+j_*^{\heartsuit} = \tau^{\leq 0} \circ j_*.
+$$
+自然变换 $j_! \to j_*$ 给出心中的自然变换 $j_!^{\heartsuit} \to j_*^{\heartsuit}$. (一般地, 右 $t$-正合函子到左 $t$-正合函子的自然变换自动给出心中的自然变换.) 这个自然变换的像称为**中间延拓** (intermediate extension) $j_{! *}$, 由 Goresky–MacPherson 定义.
+
+**命题**. $j_{! *}$ 为全忠实函子.
+
+**引理**. 设 $F\in\mathsf{Perv}(U)$. 则 $j_{! *}F$ 为带有如下结构的唯一对象 $K$:
+
+- $j^* K \simeq F$;
+- $K$ 没有非平凡的支在 $Z = X \setminus U$ 上的子对象或商对象.
+
+**命题-定义**.
+$$
+\mathrm{IC}_X = j_{! *}\mathrm{IC}_U.
+$$
+这意味着上式右端不依赖于光滑开集 $U$ 的选取.
