@@ -53,3 +53,22 @@ $$
 
 相应的单子则是 $T = uj \colon \mathcal C \to \mathcal C$.
 
+### 函子性
+
+Kleisli 范畴具有函子性: 单子同态 $f\colon S \to T$ 给出函子 $f_!\colon \mathsf{Kl}(S) \to \mathsf{Kl}(T)$. 直观上, $f_!$ 将自由代数 $SX$ 对应到自由代数 $TX$.
+$$
+\begin{array}{ccc}
+ &  & \mathsf{Kl}(S) \\
+ & \nearrow & \downarrow \\
+\mathcal C & \rightarrow & \mathsf{Kl}(T)
+\end{array}
+$$
+
+我们更仔细地解释一下这个函子的来由. 对于 $S$ 的自由代数 $SX$ 与任意 $T$-代数 $Y$, 有同构
+$$
+\begin{aligned}
+\operatorname{Hom}_{\mathcal C^S} (SX,f^*Y) &= \operatorname{Hom}_{\mathcal C}(X,Y)\\
+&=\operatorname{Hom}_{\mathcal C^T}(TX,Y).
+\end{aligned}
+$$
+这就是说 $f^*\colon \mathcal C^T\to\mathcal C^S$ 在全子范畴 $\mathsf{Kl}(T)\subset\mathcal C^T$, $\mathsf{Kl}(S)\subset\mathcal C^S$ 上有一个 "部分左伴随" $f_!$, 而范畴论的一般道理告诉我们, 当有一族范畴 $\mathcal C^{\mathrm{op}}\to\mathsf{Cat}$ 且其间每个函子有这样的部分左伴随, 就有相应的一族范畴 $\mathcal C \to \mathsf{Cat}$.
