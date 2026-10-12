@@ -6,4 +6,6 @@ author: [SimplicialCat](SimplicialCat.md)
 
 [](HADR-alg-patt.md#:embed)
 
+[](HADR-ope.md#:embed)
+
 [](HADR-disint-assem.md#:embed)

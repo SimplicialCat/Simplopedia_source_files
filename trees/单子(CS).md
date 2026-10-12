@@ -6,7 +6,7 @@ author: [SimplicialCat](SimplicialCat.md)
 
 ## 定义
 
-在计算机科学中, 一个[单子](单子.md)包含
+在[计算机科学](计算机科学.md)中, 一个[单子](单子.md)包含
 
 - 类型构造器 `m`,
 - 函数 `return :: a → m a`,

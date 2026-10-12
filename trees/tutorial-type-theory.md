@@ -71,7 +71,7 @@ author: [SimplicialCat](SimplicialCat.md)
 
 但在多数情况下, 我们不需要明确所处的宇宙层级, 而是以笼统的 $\mathcal U$ 代替.
 
-比通常宇宙低一个层级的宇宙是**命题**的类型 $\mathsf{Prop}=\mathcal U_0$. 所谓**命题**是满足如下条件的类型 $P$: 对任意 $x,y : P$ 有 $x=y$. 在 Curry–Howard 对应之下, 这意味着一个命题的任意两个证明都视为相等.
+比通常宇宙低一个层级的宇宙是**命题**的类型 $\mathsf{Prop}=\mathcal U_0$. 所谓**命题**是满足如下条件的类型 $P$: 对任意 $x,y : P$ 有 $x=y$. 在 [Curry–Howard 对应](CurryHowardLambek对应.md)之下, 这意味着一个命题的任意两个证明都视为相等.
 
 ## 依值类型: 到宇宙的函数
 

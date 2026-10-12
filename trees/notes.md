@@ -15,6 +15,7 @@ author: [SimplicialCat](SimplicialCat.md)
 
 计划中的讲稿 / 笔记:
 
+- [](notes-HH.md)
 - [](AT.md)
 - [](notes-perverse.md)
 - [](opecat.md)

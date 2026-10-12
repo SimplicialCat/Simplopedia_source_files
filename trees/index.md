@@ -39,6 +39,8 @@ You may also want to visit [my personal main page](https://simplicialcat.github.
 
 ## 最近
 
+[](融贯子.md)
+
 [](Kleisli范畴.md), [](脉性单子.md), [](相对单子.md)
 
 [](Blakers–Massey定理.md)
