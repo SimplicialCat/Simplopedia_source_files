@@ -67,7 +67,7 @@ _证明_.
 
 ### 环谱
 
-设 $R$ 是 $\mathbb E_3$-[环谱](环谱.md), 那么 $\mathsf{Mod}(R)$ 是 $\mathbb E_2$-幺半范畴, [$1\mathsf{Pr}_R=\mathsf{Mod}(\mathsf{Mod}(R))$](高阶模.md) 是 $\mathbb E_1$-幺半范畴. 定义 $R$ 上的 Azumaya 代数为 $1\mathsf{Pr}_R$ 中的可逆对象.
+设 $R$ 是 $\mathbb E_3$-[环谱](环谱.md), 那么 $\mathsf{Mod}(R)$ 是 $\mathbb E_2$-幺半范畴, [$1\mathsf{Pr}_R=\mathsf{Mod}(\mathsf{Mod}(R))$](高阶模.md) 是 $\mathbb E_1$-幺半范畴. 定义 $R$ 上的 Azumaya 代数为 $1\mathsf{Pr}_R$ 中的[可逆对象](可逆对象.md).
 
 ## 性质
 

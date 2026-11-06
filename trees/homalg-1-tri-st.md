@@ -4,6 +4,11 @@ tag: 讲义
 author: [SimplicialCat](SimplicialCat.md)
 ---
 
+## 三角范畴及其缺陷
+
+
+## 稳定 $\infty$-范畴
+
 **定义** (特殊三角)
 范畴 $\mathcal C$ 中的**特殊三角** (distinguished triangle) 是指下图,
 $$
@@ -15,6 +20,8 @@ X & \rightarrow & Y & \rightarrow & 0 \\
 $$
 其中两个方块均为[推出](推出.md) (从而整个长方形也是推出).
 
+
+## 稳定 $\infty$-范畴的同伦范畴
 
 **定理** ([Lurie](LurieHA.md) 定理 1.1.2.14).
 设 $\mathcal C$ 为[稳定范畴](稳定无穷范畴.md), 则同伦范畴 $h\mathcal C$ 为三角范畴.
@@ -30,4 +37,6 @@ X & \rightarrow & Y & \rightarrow & Z & \rightarrow & 0 &  &  \\
  &  & 0 & \rightarrow & Z/Y & \rightarrow & Y[1] & \rightarrow & (Y/X)[1]
 \end{array}
 $$
+
+## 谱与稳定化
 

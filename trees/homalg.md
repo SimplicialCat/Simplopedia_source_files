@@ -9,3 +9,7 @@ author: [SimplicialCat](SimplicialCat.md)
 [+-](homalg-1-tri-st.md#:embed)
 
 [+-](homalg-2-der-cat.md#:embed)
+
+[+-](homalg-3-der-fun.md#:embed)
+
+[+-](homalg-4-sseq.md#:embed)

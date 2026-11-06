@@ -32,7 +32,7 @@ u_! A = \operatorname{colim}_{\langle 1\rangle\leadsto\langle m \rangle} A^m.
 $$
 (这里左 Kan 扩张公式中的指标范畴可以只取活性映射.) 注意到指标范畴的对象 $\langle 1\rangle\leadsto\langle m \rangle$ 上有[对称群](对称群.md)的[作用](群作用.md), 我们看到任意 $m$ 个元素的不同顺序的乘法在 $u_! A$ 中都等同起来了.
 
-## Lurie 的算畴
+## Lurie 的算畴 (对称算畴)
 
 上面介绍的 $\mathrm{Assoc}$ 是 [Lurie HA](LurieHA.md) 定义的[算畴](算畴.md)的一例. 其实 Lurie 的每个算畴都可视为代数模式.
 
@@ -56,6 +56,59 @@ $$
 - 惰性映射就是定义中的惰性提升;
 - 活性映射就是居于 $\Gamma$ 中的活性映射之上的映射.
 
-上述结构的底不必为 $\Gamma$, 而是可以推广到任意代数模式上.
+上述结构的底不必为 $\Gamma$, 而是可以推广到任意代数模式上. 若代数模式的态射 $\mathcal O \to \mathcal P$ 满足上述条件, 则称之为[**弱 Segal 纤维化**](弱Segal纤维化.md).
 
-称为**弱 Segal 纤维化**.
+以下是一个对照表.
+
+|[Lurie HA](LurieHA.md)| HADR|
+|---|---|
+|$\mathcal O^{\otimes} \to \mathrm{N}(\mathrm{Fin}_*)$|$\mathcal O \to \Gamma$ (注意约定相反)|
+|fibration of $\infty$-operads| 弱 Segal 纤维化|
+|coCartesian fibration of $\infty$-operads| Segal 纤维化|
+
+### 对称算畴的基本例子
+
+**例**. 记 $\mathsf{Triv} := \Gamma_{\mathrm{int}} \to \Gamma$, 称之为平凡算畴. 平凡算畴的代数就是没有任何结构的对象.
+
+
+**例**. 记 $\mathbb E_0 \to \Gamma$ 为 $\Gamma$ 中 "将每个元素对应到一个至多一元子集" 的映射构成的宽子范畴, $\mathbb E_0$-代数就是[带基点对象](带基点对象.md).
+
+**例**. $\Gamma$ 上的 Segal 纤维化 $\mathcal C \to \Gamma$, 对应于 Segal 对象 $\Gamma^{\mathrm{op}} \to \mathsf{Cat}$, 即[对称幺半范畴](对称幺半范畴.md) (其底层范畴为 $\mathcal C_{\langle 1\rangle}$); 它也构成对称算畴.
+
+## 弱 Segal 纤维化
+
+详见[弱 Segal 纤维化](弱Segal纤维化.md).
+
+## 非对称算畴
+
+称 $\Delta$ 上的[弱 Segal 纤维化](弱Segal纤维化.md)为**非对称算畴**. 直观上, 一个算畴给出一族无序 $n$ 元运算, 而一个非对称算畴给出一族有序 $n$ 元运算.
+
+**例**. 记 $\Delta_{\leq n} \hookrightarrow \Delta$ 为对象 $[0],[1],\cdots,[n]$ 构成的全子范畴, 则 $\Delta_{\leq n}$ 继承 $\Delta$ 的代数模式结构, 构成一个非对称算畴; 称该模式为 [$\mathbb A_n$](An-代数.md).
+
+## 算畴的操作
+
+### 余积
+
+对称算畴 $\mathcal C \to \Gamma$, $\mathcal D \to \Gamma$ 的余积为
+$$
+\mathcal C \times\mathcal D \to \Gamma\times\Gamma\overset{\times}{\to}\Gamma.
+$$
+其中 $\times\colon \Gamma\times\Gamma\to\Gamma$ 是 $\Gamma$ 中的范畴论积 $\langle n \rangle \times \langle m \rangle = \langle n + m \rangle$.
+
+### 对称幺半包络
+
+设 $\mathcal O$ 是[可扩张代数模式](可扩张代数模式.md), $p\colon \mathcal C \to \mathcal O$ 是[弱 Segal 纤维化](弱Segal纤维化.md). 定义其 $\mathcal O$-**幺半包络** (monoidal envelope) 为
+$$
+\operatorname{Env}_{\mathcal O}(\mathcal C) := \mathcal C \times_{\mathcal O}\operatorname{Act}(\mathcal O) = \{(c\in\mathcal C,\alpha\colon o\leadsto p(c))\}.
+$$
+它构成一个 $\mathcal O$-幺半范畴, 也即 Segal 纤维化 $\operatorname{Env}_{\mathcal O}(\mathcal C)\to \mathcal O$, 对应的函子 $\mathcal O^{\mathrm{op}} \to \mathsf{Cat}$ 为
+$$
+o\mapsto \{o\leadsto p(c)\}.
+$$
+
+特别地, 取 $\mathcal O = \Gamma$, 我们就得到: 对任意对称算畴 $\mathcal C$, 其**对称幺半包络** $\operatorname{Env}_{\Gamma}(\mathcal C)$ 是一个对称幺半范畴 $\Gamma^{\mathrm{op}}\to\mathsf{Cat}$,
+$$
+\langle n\rangle\mapsto \{\langle n \rangle \leadsto p(c)\},
+$$
+其底层范畴为 $\{\langle 1 \rangle \leadsto p(c)\}$.
+

@@ -38,7 +38,7 @@ $$
 
 ### 与 $n$-范畴的联系
 
-$n$-范畴可视为某些方向退化的 $n$ 重范畴.
+[$n$-范畴](∞-n-范畴.md)可视为某些方向退化的 $n$ 重范畴.
 
 ## 例
 
@@ -55,4 +55,25 @@ $$
 
 ### 正交分解系与二重范畴
 
-每个[正交分解系](正交分解系.md)都可视为一个二重范畴, 两类态射分别就是分解系中的两类态射.
+[Branko Juran](JuranFactDCat.md) 证明每个[正交分解系](正交分解系.md)都可视为一个二重范畴, 两类态射分别就是分解系中的两类态射.
+
+来自正交分解系的二重范畴称为**分解二重范畴**.
+
+不妨采取如下约定 (参考 [Blom–Loubaton–Ruit](BlomLoubatonRuitAlgd.md), 其与 [Juran](JuranFactDCat.md) 约定相反): 正交分解系中的**左类**在二重范畴中为**纵向**态射, **右类**为**横向**态射. (相反的约定当然也可以.)
+
+若将二重范畴视为 $\mathsf{Cat}$ 中的[完备 Segal 对象](范畴对象.md) $\mathcal C \colon \Delta^{\mathrm{op}}\to \mathsf{Cat}$, 其中
+
+- $\mathcal C_0$ 的**态射**视为**纵向**态射,
+- $\mathcal C_1$ 的**对象**视为**横向**态射,
+- $\mathcal C_1$ 的**态射**视为方块 (即 $\mathcal C$ 作为双单纯对象时在 $([1],[1])$ 上的元素),
+
+则 $\mathcal C$ 为分解二重范畴当且仅当 "取横向态射的终点" 函子 $t\colon \mathcal C_1 \to \mathcal C_0$ 为[推前纤维化](纤维范畴.md). 这个条件是直观的: 每个图
+$$
+\begin{array}{ccc}
+\bullet & \rightarrow & \bullet \\
+ &  & \downarrow \\
+ &  & \bullet
+\end{array}
+$$
+都能唯一地填充为方块. 这对应着分解系统中 "将错误顺序的复合变为正确顺序的复合" 的操作.
+

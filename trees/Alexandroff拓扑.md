@@ -6,7 +6,7 @@ author: [SimplicialCat](SimplicialCat.md)
 
 ## 定义
 
-预序集上的 **Alexandroff 拓扑**是以其向上封闭子集为开集的拓扑.
+预序集上的 **Alexandroff 拓扑** (又叫**特化拓扑** specialization topology) 是以其向上封闭子集为开集的拓扑.
 
 一个[拓扑空间](拓扑学.md)是 Alexandroff 的当且仅当开集的任意交是开集; 此时其上对应的预序是**特化** (specialization): $x\leq y$ 当且仅当 $x$ 的每个邻域都包含 $y$, 也即 $x\in\overline{\{y\}}$, 此时我们称 $x$ 是 $y$ 的一个特化.
 

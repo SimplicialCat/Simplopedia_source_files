@@ -32,11 +32,11 @@ $$
 
 ### $\mathbb F_p$-概形的 Frobenius 映射
 
-设 $S$ 为 $\mathbb F_p$-概形, 而 $X$ 为 $S$-概形.
+设 $S$ 为 $\mathbb F_p$-概形 (或更一般的 $\mathbb F_q$-概形), 而 $X$ 为 $S$-概形.
 
-定义 $X$ 的**绝对 Frobenius 态射** $F^{\mathrm {ab}}\colon X\to X$ 为其结构层 $\mathcal O_X$ 上的 $p$ 次方映射 $\mathcal O_X\to\mathcal O_X$.
+定义 $X$ 的**绝对 Frobenius 态射** $F^{\mathrm {ab}}\colon X\to X$ 为其结构层 $\mathcal O_X$ 上的 $p$ 次方 ($q$ 次方) 映射 $\mathcal O_X\to\mathcal O_X$.
 
-绝对 Frobenius 态射一般不是 $X$ 作为 $S$-概形的自同态, 因为如下交换图的底边不是恒等态射.
+绝对 Frobenius 态射一般**不是** $X$ 作为 $S$-概形的自同态, 因为如下交换图的底边不是恒等态射.
 $$
 \begin{array}
 	{ccc}
@@ -46,9 +46,22 @@ $$
 \end{array}
 $$
 
-一个特殊情形: 当 $S=\operatorname{Spec}\mathbb F_p$ 时, $F^{\mathrm {ab}}$ 是概形 $S$ 上的恒等态射, 故给出 $X$ 作为 $S$-概形的自同态.
-
 在一般情形, 考虑 $X$ 沿 $F^{\mathrm{ab}}\colon S\to S$ 的基变换 $X^{(p)}=X\times_S S$, 我们就得到 $X$ 作为 $S$-概形的一个自同态, 称为**相对 Frobenius 态射** $F^{\mathrm {rel}}\colon X\to X^{(p)}$.
+
+**例 0**. 当 $S=\operatorname{Spec}k_0$ ($k_0 = \mathbb F_p$ 或 $\mathbb F_q$) 时, $F^{\mathrm {ab}}$ 是概形 $S$ 上的**恒等态射**, 故给出 $X$ 作为 $S$-概形的自同态.
+
+**例 1**. 当 $S = \operatorname{Spec} k$ ($k=\overline{k_0}$) 时, $F^{\mathrm {ab}}$ 是概形 $S$ 的**自同构**. 故 $b\colon X^{(p)}\to X$ 为抽象概形的同构 (但**不是** $S$-概形的同构); 但相对 Frobenius $F^{\mathrm{rel}}\colon X\to X^{(p)}$ 一般不是同构.
+
+**例 1-1**. 当 $X$ 是来自 $k_0$-概形 $X_0$ 的基变换时, 有如下拉回图.
+$$
+\begin{CD}
+X^{(q)} @>{b}>> X @>>> X_0 \\
+@VVV @VVV @VVV \\
+\operatorname{Spec}k @>>> \operatorname{Spec}k @>>> \operatorname{Spec}k_0
+\end{CD}
+$$
+
+**例 1-1-1**. $X = \operatorname{Spec}k[t]$, $X^{(q)} = \operatorname{Spec} k[t]$, 同构 $b\colon X^{(q)}\to X$ 对应 $t\mapsto t$, $c\mapsto c^q$. 而相对 Frobenius $F^{\mathrm{rel}}\colon X\to X^{(q)}$ 对应 $t\mapsto t^q$, $c\mapsto c$, 注意这并非同构, 而像是一个 $q$ 重覆叠.
 
 ### 函子式代数几何中的定义
 
@@ -88,6 +101,10 @@ $\operatorname{Gal}(\overline{\kappa(v)}/\kappa(v))\simeq\widehat {\mathbb{Z}}$ 
 $\mathbb F_p$ 的代数闭包的 Frobenius 同态是[绝对 Galois 群](绝对Galois群.md) $\operatorname{Gal}(\overline{\mathbb F_p}/\mathbb F_p)$ 的拓扑生成元.
 
 设 $k$ 为 $p$ 特征域 (视为 $\mathbb F_p$-代数). 若 $k$ 的 Frobenius 态射 $x\mapsto x^p$ 为同构, 则 $k$ 为[完美域](完美域.md).
+
+### 平展上同调
+
+**命题**. 绝对 Frobenius $F^{\mathrm{ab}}\colon X\to X$ 诱导平展景与常值层平展上同调的**恒等映射** (注意不仅是同构, 而是等于恒等). 进而相对 Frobenius 诱导常值层平展上同调的**同构**.
 
 ## 相关概念
 

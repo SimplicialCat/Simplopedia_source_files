@@ -24,7 +24,9 @@ Joyal 范畴 $\Theta_n$ 的对象是[探测](探测.md) $(\infty,n)$-范畴的�
 - 态射 $[k] (X_1,\cdots,X_k) \to [\ell] (Y_1,\cdots,Y_\ell)$ 包括单纯形的态射 $\phi\colon [k] \to [\ell]$ 以及 $\Theta_{n-1}$ 中的态射 $X_i \to Y_j$ ($\phi(i-1) < j \leq \phi(i)$);
 - 函子 $|{-}|\colon \Theta_n\to\Gamma$ 定义为 $|[k] (X_1,\cdots,X_k)| = \prod_{i=1}^k |X_i|$ (注意 $\Gamma$ 中的积为 $\langle n \rangle \times \langle m \rangle = \langle n+m \rangle$).
 
-直观上, $\Theta_n$ 的对象 $[k] (X_1,\cdots,X_k)$ 是一个[充实](充实范畴.md)于 $\widehat {\Theta_{n-1}}$, 以 $0,1,\cdots,k$ 为对象的范畴, 态射对象为 $\operatorname{Hom}(i-1,i)= X_i$.
+直观上,
+- $\Theta_n$ 的对象 $[k] (X_1,\cdots,X_k)$ 是一个[充实](充实范畴.md)于 $\widehat {\Theta_{n-1}}$, 以 $0,1,\cdots,k$ 为对象的范畴, 态射对象为 $\operatorname{Hom}(i-1,i)= X_i$;
+- 函子 $\Theta_n\to\Gamma$ 指出了每个对象所含有的基本对象的数目, 使得 $\Theta_n$ 构成[积性模式](HADR-cart-patt.md).
 
 如下是 $\Theta_3$ 的一个对象的示意:
 

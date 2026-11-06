@@ -1,0 +1,38 @@
+---
+title: (∞,∞)-范畴
+tag: 百科
+author: [SimplicialCat](SimplicialCat.md)
+---
+
+## 观念
+
+$(\infty,\infty)$-范畴是可有任意高阶不可逆态射的[高阶范畴](高阶范畴.md).
+
+## 定义
+
+在本页面中, $n$-范畴指的是 [$(\infty,n)$-范畴](∞-n-范畴.md).
+注意到 $(n+1)$-范畴可去掉不可逆 $(n+1)$-态射变为 $n$-范畴, 即有 "遗忘" 函子
+$$
+(n+1)\mathsf{Cat} \to n\mathsf{Cat}.
+$$
+于是可定义 $(\infty,\infty)$-范畴的范畴 $\infty \mathsf{Cat}$ 为如下极限:
+$$
+\infty \mathsf{Cat} = \operatorname{lim}_n n\mathsf{Cat}.
+$$
+换言之, 一个 $(\infty,\infty)$-范畴可由一列相容的 $(\infty,n)$-范畴定义.
+
+## 性质
+
+### 纬悬
+
+对于 $(\infty ,\infty )$-范畴 $X$, 其 (非约化) 纬悬 $\Sigma X$ 为 $(\infty ,\infty )$-范畴, 有两个对象 $\bot,\top$, $\operatorname{Hom}_{\Sigma X}(\bot,\top) = X$.
+
+纬悬函子
+$$
+\Sigma \colon \infty \mathsf{Cat} \to \infty \mathsf{Cat}_{**}
+$$
+是
+$$
+\infty \mathsf{Cat}_{**}\to\infty \mathsf{Cat}, (X,x_0,x_1)\mapsto \operatorname{Hom}_X (x_0,x_1)
+$$
+的左伴随.

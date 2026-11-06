@@ -4,7 +4,9 @@ tag: 笔记
 author: [SimplicialCat](SimplicialCat.md)
 ---
 
-[](AyalaFrancisRozenblyumStrat.md)
+参考文献: [](AyalaFrancisRozenblyumStrat.md)
+
+合集: [](mfd-cat.md)
 
 ## 简介
 
@@ -12,7 +14,7 @@ author: [SimplicialCat](SimplicialCat.md)
 $$
 \mathsf{Exit}\colon \mathsf{Strat} \to \mathsf{Cat}.
 $$
-且在本文研究的 "锥光滑分层空间" 的子范畴上, $\mathsf{Exit}$ 为全忠实函子.
+且在本文研究的 "锥光滑分层空间" 的子范畴上, $\mathsf{Exit}$ 为[全忠实函子](全忠实函子.md).
 
 由于上述构造, $\infty$-范畴可以用锥光滑分层空间来[探测](探测.md), 从而视为这种分层空间的范畴上的层. 本文具体给出了一个层构成 $\infty$-范畴须满足的条件, 称之为**条纹层** (striation sheaves), 证明有范畴等价
 $$

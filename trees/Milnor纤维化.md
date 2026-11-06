@@ -8,7 +8,7 @@ author: [SimplicialCat](SimplicialCat.md)
 
 Milnor 纤维化是刻画代数簇奇点 (局部上不是流形的点) 局部的拓扑信息的工具.
 
-孤立奇点的附近长得像某个低一维子流形的锥, 称为 **Milnor 扭结**.
+孤立奇点的附近长得像某个低一维子流形的[锥](锥(拓扑学).md), 称为 **Milnor 扭结**.
 
 有些奇异球面可构造为 Milnor 扭结.
 

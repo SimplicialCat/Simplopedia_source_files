@@ -26,7 +26,7 @@ author: [SimplicialCat](SimplicialCat.md)
 
 记 $\Theta_0$ 为 $\Theta$ 中惰性映射构成的[宽子范畴](宽子范畴.md). 所谓[惰性映射](代数模式.md)是不承载代数运算的映射, 在这里就是指 $\Theta$ 的对象作为[球状集](球状集.md)的含入映射.
 
-一个[融贯子](融贯子.md) $\Theta_0 \to \mathcal C$ 是向 $\Theta_0$ 添加一些活性映射所得的一种[代数模式](代数模式.md), 直观上是指定球状结构中 "态射" 如何 "复合", 满足何种 "结合律" 的方式.
+一个[融贯子](融贯子.md) $\Theta_0 \to \mathcal C$ 是向 $\Theta_0$ 添加一些活性映射所得的一种[代数模式](代数模式.md), 直观上是指定球状结构中 "态射" 如何 "复合", 满足何种 "结合律" 的方式. 代数模式的基本对象为胞腔 $D_0, D_1, D_2,\cdots$. 基本对象与惰性映射构成范畴 $\Theta_{\mathrm{el}}$, [球状集](球状集.md)正是 $\Theta_{\mathrm{el}}$ 上的[预层](预层.md).
 
 定义一个[融贯子](融贯子.md) $\mathcal C$ 的**模型**为其 $\mathsf{Set}$-值 Segal 对象:
 $$
@@ -54,7 +54,7 @@ $$
   - 在这里我们遇到的是**理论**层面的填充不唯一, 而 Kan 复形则面对**模型**层面的填充不唯一;
   - 在我们选定了一个融贯子中的上述填充之后, 它的所有模型立刻获得了明确的填充运算.
 
-## 表现函子
+---
 
 考虑沿[代数模式](代数模式.md) $\mathcal C$ 到终模式 $1$ 的态射的左 Kan 扩张, 即余极限函子
 $$
@@ -62,9 +62,14 @@ L := \operatorname{colim}_{\mathcal C^{\mathrm{op}}}
 \colon \mathsf{Seg}_{\mathcal C}(\mathsf{Ani}) \to \mathsf{Seg}_1(\mathsf{Ani}) = \mathsf{Ani}.
 $$
 
-## 弱等价
-
-对于融贯子 $\mathcal C$, 我们可以手动定义 $\mathsf{Set}$-值模型的范畴 $\mathsf{Mod}(\mathcal C) := \mathsf{Seg}_{\mathcal C} (\mathsf{Set})$ 上的[弱等价](带弱等价的范畴.md) $\mathcal W$.
+限制在 $\mathsf{Set}$-值 Segal 对象的全子范畴, 有函子
+$$
+\mathsf{Mod}(\mathcal C) \to \mathsf{Ani}.\,(\star)
+$$
+要证明同伦假设, 我们手动定义 $\mathsf{Mod}(\mathcal C)$ 上的[弱等价](带弱等价的范畴.md) $\mathcal W$, 然后证明 $(\star)$ 是关于 $\mathcal W$ 的[局部化](局部化(范畴论).md):
+$$
+\mathsf{Mod}(\mathcal C)[\mathcal W^{-1}] \overset{\simeq}{\to} \mathsf{Ani}.
+$$
 
 ### 同伦群
 
@@ -83,7 +88,42 @@ $$
 \pi_r (X,x) := \pi_r (X;e_0^{r-1}(x),e_0^{r-1}(x)).
 $$
 
+容易相信, $\pi_r (X,x)$ 在 $r\geq 1$ 时有群结构.
+
 注意, 同伦集以及其间的映射不依赖于 $\mathcal C$ 中活性运算的具体填充的选取.
 
 **定义**. 令 $\mathcal W$ 为 $\mathsf{Mod}(\mathcal C)$ 中诱导所有 $\pi_0$ 与 $\pi_r (X,x)$ 双射的态射构成的类.
+
+**引理**. 胞腔 $\alpha\colon u\to v$ 给出同伦集的双射
+$$
+\alpha * (-) \colon \pi_r (X;v,w) \to \pi_r (X; u,w).
+$$
+
+**引理**. 对胞腔 $u$ 的顶点 $x$, 有双射 $\pi_r(X;u,u) \simeq\pi_r(X,x)$.
+
+这两个引理的证明对于熟悉拓扑学的人都是直观的. 关键在于为了构造 "除法" 即 $\alpha * (-)$ 的逆运算, 需要
+
+**命题** (弱等价检验). 对于 $\mathsf{Mod}(\mathcal C)$ 中的态射 $f\colon X\to Y$, 如下条件等价.
+
+1. $f\in\mathcal W$.
+2. $f$ 在 $\pi_0$ 上为单射, 且对 $r\geq 1$ 与每对平行胞腔 $u,v$, 给出双射 $\pi_r (X;u,v) \to \pi_r (Y;fu,fv)$.
+3. 对任意 $r\geq 0$, $b\colon \partial D_r \to X$, 以及 $Y$ 中以 $fb$ 为边界的 $r$ 维胞腔 $y$, 都存在 $X$ 中以 $b$ 为边界的 $r$ 维胞腔 $x$ 以及 $Y$ 中的 $(r+1)$ 维胞腔 $fx \to y$.
+
+*证明*. 使用前面两个引理, 证明不难.
+
+称 $X\in\mathsf{Mod}(\mathcal C)$ 可缩是指 $(X\to 1)\in\mathcal W$.
+
+由弱等价检验的第 3 个条件, $X$ 弱可缩当且仅当 $X$ 中任意两个平行胞腔之间都有填充.
+
+**命题**. $\mathcal W$ 满足 "三中之二" 性质, 关于箭头范畴中的[收缩](收缩.md)和[滤余极限](滤余极限.md)封闭. 这使 $(\mathsf{Mod}(\mathcal C),\mathcal W)$ 构成了一个[带弱等价的范畴](带弱等价的范畴.md).
+
+注意, "带弱等价的范畴" 这个概念与[模型范畴](模型范畴.md)**没有**必然联系.
+
+### 基本扩张
+
+考虑模型 $X\in\mathsf{Mod}(\mathcal C)$ 的 $n$ 维胞腔 $D_n \to X$. 定义其**基本扩张**为 $\mathsf{Mod}(\mathcal C)$ 中沿 $s \colon D_n \to D_{n+1}$ 的推出 $X \to X^+$, 也即自由地添加一个平行于 $\alpha$ 的 $n$ 维胞腔 $\beta$, 以一个 $(n+1)$ 维胞腔 $\gamma\colon \alpha\to\beta$ 相连. 当然, 由于模型的代数结构, 还会生成出许许多多的胞腔, 这正是这个概念的复杂所在.
+
+[OpenAI 文章](OAIGHH.md)证明的主定理, 也即 [Simon Henry](HenryAlgModHomTyp.md) 遗留的关键引理是如下定理.
+
+**定理**. 基本扩张是弱等价.
 

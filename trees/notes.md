@@ -15,13 +15,17 @@ author: [SimplicialCat](SimplicialCat.md)
 
 计划中的讲稿 / 笔记:
 
+- [](plus-principle.md)
+- [流形与高阶范畴](mfd-cat.md)
+  - [](notes-manifold-diagrams.md)
+  - [](strat-cat.md)
+- [](notes-topology.md)
 - [](notes-HH.md)
 - [](AT.md)
 - [](notes-perverse.md)
 - [](opecat.md)
 - [](HADR.md)
 - [](br-monodromy.md)
-- [](strat-cat.md)
 - [](higherZar.md)
 - [](geometry-DAGV.md)
 - [](ch-fil.md)

@@ -35,4 +35,18 @@ Grothendieck 拓扑, 又名**覆盖结构** (coverage), 是指定一个范畴上
 
 ## 性质
 
+### 分解系统
+
+
+
+## 例
+
+### 偏序集上的 Grothendieck 拓扑
+
+设 $(P,\leq)$ 为[偏序集](偏序集.md), $P$ 上的 Grothendieck 拓扑是对每个元素 $x\in P$ 指定何时 $\{x_i \leq x\}$ 为覆盖, 且满足稳定性和传递性. 这定义了一个 $0$-意象, 也即[位象](位象.md).
+
+偏序集上一个重要的 Grothendieck 拓扑是[双重否定](双重否定.md) $\neg\neg$ 对应的 Grothendieck 拓扑, 覆盖为稠密族: 子集 $S$ 在元素 $x$ 下稠密是指对任意 $y\leq x$ 都存在 $s\in S$, $s\leq y$.
+
+## 相关概念
+
 - [次典范拓扑](次典范拓扑.md)
