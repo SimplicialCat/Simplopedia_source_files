@@ -88,11 +88,11 @@ $$
 
 弱 Segal 纤维化之间的态射是保持惰性映射的水平提升的态射.
 
-记代数模式 $\mathcal O$ 上的弱 Segal 纤维化的范畴为 $\mathsf{WSegFib}_{\mathcal O}$.
+记代数模式 $\mathcal O$ 上的弱 Segal 纤维化的范畴为 $\mathsf{WSegFib}_{\mathcal O}$. 这是个 $(\infty,2)$-范畴, 其中态射范畴 $\operatorname{Hom}_{\mathsf{WSegFib}_{\mathcal O}}(\mathcal P,\mathcal Q)$ 是函子范畴 $\mathsf{Fun}_{/\mathcal O}(\mathcal P,\mathcal Q)$ 的全子范畴, 即保持惰性映射的那些函子构成的全子范畴.
 
 **命题**. 对于弱 Segal 纤维化 $\mathcal P \to\mathcal O$, 有等价
 $$
-\mathsf{WSegFib}_{\mathcal P} \simeq (\mathsf{WSegFib}_{\mathcal O})_{/P}.
+\mathsf{WSegFib}_{\mathcal P} \simeq (\mathsf{WSegFib}_{\mathcal O})_{/\mathcal P}.
 $$
 
 **命题**. 算畴就是 $\Gamma$ 上的弱 Segal 纤维化:
@@ -126,21 +126,13 @@ $$
 $$
 \mathsf{Alg}_{\mathcal Q / \mathcal O} (\mathcal P) := \operatorname{Hom}_{\mathsf{WSegFib}_{\mathcal O}}(\mathcal Q,\mathcal P).
 $$
+当 $\mathcal O$ 在上下文中无歧义时, 也记之为 $\mathsf{Alg}_{\mathcal Q}(\mathcal P)$.
+注意到 $\mathsf{WSegFib}_{(-)}$ 的自相似性, 这个定义中的 $\mathcal O$ 的角色其实无关紧要 (当然也不能完全忽视, 毕竟至少需要存在这样的两个态射 $\mathcal P\to\mathcal O$, $\mathcal Q\to\mathcal O$).
 
-上述记号有一些常用的特例, 值得特殊的记号.
-
-- ([Lurie HA](LurieHA.md), 2.1.2.7) 当 $\mathcal O = \Gamma$ 时, 记
-  $$
-    \mathsf{Alg}_{\mathcal Q}(\mathcal P) := \operatorname{Hom}_{\mathsf{Operad}}(\mathcal Q,\mathcal P) = \operatorname{Hom}_{\mathsf{WSegFib}_{\Gamma}}(\mathcal Q,\mathcal P).
-  $$
-- 当 $\mathcal Q = \mathcal O$ 时, 记
-  $$
-    \mathsf{Alg}_{/ \mathcal O} (\mathcal P) := \mathsf{Alg}_{\mathcal O / \mathcal O}(\mathcal P) = \operatorname{Hom}_{\mathsf{WSegFib}_{\mathcal O}}(\mathcal O,\mathcal P).
-  $$
-- 当 $\mathcal Q = \mathcal O = \Gamma$ 时, 记
-  $$
-    \mathsf{CAlg}(\mathcal P) := \mathsf{Alg}_{\Gamma /\Gamma}(\mathcal P) = \operatorname{Hom}_{\mathsf{Operad}}(\Gamma,\mathcal P).
-  $$
+**例**. 当 $\mathcal Q = \mathcal O = \Gamma$ 时, 记
+$$
+  \mathsf{CAlg}(\mathcal P) := \mathsf{Alg}_{\Gamma /\Gamma}(\mathcal P) = \operatorname{Hom}_{\mathsf{Operad}}(\Gamma,\mathcal P).
+$$
 
 ### 例子: 算畴在对称幺半范畴中的代数
 
@@ -223,33 +215,39 @@ $$
 $$
 \mathsf{Alg}_{\mathcal O\otimes \mathcal P}(\mathcal C)\simeq\mathsf{Alg}_{\mathcal O}(\mathsf{Alg}_{\mathcal P}(\mathcal C)).
 $$
-为了让上式右端有意义, 我们至少需要一个弱 Segal 纤维化 $\mathsf{Alg}_{\mathcal P}(\mathcal C)\to\mathcal O$. 见下节.
+这里需要小心解释各个对象的类型:
+
+- 若 $\mathcal C$ 为对称幺半范畴, 上式右端中的 $\mathsf{Alg}_{\mathcal P}(\mathcal C)$ 是个对称幺半范畴, 定义代数范畴没有问题.
+- 但若 $\mathcal C$ 只是 $\mathcal O\otimes\mathcal P$ 上的弱 Segal 纤维化, 要让上式右端有意义, 我们至少需要 $\mathsf{Alg}_{\mathcal P}(\mathcal C)$ 是 $\mathcal O$ 上的弱 Segal 纤维化. 在下一节我们将说明这一重要构造.
 
 ## 代数范畴是范畴中的代数
 
-设有弱 Segal 纤维化 $\mathcal C\to\mathcal O\otimes\mathcal P$. 我们要构造一个弱 Segal 纤维化
+**直观**. 
+
+- 高阶代数中的一个重要现象是代数范畴 $\mathsf{Alg}_{\mathcal O}(\mathcal C)$ 本身具有代数结构, 但这种代数结构相比于原来范畴 $\mathcal C$ 的代数结构会减少.
+- 例如 $\mathbb E_{n+m}$-幺半范畴中 $\mathcal C$ 的 $\mathbb E_m$-代数的范畴 $\mathsf{Alg}_{\mathbb E_m}(\mathcal C)$ 是 $\mathbb E_n$-幺半范畴.
+- 直观上, 两个 $\mathbb E_m$-代数 $A,B$ 可以积起来得到 $A\otimes B$, 但不能沿着它们本身的代数结构所用的 $m$ 个方向, 而只能用剩下的 $n$ 个方向.
+- 当 $n=\infty$ 时, 对称幺半范畴中的 $\mathbb E_m$-代数构成对称幺半范畴. "$\infty - m$ 还是 $\infty$."
+
+**构造** ([Lurie HA](LurieHA.md) 3.2.4.1, 推广版本). 作[拉回](拉回.md)
 $$
-\mathsf{Alg}_{\mathcal P / (\mathcal O\otimes\mathcal P)}(\mathcal C)^{\otimes} \to \mathcal O.
+(-)\times\mathcal P\colon \mathsf{WSegFib}_{\mathcal O}\to \mathsf{WSegFib}_{\mathcal O\times\mathcal P}
 $$
-指定如下万有性质:
-对任意范畴 $\mathcal K$, 函子 $\mathcal K \to \mathsf{Alg}_{\mathcal P / (\mathcal O\otimes\mathcal P)}(\mathcal C)^{\otimes}$ 等同于交换图
+的[右伴随](伴随.md), 即[依值积](依值积.md)
 $$
-\begin{array}
-  {ccc}
-\mathcal K\times\mathcal P &\to & \mathcal C \\
- \downarrow & \swarrow  &  \\
-\mathcal O\otimes\mathcal P.\!\! & &
-\end{array}
+\Pi_{\mathcal P}\colon \mathsf{WSegFib}_{\mathcal O\times\mathcal P}\to \mathsf{WSegFib}_{\mathcal O}.
+$$
+设有弱 Segal 纤维化 $\mathcal C\to\mathcal O\times\mathcal P$. 定义
+$$
+\mathsf{Alg}_{\mathcal P}(\mathcal C) := \Pi_{\mathcal P}(\mathcal C)\in\mathsf{WSegFib}_{\mathcal O}.
 $$
 
-特别地,
-$$
-\mathsf{Alg}_{\mathcal O}
-$$
+注意有取值映射即伴随 $(-)\times\mathcal P\dashv\Pi_{\mathcal P}$ 的余单位 $\mathsf{Alg}_{\mathcal P}(\mathcal C)\times\mathcal P\to\mathcal C$.
 
-**命题** ([Lurie HA](LurieHA.md), 3.2.4.3).
-- 若 $\mathcal C\to (\mathcal O\otimes \mathcal P)$ 为 Segal 纤维化, 则 $\mathsf{Alg}_{\mathcal P / (\mathcal O\otimes \mathcal P)}(\mathcal C)^{\otimes} \to \mathcal O$ 为 Segal 纤维化.
+**例**. 设 $\mathcal C\to \mathcal O\otimes\mathcal P$ 为弱 Segal 纤维化. 先将 $\mathcal C$ 拉回到 $\mathcal O \times \mathcal P$ 上再作上述操作, 即得 $\mathcal O$ 上的弱 Segal 纤维化 $\mathsf{Alg}_{\mathcal P}(\mathcal C)\to\mathcal O$.
 
-这也可以表述为
+**例中之例**. 其实 Lurie 的原文 3.2.4.1 更接近于如下例子: $\mathcal C \to\mathcal Q$ 为弱 Segal 纤维化, 同时有算畴的双函子 $\mathcal O\times\mathcal P\to\mathcal Q$. 这便给出算畴态射 $\mathcal O\otimes\mathcal P\to\mathcal Q$, 从而将 $\mathcal C$ 拉回到 $\mathcal O\otimes\mathcal P$ 上. 故这个例子又是上一例的特例.
 
-- 若 $\mathcal C$ 为 $(\mathcal O\otimes \mathcal P)$-幺半范畴, 则 $\mathsf{Alg}_{\mathcal P / (\mathcal O\otimes \mathcal P)}(\mathcal C)$ 为 $\mathcal O$-幺半范畴.
+**命题** ([Lurie HA](LurieHA.md) 3.2.4.3, 推广版本).
+- $\mathsf{Alg}_{\mathcal P}(\mathcal C)$ 中的一个态射为惰性映射, 当且仅当其落在 $\mathcal O$ 中的惰性映射上并且其取值于每个对象 $X\in\mathcal P$ 都给出 $\mathcal C$ 中的惰性映射.
+- 若 $\mathcal C\to \mathcal O\times \mathcal P$ 为 Segal 纤维化, 则 $\mathsf{Alg}_{\mathcal P}(\mathcal C)\to \mathcal O$ 为 Segal 纤维化.
