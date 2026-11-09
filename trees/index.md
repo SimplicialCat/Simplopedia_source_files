@@ -16,7 +16,10 @@ You may also want to visit [my personal main page](https://simplicialcat.github.
 
 欢迎所有读者在页面下方发布[评论](comments.md), 或[通过邮箱联系我](mailto:wangjiny24@mails.tsinghua.edu.cn) `wangjiny24@mails.tsinghua.edu.cn` , 交流, 催更. (对于好友, 通过微信或 QQ 联系我当然是更加欢迎的.)
 
+## 精选
 
+- [](HADR.md)
+- [](mfd-cat.md)
 
 ## 分类
 
@@ -38,6 +41,8 @@ You may also want to visit [my personal main page](https://simplicialcat.github.
 [术语翻译表](terminologies.md)
 
 ## 最近
+
+(这一栏内容是我手动维护的, 而非由程序自动生成.)
 
 [](范畴谱.md)
 

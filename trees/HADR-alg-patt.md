@@ -73,3 +73,4 @@ $$
 ...
 
 不难发现左 Kan 扩张给出的自由的 [Segal 生象](Segal空间.md) $\operatorname{LKE}(X)$ 为[游走](游走.md)的自同态 $\mathbf{B}\mathbb{N}$.
+
