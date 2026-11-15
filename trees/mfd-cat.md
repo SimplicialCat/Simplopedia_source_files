@@ -23,6 +23,8 @@ author: [SimplicialCat](SimplicialCat.md)
 
 ### $(\infty,n)$-范畴的分解同调
 
+- 百科页面: [](分解同调.md)
+- 相关笔记: [](notes-fact.md)
 - 参考文献: [Ayala–Francis–Rozenblyum, Factorization homology I: higher categories](AyalaFrancisRozenblyumI.md)
 
 ### 配边假设与缠结假设

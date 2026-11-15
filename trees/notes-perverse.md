@@ -671,3 +671,15 @@ $$
 设 $X_0$ 为曲线, $L$ 为纯权 $w$ lisse 层. Deligne 证明了 $H^1_c (L)$ 的权 $\leq w+1$.
 
 [-](notes-perverse-summary.md#:embed)
+
+## 第 8 讲 (2026-11-10)
+
+**定理** (IC 对象的纯性). 设 $Y_0\subset X_0$ 为光滑子概形, $\mathcal L_0$ 是 $Y_0$ 上的 lisse 层, 纯权 $w$, 则 $\mathrm{IC}_{X_0}(\mathcal L_0) := i_* j_{!*}(\mathcal L_0 [\dim Y_0])$ 为纯权 $w+d$ 层.
+
+
+引理. $K_0\leq w$, $L_0\geq w'$, 则
+$$
+\mathcal {Ext}(K,L)\geq w' - w.
+$$
+
+- $\mathbb D (K_0\otimes \mathbb D L_0) \geq w' - w$.

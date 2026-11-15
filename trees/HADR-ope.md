@@ -229,20 +229,29 @@ $$
 - 直观上, 两个 $\mathbb E_m$-代数 $A,B$ 可以积起来得到 $A\otimes B$, 但不能沿着它们本身的代数结构所用的 $m$ 个方向, 而只能用剩下的 $n$ 个方向.
 - 当 $n=\infty$ 时, 对称幺半范畴中的 $\mathbb E_m$-代数构成对称幺半范畴. "$\infty - m$ 还是 $\infty$."
 
-**构造** ([Lurie HA](LurieHA.md) 3.2.4.1, 推广版本). 作[拉回](拉回.md)
+下面的构造几乎完全是软的, 只用到抽象废话.
+
+**构造** ([Lurie HA](LurieHA.md) 3.2.4.1, 推广版本). 考虑代数模式的投影 $p\colon \mathcal O\times\mathcal P\to\mathcal O$. 考虑[拉回](拉回.md)
 $$
-(-)\times\mathcal P\colon \mathsf{WSegFib}_{\mathcal O}\to \mathsf{WSegFib}_{\mathcal O\times\mathcal P}
+p^*\colon \mathsf{WSegFib}_{\mathcal O}\to \mathsf{WSegFib}_{\mathcal O\times\mathcal P},
 $$
-的[右伴随](伴随.md), 即[依值积](依值积.md)
+$p^*(X)$ 是 $X\times\mathcal P$ 的局部化 (自由地变为弱 Segal 纤维化);
+作拉回的[右伴随](伴随.md), 即[依值积](依值积.md)
 $$
-\Pi_{\mathcal P}\colon \mathsf{WSegFib}_{\mathcal O\times\mathcal P}\to \mathsf{WSegFib}_{\mathcal O}.
+p_*\colon \mathsf{WSegFib}_{\mathcal O\times\mathcal P}\to \mathsf{WSegFib}_{\mathcal O}.
 $$
 设有弱 Segal 纤维化 $\mathcal C\to\mathcal O\times\mathcal P$. 定义
 $$
-\mathsf{Alg}_{\mathcal P}(\mathcal C) := \Pi_{\mathcal P}(\mathcal C)\in\mathsf{WSegFib}_{\mathcal O}.
+\mathsf{Alg}_{\mathcal P}(\mathcal C) := p_*(\mathcal C)\in\mathsf{WSegFib}_{\mathcal O}.
 $$
 
-注意有取值映射即伴随 $(-)\times\mathcal P\dashv\Pi_{\mathcal P}$ 的余单位 $\mathsf{Alg}_{\mathcal P}(\mathcal C)\times\mathcal P\to\mathcal C$.
+注意有取值映射 $\mathsf{Alg}_{\mathcal P}(\mathcal C)\times\mathcal P\to\mathcal C$,
+来自伴随 $p^*\dashv p_*$ 的余单位.
+
+由构造直接可得
+$$
+\mathsf{Alg}_{\mathcal O}(\mathsf{Alg}_{\mathcal P}(\mathcal C))=\operatorname{Hom}(\mathcal O,p_*\mathcal C)=\operatorname{Hom}(p^*\mathcal O,\mathcal C)=\mathsf{Alg}_{\mathcal O\times \mathcal P}(\mathcal C).
+$$
 
 **例**. 设 $\mathcal C\to \mathcal O\otimes\mathcal P$ 为弱 Segal 纤维化. 先将 $\mathcal C$ 拉回到 $\mathcal O \times \mathcal P$ 上再作上述操作, 即得 $\mathcal O$ 上的弱 Segal 纤维化 $\mathsf{Alg}_{\mathcal P}(\mathcal C)\to\mathcal O$.
 
@@ -251,3 +260,4 @@ $$
 **命题** ([Lurie HA](LurieHA.md) 3.2.4.3, 推广版本).
 - $\mathsf{Alg}_{\mathcal P}(\mathcal C)$ 中的一个态射为惰性映射, 当且仅当其落在 $\mathcal O$ 中的惰性映射上并且其取值于每个对象 $X\in\mathcal P$ 都给出 $\mathcal C$ 中的惰性映射.
 - 若 $\mathcal C\to \mathcal O\times \mathcal P$ 为 Segal 纤维化, 则 $\mathsf{Alg}_{\mathcal P}(\mathcal C)\to \mathcal O$ 为 Segal 纤维化.
+

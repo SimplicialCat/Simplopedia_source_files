@@ -14,6 +14,10 @@ author: [SimplicialCat](SimplicialCat.md)
 
 Lie 代数的理论是一种 [Lawvere 理论](Lawvere理论.md).
 
+### 群的 Lie 代数
+
+todo
+
 ### 通过算畴
 
 Lie 代数是 [Lie 算畴](Lie算畴.md)上的代数.

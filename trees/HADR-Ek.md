@@ -1,8 +1,10 @@
 ---
-title: HADR - Ek
+title: HADR - E_k 的基本概念
 tag: 讲稿
 author: [SimplicialCat](SimplicialCat.md)
 ---
+
+### 算畴 $\mathbb E_k$
 
 固定一个自然数 $k$, 记 $\square^k = (-1,1)^k$ 为 $k$ 维开方块. 开方块之间的**平直嵌入** (rectilinear embedding) 是形如 $(x_1,\cdots,x_k)\mapsto (a_1x_1+b_1,\cdots)$ ($a_i > 0$) 的嵌入. 对于有限集 $S$ 与嵌入 $f\colon \square^k\times S\to \square^k$, 若 $f$ 在每个分支上为平直嵌入, 也称 $f$ 为平直嵌入.
 
@@ -33,3 +35,35 @@ $$
 **断言**. 上述函子为等价.
 
 这个断言的内容基本上就是 Dunn–Lurie 加性定理.
+
+### 算畴 $\mathbb E_k$ 之间的关系; $k\to\infty$ 的余极限
+
+**命题** ([Lurie HA](LurieHA.md), 5.1.1.4). 映射
+$$
+\operatorname{Hom}_{\mathbb E_k}(\langle m \rangle,\langle n\rangle)\to\operatorname{Hom}_{\Gamma}(\langle m \rangle,\langle n\rangle)
+$$
+是 $(k-2)$-[连通](连通性.md)映射, 也即其每个点处的纤维是 $(k-2)$-[连通](连通性.md)生象.
+如果我们将连通度高的映射视为两个生象 "接近" 的证据, 那么上述命题告诉我们当 $k$ 较大时, $\mathbb E_k$ 接近于 $\Gamma$.
+
+**例**. 考虑活性映射 $f\colon \langle 1\rangle\to\langle 2\rangle$, 有 $\operatorname{Hom}_{\mathbb E_k}^f(\langle 1\rangle,\langle 2\rangle)\simeq S^{k-1}$.
+
+直观上, 当背景 $\mathbb{R}^k$ 维数越来越大时, 其中的子流形有越来越多的活动空间, 任何不平凡的高阶同伦都会在背景维数更高时变得平凡.
+
+考虑算畴态射 $\mathbb E_k\to\mathbb E_{k+1}$, 在拓扑空间的层面上将所有态射乘以一个区间.
+
+**推论**. 算畴序列
+$$
+\mathbb E_0 \to \mathbb E_1 \to \mathbb E_2 \to \cdots
+$$
+的余极限为 $\Gamma$. 特别地, 对任意自然数 $k$, [交换代数](交换代数.md)可遗忘为 [$\mathbb E_k$-代数](En-代数.md).
+
+**记号**. 记 $\mathbb E_{\infty} := \Gamma$.
+
+前述关于 $\mathbb E_k$ 的连通性的命题还有如下推论 (本质上是连通性[左正交](正交分解系.md)于截断性):
+
+**推论** (5.1.1.7). 若 $\mathcal C$ 为对称幺半 $(n,1)$-范畴, 则当 $k\geq n+1$ 时, 遗忘函子
+$$
+\mathsf{CAlg}(\mathcal C) \to \mathsf{Alg}_{\mathbb E_k}(\mathcal C)
+$$
+为等价.
+

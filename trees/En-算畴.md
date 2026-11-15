@@ -8,6 +8,8 @@ author: [SimplicialCat](SimplicialCat.md)
 
 $\mathbb E_n$ 是表达 $n$ 维[构形](构形空间.md)上的结合运算的[算畴](算畴.md).
 
+相关讲义: [](HADR-Ek.md)
+
 ## 定义
 
 

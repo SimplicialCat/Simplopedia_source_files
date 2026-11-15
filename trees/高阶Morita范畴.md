@@ -24,7 +24,7 @@ $$
 
 ### 分解同调与拓扑场论
 
-对称幺半 $(\infty ,1)$-范畴 $\mathcal C$ 中的 [$\mathbb E_n$-代数](En-代数.md) $A$ 给出一个取值于 Morita 范畴 $\mathsf{Morita}_{n}(\mathcal C)$ 的 $n$ 维[拓扑场论](拓扑场论.md) $\mathsf{Bord}_n^{\mathrm{fr}} \to \mathsf{Morita}_{n}(\mathcal C)$. 对于自然数 $0\leq k\leq n$, 该函子将 $\mathsf{Bord}_n^{\mathrm{fr}}$ 中的 $k$-态射 ($k$ 维标架配边) $M$ 对应到[分解同调](分解同调.md)
+对称幺半 $(\infty ,1)$-范畴 $\mathcal C$ 中的 [$\mathbb E_n$-代数](En-代数.md) $A$ 给出一个取值于 Morita 范畴 $\mathsf{Morita}_{n}(\mathcal C)$ 的 $n$ 维[拓扑场论](拓扑场论.md) $\mathsf{Bord}_n^{\mathrm{fr}} \to \mathsf{Morita}_{n}(\mathcal C)$. 对于自然数 $0\leq k\leq n$, 该函子将 $\mathsf{Bord}_n^{\mathrm{fr}}$ 中的 $k$-态射 ($k$ 维[标架配边](标架配边.md)) $M$ 对应到[分解同调](分解同调.md)
 $$
 M \mapsto \int_{M\times\mathbb{R}^{n-k}}A.
 $$
