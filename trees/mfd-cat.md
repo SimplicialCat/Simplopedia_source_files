@@ -19,11 +19,12 @@ author: [SimplicialCat](SimplicialCat.md)
 
 - 百科页面: [分层](分层.md)
 - 相关笔记: [分层空间与范畴](strat-cat.md)
-- 参考文献: [Ayala–Francis–Rozenblyum, A stratified homotopy hypothesis](AyalaFrancisRozenblyumStrat.md)
+- 参考文献:
+  - [Ayala–Francis–Tanaka, Local structures on stratified spaces](AyalaFrancisTanaka.md)
+  - [Ayala–Francis–Rozenblyum, A stratified homotopy hypothesis](AyalaFrancisRozenblyumStrat.md)
 
 ### $(\infty,n)$-范畴的分解同调
 
-- 百科页面: [](分解同调.md)
 - 相关笔记: [](notes-fact.md)
 - 参考文献: [Ayala–Francis–Rozenblyum, Factorization homology I: higher categories](AyalaFrancisRozenblyumI.md)
 

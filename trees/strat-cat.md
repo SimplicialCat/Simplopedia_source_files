@@ -4,9 +4,14 @@ tag: 笔记
 author: [SimplicialCat](SimplicialCat.md)
 ---
 
-参考文献: [](AyalaFrancisRozenblyumStrat.md)
+参考文献:
+
+- [](AyalaFrancisTanaka.md)
+- [](AyalaFrancisRozenblyumStrat.md)
 
 合集: [](mfd-cat.md)
+
+下一集: [](notes-fact.md)
 
 ## 简介
 
@@ -26,7 +31,7 @@ $$
 $$
 换言之, 条纹层提供了 $\infty$-范畴的一个[模型](无穷范畴的模型.md), 其特点在于方便通过几何来构造一些通过单纯集等模型难以企及的无穷范畴. 无穷范畴的反转态射的对称性在这种模型中体现为 Poincaré 对偶.
 
-## 锥光滑分层空间
+## 1 锥光滑分层空间
 
 定义 $C^0$ 分层空间为如下操作生成的最小类:
 
@@ -54,3 +59,31 @@ $$
 
 - 在 $\mathbb R^i \times C(Y)$ 的锥点之外的部分, 光滑性通过 $Y$ 的各个坐标卡归纳定义. (因为 $Y$ 的深度较小, 可以假设光滑性已经定义好了.)
 - 考虑 $\mathbb R^i \times C(Y)$ 的锥点, 注意锥点未必打到锥点, 但是若不打到锥点则光滑性可由上一款定义, 故在此假设锥点打到锥点.
+
+## 2 可构造层
+
+### 2.4 范畴 $\mathsf{Strat}$
+
+### 2.5 几类特殊余极限
+
+
+#### 2.5.1 开覆盖与爆破
+
+$$
+\begin{CD}
+L @>>> L\times \left[0,1\right) \\
+@VVV @VVV \\
+\{0\} @>>> C(L)
+\end{CD}
+$$
+
+**命题**. 对于锥光滑分层空间 $X$ 的最底层 $X_d\subset X$, 方块
+$$
+\begin{CD}
+\operatorname{Link}_{X_d}(X) @>>> \operatorname{Unzip}_{X_d}(X) \\
+@VVV @VVV \\
+X_d @>>> X
+\end{CD}
+$$
+为 $\mathsf{Strat}$ 中的推出方块, 称之为**爆破** (blow-up).
+
