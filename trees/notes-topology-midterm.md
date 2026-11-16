@@ -1,0 +1,26 @@
+---
+title: 拓扑学 2026 秋助教讲稿 - 期中
+tag: 讲稿
+author: [SimplicialCat](SimplicialCat.md)
+---
+
+**Question**. Construct a metric on $\mathbb{R}$ which induces the usual topology, such that the completion adds exactly three points.
+
+**Solution**. Let me tell a story to answer this question.
+
+Suppose in a country where highways connect all places, and traveling along highways costs money proportional to distance. This is the metric space we have in mind.
+
+People are not satisfied with the high cost of traveling, and wanted to build airports and create airlines between them. They decided to make the flights very very cheap, so that one can travel very far with only a finite amount of money.
+
+The cost between two places is defined to be the minimal cost of all routes between them. For example, one may drive their car to a near airport, take a flight, and then take a taxi to their destination. Sometimes this is cheaper than driving all the way. But one thing still holds: the cost from any place $X$ to $Y$ plus the cost from $Y$ to $Z$ cannot be less than that from $X$ to $Z$; because all routes are taken into account. This defines a metric less or equal to the original one.
+
+However, a flight is still not free; if you are too poor, you still cannot take airplanes. In a poor guy's perspective, traveling has not changed at all. This tells us that the topology induced by the metric is still the usual topology.
+
+Suppose the airlines are run by several independent companies. No two companies use the same airport. Each company owns an infinite sequence of airports, and one may travel along the sequence using only a finite amount of money. This gives us a Cauchy sequence for each company.
+
+This is how we construct a new metric whose completion adds any given amount of points.
+
+An explicit construction:
+$$
+d(x,y) = \operatorname{min}_{n,m\in\mathbb{N},i\in\{0,1,2\}} \{|x-y|, |x-(3n+i)| + 2^{-\operatorname{min}(n,m)} + |(3m+i) - y|\}.
+$$

@@ -60,15 +60,23 @@ $$
 - 在 $\mathbb R^i \times C(Y)$ 的锥点之外的部分, 光滑性通过 $Y$ 的各个坐标卡归纳定义. (因为 $Y$ 的深度较小, 可以假设光滑性已经定义好了.)
 - 考虑 $\mathbb R^i \times C(Y)$ 的锥点, 注意锥点未必打到锥点, 但是若不打到锥点则光滑性可由上一款定义, 故在此假设锥点打到锥点.
 
+注意光滑映射可以把低维数部分打到高维数部分.
+
 ## 2 可构造层
 
 ### 2.4 范畴 $\mathsf{Strat}$
 
+分层空间的范畴 $\mathsf{Strat}$ 一开始是 $(1,1)$-范畴, 但实际上它可[充实](充实范畴.md)于[生象](Ani.md), 即构成 $(\infty,1)$-范畴. 它可由如下的 Kan 复形充实结构 $\underline{\operatorname{Hom}}_{\mathsf{Strat}}$ 定义:
+$$
+\underline{\operatorname{Hom}}_{\mathsf{Strat}}(X,Y)[n] :=\operatorname{Hom}_{\mathsf{Strat}_{/\Delta^n}}(X\times\Delta^n, Y\times\Delta^n).
+$$
+它还有一个性质: $(\infty,1)$-范畴版本的 $\mathsf{Strat}$ 是 $(1,1)$-范畴版本关于所有投影 $X\times\mathbb{R}\to X$ 的[局部化](局部化(范畴论).md). 我们将主要使用 $(\infty,1)$-范畴版本, 除非特殊说明.
+
 ### 2.5 几类特殊余极限
 
+#### 爆破
 
-#### 2.5.1 开覆盖与爆破
-
+我们心目中的基本图像是, 开锥 $C(L)$ 是由 $L\times \left[0,1\right)$ 将 $L\times\{0\}$ 粘成一点所得. 这也可以想象为对锥点作 "奇点消解", 又称为**爆破** (blow-up), 得到一个以 $L$ 为边界的分层空间.
 $$
 \begin{CD}
 L @>>> L\times \left[0,1\right) \\
@@ -77,7 +85,31 @@ L @>>> L\times \left[0,1\right) \\
 \end{CD}
 $$
 
-**命题**. 对于锥光滑分层空间 $X$ 的最底层 $X_d\subset X$, 方块
+对于一般的分层空间 $X$, 从最底层逐层往上重复爆破 (每次都消解最底层的奇点), 可得一个**拉开** (unzip) 映射
+$$
+\operatorname{Unzip}(X) \to X.
+$$
+这个操作像是拉开拉链:
+<img src="/assets/strat-unzip.svg" alt="" width="450" style="display:block; margin:auto;">
+
+一般地, 有如下结论.
+
+**命题-定义** (拉开, 链环). 对于分层空间的闭嵌入 $Y\hookrightarrow X$ 可作 $\operatorname{Unzip}_Y(X) \to X$, 且存在唯一的交换图
+$$
+\begin{CD}
+\operatorname{Link}_Y (X) @>>> \operatorname{Unzip}_Y (X) \\
+@VVV @VVV \\
+Y @>>> X,
+\end{CD}
+$$
+使得
+
+- 该方块同时为拉回和推出方块;
+- 每个态射均为紧合弱可构造层 (即在每个分层内局部平凡);
+- $\operatorname{Link}_Y (X) \to\operatorname{Unzip}_Y (X)$ 为 $\operatorname{Unzip}_Y (X)$ 的闭面的嵌入, 称之为 $Y$ 在 $X$ 中的**链环** (link);
+- $\operatorname{Unzip}_Y (X) \to X$ 在 $X\setminus Y$ 上为同构.
+
+**推论**. 对于锥光滑分层空间 $X$ 的最底层 $X_d\subset X$, 方块
 $$
 \begin{CD}
 \operatorname{Link}_{X_d}(X) @>>> \operatorname{Unzip}_{X_d}(X) \\
@@ -85,5 +117,34 @@ $$
 X_d @>>> X
 \end{CD}
 $$
-为 $\mathsf{Strat}$ 中的推出方块, 称之为**爆破** (blow-up).
+为 $\mathsf{Strat}$ 中的[推出](推出.md)方块.
+
+#### 迭代锥
+
+记 $\overline{C}(L)$ 为闭锥 $L\times [0,1] / L \times \{0\}$.
+
+**命题**. 对分层空间 $L$, 下图为 $(\infty,1)$-范畴 $\mathsf{Strat}$ 中的推出方块:
+$$
+\begin{CD}
+{*} = \overline{C}(\varnothing) @>>> \overline{C} (L) \\
+@VVV @VVV \\
+[0,1] = \overline{C}^2 (\varnothing) @>>> \overline{C} ^2 (L).
+\end{CD}
+$$
+注意这个图在 $(1,1)$-范畴版本的 $\mathsf{Strat}$ 中不是推出, 在局部化后才是推出.
+
+## 3 出路范畴
+
+**命题**.
+"出路范畴" 函子
+$$
+\mathsf{Exit}\colon \mathsf{Strat}\hookrightarrow \mathsf{sAni},\, X\mapsto ([n]\mapsto\operatorname{Hom}_{\mathsf{Strat}}(\Delta^n, X))
+$$
+是[全忠实函子](全忠实函子.md), 且其像落在范畴 (即[完备 Segal 生象](范畴对象.md)) 的范畴 $\mathsf{Cat}\hookrightarrow\mathsf{sAni}$ 中.
+
+**命题**. 函子 $\mathsf{Exit}\colon \mathsf{Strat}\hookrightarrow\mathsf{Cat}$ 保持上节所述的 "拉开" 以及 "迭代锥" 几种推出方块.
+
+
+
+## 4 条纹层
 

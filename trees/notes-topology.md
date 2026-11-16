@@ -5,3 +5,5 @@ author: [SimplicialCat](SimplicialCat.md)
 ---
 
 [](notes-topology-1.md)
+
+[](notes-topology-midterm.md)

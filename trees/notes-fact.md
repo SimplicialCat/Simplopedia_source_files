@@ -20,8 +20,9 @@ author: [SimplicialCat](SimplicialCat.md)
 
 - 分层空间被形如 $\mathbb{R}^i \times \mathbb{R}_{\geq 0}^j \times C(Z)$ 的基本开集 (又叫**奇点类型**) 覆盖, 其中 $Z$ 是更低维的分层空间;
 - 分层空间的态射 $f\colon C(X)\to C(Y)$ (锥点为单独一层, 锥点打到锥点) 给出链环之间的 "切映射" $Df \colon X \to Y$.
+- 事实上 (后面将介绍), 分层空间的 $(\infty,1)$-范畴 $\mathsf{Strat}$ 通过[出路范畴](出路范畴.md)函子 $\mathsf{Exit}\colon \mathsf{Strat}\to\mathsf{Cat}$ [全忠实](全忠实函子.md)地嵌入范畴的范畴, 从而分层空间的态射 $X\to Y$ 等同于其出路范畴之间的函子 $\mathsf{Exit}(X)\to\mathsf{Exit}(Y)$.
 
-光滑流形范畴是分层空间范畴的全子范畴
+光滑流形的 $(1,1)$-范畴是分层空间范畴的全子范畴
 $$
 \mathsf{Mfd}\hookrightarrow\mathsf{Strat}.
 $$
@@ -50,24 +51,124 @@ $$
 
 ### 1.2 出路范畴
 
-
+**命题**.
 "出路范畴" 函子
 $$
-\mathsf{Exit}\colon \mathsf{Strat}\to \mathsf{sAni},\, X\mapsto ([n]\mapsto\operatorname{Hom}_{\mathsf{Strat}}(\Delta^n, X))
+\mathsf{Exit}\colon \mathsf{Strat}\hookrightarrow \mathsf{sAni},\, X\mapsto ([n]\mapsto\operatorname{Hom}_{\mathsf{Strat}}(\Delta^n, X))
 $$
-的像落在范畴的范畴 $\mathsf{Cat}\hookrightarrow\mathsf{sAni}$ 中.
-
+是[全忠实函子](全忠实函子.md), 且其像落在范畴 (即[完备 Segal 生象](范畴对象.md)) 的范畴 $\mathsf{Cat}\hookrightarrow\mathsf{sAni}$ 中.
 
 
 ### 1.3 条纹层
 
-由出路范畴函子 $\mathsf{Exit}\colon \mathsf{Strat} \to \mathsf{Cat}$, 我们又可将范畴变为 $\mathsf{Strat}$ 上的预层. 我们甚至可以写出判断这样一个预层何时来自范畴的条件.
+回忆 $\mathsf{Strat}$ 有如下的余极限, 称为**特殊余极限**:
 
+- 开覆盖;
+- 爆破 (详见[上一集](strat-cat.md));
+- 迭代锥 (详见[上一集](strat-cat.md));
+- [泛等性](泛等性.md)
 
+$$
+\begin{array}{ccc}
+\Delta^{ \{0 < 2\}} + \Delta^{ \{1 < 3\}} & \rightarrow & \Delta^{\{0 < 1 < 2 < 3\}} \\
+\downarrow &  & \downarrow \\
+{*} + {*} & \rightarrow & {*}.
+\end{array}
+$$
+
+由出路范畴函子 $\mathsf{Exit}\colon \mathsf{Strat} \hookrightarrow \mathsf{Cat}$, 我们又可将范畴变为 $\mathsf{Strat}$ 上的预层. 我们甚至可以写出判断这样一个预层何时来自范畴的条件.
+
+**定义**. **条纹层** (striation sheaf) 的范畴
+$$
+\mathsf{Stri}\hookrightarrow \mathsf{Psh}(\mathsf{Strat})
+$$
+是 $\mathsf{Strat}$ 上将前述 "特殊余极限" 变为极限图的预层构成的全子范畴.
+
+当然, 条纹层不构成意象; 事实上这个 "层条件" 不构成 Grothendieck 拓扑. (毕竟 $\mathsf{Stri} \simeq \mathsf{Cat}$ 而 $\mathsf{Cat}$ 不是 $(\infty,1)$-意象.)
+
+**定理**. 出路范畴函子 $\mathsf{Exit}\colon \mathsf{Strat}\to \mathsf{Cat}$ 对应的[脉](脉.md)函子 $\mathsf{Cat}\to\mathsf{Psh}(\mathsf{Strat})$ 将 $\mathsf{Cat}$ 等同于全子范畴 $\mathsf{Stri}$.
+
+**定义**. 通过[分类空间](分类空间.md)的观念, 我们定义如下条纹层, 从而定义相应的范畴:
+
+- $\mathsf{Bun}$ 分类可构造丛, 即 $\mathsf{Bun}(K)$ 是 $K\times\Delta^\bullet$ 上的可构造丛集合构成的 Kan 复形表现的生象;
+- $\mathsf{cBun}$ 分类紧合可构造丛;
+- $\mathsf{Exit}$ 分类带一个截面的可构造丛.
+
+直观上, 两个范畴 $\mathsf{Bun}$, $\mathsf{Exit}$ 可描述如下:
+
+- $\mathsf{Bun}$ 的对象是分层空间, 态射是 $\Delta^1$ 上的可构造丛 (注意, 态射不仅是分层空间之间的态射, 还包含了 "活性配边", 参见[流形图的笔记](notes-manifold-diagrams.md));
+- $\mathsf{Exit}$ 的对象是分层空间带一个指定的点, 态射是 $\Delta^1$ 上的可构造丛带一个截面;
+
+**命题**. 每个可构造丛 $X\to K$ 给出函子 $\mathsf{Exit}(K) \to\mathsf{Bun}$ 以及 $\mathsf{Exit}(X)\to\mathsf{Exit}$; 有拉回图
+$$
+\begin{array}{ccc}
+\mathsf{Exit}(X) & \rightarrow & \mathsf{Exit} \\
+\downarrow &  & \downarrow \\
+\mathsf{Exit}(K) & \rightarrow & \mathsf{Bun}.
+\end{array}
+$$
+
+特别地, $K = {*}$ 时, 我们知道 $\mathsf{Exit}(X)$ 就是 $\mathsf{Exit}\to\mathsf{Bun}$ 在对象 $X\in\mathsf{Bun}$ 处的纤维.
 
 ## 2 切结构
 
+### 2.1 切丛
 
+记 $\mathsf{Vect}^{\mathrm{inj}}$ 为实线性空间, 线性单射以及线性单射中的同伦构成的 $(\infty,1)$-范畴. 其中 $\operatorname{Hom}(\mathbb{R}^i,\mathbb{R}^j)\simeq\mathrm{O}(j) / \mathrm{O}(j-i)$.
+
+每个分层空间都给出一个函子
+$$
+T_X\colon \mathsf{Exit}(X) \to \mathsf{Vect}^{\mathrm{inj}},
+$$
+称为其**切丛**. 事实上该构造关于 $X$ 有很好的函子性, 以至于可以写成 "万有出路范畴" 出发的函子
+$$
+T\colon \mathsf{Exit} \to \mathsf{Vect}^{\mathrm{inj}}.
+$$
+
+### 2.2 标架
+
+**定义**. 一种**切结构**是一个函子
+$$
+\mathcal B \to \mathsf{Vect}^{\mathrm{inj}}.
+$$
+我们常将其简记为 $\mathcal B$.
+
+**定义**. 设 $X$ 为分层空间, $\mathcal B$ 为切结构. 定义 $X$ 上的 $\mathcal B$-结构为提升
+$$
+\begin{array}{ccc}
+ &  & \mathcal B \\
+ & \nearrow & \downarrow \\
+\mathsf{Exit}(X) & \underset{T_X}{\rightarrow} & \mathsf{Vect}^{\mathrm{inj}}.
+\end{array}
+$$
+定义 $\mathcal B$-分层空间的范畴为
+$$
+\mathsf{Bun}^{\mathcal B} = \pi_* T^* \mathcal B \to \mathsf{Bun},
+$$
+其中 $\pi_*$ 表示沿 $\pi \colon \mathsf{Exit}\to\mathsf{Bun}$ 的[依值积](依值积.md).
+
+**定义**. **变标架切结构** (vari-framing) 是函子
+$$
+\mathrm{vfr}\colon \mathbb{N}\to\mathsf{Vect}^{\mathrm{inj}},\,i\mapsto\mathbb{R}^i.
+$$
+这里 "变" (vari-) 意指跨分层时切丛维数改变.
+另外, 对于自然数 $n$, 定义 $n$-变标架切结构为其限制
+$$
+\mathrm{vfr}_n\colon [n]\to\mathsf{Vect}^{\mathrm{inj}},\,i\mapsto\mathbb{R}^i.
+$$
+
+**例**. 考虑闭圆盘 $D^n$, 其边界划分为两个 $n-1$ 维圆盘, 递归向下. 它上面有一个 $n$-变标架切结构. 这可以理解为从 $*$ 反复作纬悬 $X\mapsto SX$ 得到.
+
+**定义**. 变标架分层 $n$-流形的范畴为
+$$
+\mathsf{Mfd}_n^{\mathrm{vfr}} := \mathsf{Bun}^{\mathrm{vfr}_n}.
+$$
+
+## 3 圆盘
+
+### 3.5
+
+定义范畴 $\mathsf{cDisk}_n^{\mathrm{vfr}}$, 其对象简单地说就是由有限个圆盘粘起来的图案.
 
 ### 3.8 胞腔几何实现
 
